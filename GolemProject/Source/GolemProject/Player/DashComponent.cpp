@@ -2,6 +2,7 @@
 
 
 #include "DashComponent.h"
+#include <Engine/Engine.h>
 #include "GolemProjectCharacter.h"
 
 // Sets default values for this component's properties
@@ -36,7 +37,8 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDashComponent::Dash()
 {
-	if (m_character)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
+	if (m_character != nullptr)
 	{
 		m_character->LaunchCharacter(velocityDash, true, true);
 	}

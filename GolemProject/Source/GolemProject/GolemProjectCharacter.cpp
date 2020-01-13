@@ -8,6 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/DashComponent.h"
+#include <Engine/Engine.h>
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -43,6 +45,8 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	dashComponent = Cast<UDashComponent>(GetComponentByClass(UDashComponent::StaticClass()));
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -56,6 +60,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AGolemProjectCharacter::Dash);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGolemProjectCharacter::MoveRight);
@@ -74,6 +80,15 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGolemProjectCharacter::OnResetVR);
+}
+
+void AGolemProjectCharacter::Dash()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("tamer!"));
+	if (dashComponent != nullptr)
+	{
+		dashComponent->Dash();
+	}
 }
 
 
