@@ -2,7 +2,7 @@
 
 
 #include "GrappleComponent.h"
-
+#include "Engine/World.h"
 // Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
 {
@@ -19,16 +19,23 @@ void UGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AActor* owner = GetOwner();
+	if (owner)
+	{
+		mPawn = Cast<APawn>(owner);
+	}
 	// ...
-	
 }
 
+
+void UGrappleComponent::GoToDestination(FVector destination)
+{
+	mPawn->LaunchPawn(launchVelocity, true, true);
+}
 
 // Called every frame
 void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
