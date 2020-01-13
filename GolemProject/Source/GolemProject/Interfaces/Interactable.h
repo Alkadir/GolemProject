@@ -21,6 +21,6 @@ class GOLEMPROJECT_API IInteractable
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Interactable")
-		bool Interact(AActor* caller) const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
+		bool Interact(const AActor* caller) const;
 };
