@@ -8,7 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
-
+#include "Player/GrappleComponent.h"
+#include "GameFramework/PlayerController.h"
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
 
@@ -79,13 +80,26 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGolemProjectCharacter::OnResetVR);
 }
 
+void AGolemProjectCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	mGrapple = FindComponentByClass<UGrappleComponent>();
+
+	APlayerController* pc = Cast<APlayerController>(GetController());
+
+	if (pc)
+	{
+		pc->bShowMouseCursor = showCursor;
+	}
+}
+
 
 void AGolemProjectCharacter::Fire()
 {
-	/*if (mGrapple)
+	if (mGrapple)
 	{
 		mGrapple->GoToDestination();
-	}*/
+	}
 }
 
 void AGolemProjectCharacter::OnResetVR()
@@ -95,12 +109,12 @@ void AGolemProjectCharacter::OnResetVR()
 
 void AGolemProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void AGolemProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
 }
 
 void AGolemProjectCharacter::TurnAtRate(float Rate)
@@ -131,12 +145,12 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
