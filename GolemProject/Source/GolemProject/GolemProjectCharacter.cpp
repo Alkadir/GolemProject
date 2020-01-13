@@ -82,10 +82,10 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AGolemProjectCharacter::Fire()
 {
-	if (mGrapple)
+	/*if (mGrapple)
 	{
 		mGrapple->GoToDestination();
-	}
+	}*/
 }
 
 void AGolemProjectCharacter::OnResetVR()
