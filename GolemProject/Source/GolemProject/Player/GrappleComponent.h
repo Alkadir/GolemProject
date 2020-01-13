@@ -20,14 +20,14 @@ protected:
 	APawn* mPawn;
 
 	UPROPERTY(EditAnywhere, Category = "physics")
-	FVector launchVelocity;
+	float launchForce;
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:
 	UFUNCTION()
-	void GoToDestination(FVector destination);
+	void GoToDestination();
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

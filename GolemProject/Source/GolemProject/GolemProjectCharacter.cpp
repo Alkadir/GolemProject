@@ -59,6 +59,9 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	//Input left Mouse Click
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AGolemProjectCharacter::Fire);
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGolemProjectCharacter::MoveRight);
 
@@ -78,6 +81,14 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGolemProjectCharacter::OnResetVR);
 }
 
+
+void AGolemProjectCharacter::Fire()
+{
+	if (mGrapple)
+	{
+		mGrapple->GoToDestination();
+	}
+}
 
 void AGolemProjectCharacter::OnResetVR()
 {
