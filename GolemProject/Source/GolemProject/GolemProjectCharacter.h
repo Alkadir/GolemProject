@@ -11,7 +11,12 @@ class AGolemProjectCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	//class UmGrapple;
+	UPROPERTY(EditAnyWhere, Category = "Debug")
+	bool showCursor = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
+	class UGrappleComponent* mGrapple;
+
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -65,6 +70,7 @@ protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+	virtual void BeginPlay() override;
 
 public:
 	/** Returns CameraBoom subobject **/

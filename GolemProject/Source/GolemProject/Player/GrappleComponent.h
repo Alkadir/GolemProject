@@ -12,16 +12,21 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+	class APawn* mPawn;
+	FVector mDestination;
+	FVector mDirection;
+	bool bIsGrappling;
+
 public:
 	// Sets default values for this component's properties
 	UGrappleComponent();
-
 protected:
-	APawn* mPawn;
+	
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	float velocity = 200.0f;
 
-	UPROPERTY(EditAnywhere, Category = "physics")
-	float launchForce;
-
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	float offsetStop = 500.0f;
 	// Called when the game starts
 	virtual void BeginPlay() override;
 

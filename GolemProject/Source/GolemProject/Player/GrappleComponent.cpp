@@ -5,7 +5,9 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
-
+#include "GolemProjectCharacter.h"
+#include "Engine/Engine.h"
+#include "GameFramework/CharacterMovementComponent.h"
 // Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
 {
@@ -22,30 +24,27 @@ void UGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-
+	mPawn = Cast<AGolemProjectCharacter>(GetOwner());
+	bIsGrappling = false;
 }
 
 
 void UGrappleComponent::GoToDestination()
 {
-	FVector velocity = FVector::ZeroVector;
+	FVector direction = FVector::ZeroVector;
 	UWorld* world = GetWorld();
 
-	if (world&&mPawn)
+	if (world && mPawn)
 	{
 		APlayerController* PlayerController = Cast<APlayerController>(mPawn->GetController());
 
-		FHitResult TraceResult(ForceInit);
-		PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, false, TraceResult);
+		FHitResult TraceResult;
 
-		//TraceResult.
-
-		/*TArray<FHitResult> hits;
-		FVector cameraPos = UGameplayStatics::GetPlayerCameraManager(world, 0)->GetCameraLocation();
-
-		if (world->LineTraceMultiByChannel(hits, cameraPos, , ECollisionChannel::ECC_Visibility)
-			mPawn->LaunchPawn(launchForce *velocity, true, true);*/
+		if (PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, false, TraceResult))
+		{
+			mDestination = TraceResult.Location;
+			bIsGrappling = true;
+		}
 	}
 
 }
@@ -55,5 +54,33 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (bIsGrappling)
+	{
+		if (mPawn)
+		{
+			mDirection = mDestination - mPawn->GetActorLocation();
+			float dist = mDirection.Size();
+
+			mDirection = (mDestination - mPawn->GetActorLocation()).GetSafeNormal();
+
+			if (dist > offsetStop)
+			{
+				mPawn->LaunchPawn(mDirection * velocity, false, false);
+			}
+			else
+			{
+				AController* ctrl = mPawn->GetController();
+
+				if (ctrl)
+				{
+					ACharacter* character = ctrl->GetCharacter();
+					if (character)
+					{
+						character->GetCharacterMovement()->Velocity *= 0.5f;
+					}
+				}
+				bIsGrappling = false;
+			}
+		}
+	}
 }
