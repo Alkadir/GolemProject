@@ -23,13 +23,13 @@ protected:
 	class AGolemProjectCharacter* m_character;
 
 	UPROPERTY(EditAnywhere, Category = "VelocityDash")
-		FVector velocityDash;
+		float forceDash;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void Dash();
+	void Dash(FVector _direction);
 		
 };

@@ -31,6 +31,8 @@ public:
 
 protected:
 
+	virtual void BeginPlay() override;
+
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 
@@ -58,6 +60,7 @@ protected:
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
+	UPROPERTY(EditAnywhere)
 	class UDashComponent* dashComponent;
 
 protected:

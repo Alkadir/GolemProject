@@ -45,7 +45,8 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	dashComponent = Cast<UDashComponent>(GetComponentByClass(UDashComponent::StaticClass()));
+	//dashComponent = Cast<UDashComponent>(GetComponentByClass(UDashComponent::StaticClass()));
+
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -84,13 +85,28 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AGolemProjectCharacter::Dash()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("tamer!"));
 	if (dashComponent != nullptr)
 	{
-		dashComponent->Dash();
+		if (Controller != NULL)
+		{
+			// find out which way is forward
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+			// get forward vector
+			const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("dash!"));
+			dashComponent->Dash(Direction);
+		}
 	}
 }
 
+
+void AGolemProjectCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	dashComponent = FindComponentByClass<UDashComponent>();
+}
 
 void AGolemProjectCharacter::OnResetVR()
 {
@@ -99,12 +115,12 @@ void AGolemProjectCharacter::OnResetVR()
 
 void AGolemProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void AGolemProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
 }
 
 void AGolemProjectCharacter::TurnAtRate(float Rate)
@@ -135,12 +151,12 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
