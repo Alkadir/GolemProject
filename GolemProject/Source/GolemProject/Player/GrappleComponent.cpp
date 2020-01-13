@@ -39,7 +39,7 @@ void UGrappleComponent::GoToDestination()
 		FHitResult TraceResult(ForceInit);
 		PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, false, TraceResult);
 
-		TraceResult.
+		//TraceResult.
 
 		/*TArray<FHitResult> hits;
 		FVector cameraPos = UGameplayStatics::GetPlayerCameraManager(world, 0)->GetCameraLocation();
