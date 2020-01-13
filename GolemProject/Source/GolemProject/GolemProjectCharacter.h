@@ -11,8 +11,6 @@ class AGolemProjectCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-	class UGrappleComponent* mGrapple;
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;

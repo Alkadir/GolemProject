@@ -22,12 +22,8 @@ void UGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AActor* owner = GetOwner();
-	if (owner)
-	{
-		mPawn = Cast<APawn>(owner);
-	}
 	// ...
+
 }
 
 
@@ -58,5 +54,6 @@ void UGrappleComponent::GoToDestination()
 void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
 
+	// ...
+}
