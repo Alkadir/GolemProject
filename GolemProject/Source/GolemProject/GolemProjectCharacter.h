@@ -31,6 +31,8 @@ public:
 
 protected:
 
+	void Fire();
+
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 

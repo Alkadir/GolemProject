@@ -12,17 +12,24 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UGrappleComponent();
 
 protected:
+	APawn* mPawn;
+
+	UPROPERTY(EditAnywhere, Category = "physics")
+	float launchForce;
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	UFUNCTION()
+	void GoToDestination();
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+
 };
