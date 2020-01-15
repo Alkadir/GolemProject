@@ -4,6 +4,7 @@
 #include "DashComponent.h"
 #include <Engine/Engine.h>
 #include "GolemProjectCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
 UDashComponent::UDashComponent()
@@ -19,14 +20,31 @@ UDashComponent::UDashComponent()
 // Called when the game starts
 void UDashComponent::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 	m_character = Cast<AGolemProjectCharacter>(GetOwner());
-	// ...
-	
+	m_canDash = true;
+	if (m_character != nullptr)
+	{
+		if (UCharacterMovementComponent* cmc = m_character->GetCharacterMovement())
+		{
+			m_groundFriction = m_character->GetCharacterMovement()->GroundFriction;
+		}
+	}
 }
 
+void UDashComponent::StopDash()
+{
+	if (m_character != nullptr)
+	{
+		m_character->GetMovementComponent()->StopMovementImmediately();
+		m_character->GetCharacterMovement()->GroundFriction = m_groundFriction;
+	}
+}
 
-
+void UDashComponent::CanRedashDash()
+{
+	m_canDash = true;
+}
 
 // Called every frame
 void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -37,11 +55,19 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDashComponent::Dash(FVector _direction)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Some variable values: x: %f, y: %f"), _direction.X, _direction.Y));
-	if (m_character != nullptr)
+	if (m_canDash && m_character != nullptr)
 	{
-		m_character->AddMovementInput(_direction * forceDash);
-		//m_character->LaunchCharacter(_direction* forceDash, false, false);
+		if (UCharacterMovementComponent* cmc = m_character->GetCharacterMovement())
+		{
+			cmc->GroundFriction = 0.0f;
+			m_character->LaunchCharacter(_direction * m_forceDash, false, false);
+			m_canDash = false;
+			if (UWorld* world = GetWorld())
+			{
+				world->GetTimerManager().SetTimer(m_loopTimer, this, &UDashComponent::StopDash, m_timerStopDash, false);
+				world->GetTimerManager().SetTimer(m_timerDash, this, &UDashComponent::CanRedashDash, m_cdDash, false);
+			}
+		}
 	}
 }
 

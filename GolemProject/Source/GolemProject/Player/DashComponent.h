@@ -22,8 +22,26 @@ protected:
 
 	class AGolemProjectCharacter* m_character;
 
-	UPROPERTY(EditAnywhere, Category = "VelocityDash")
-		float forceDash;
+	UPROPERTY(EditAnywhere, Category = VelocityDash)
+		float m_forceDash = 2000.0f;
+
+	UPROPERTY(EditAnywhere, Category = VelocityDash)
+		float m_timerStopDash = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category = TimerDash)
+		float m_cdDash = 1.0f;
+
+	bool m_canDash;
+
+	float m_groundFriction;
+
+	FTimerHandle m_loopTimer;
+
+	FTimerHandle m_timerDash;
+
+	void StopDash();
+
+	void CanRedashDash();
 
 public:	
 	// Called every frame

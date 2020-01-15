@@ -11,7 +11,6 @@
 #include "Player/DashComponent.h"
 #include <Engine/Engine.h>
 #include "Player/GrappleComponent.h"
-#include "GameFramework/PlayerController.h
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -47,7 +46,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	//dashComponent = Cast<UDashComponent>(GetComponentByClass(UDashComponent::StaticClass()));
+	
 
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
@@ -87,40 +86,27 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGolemProjectCharacter::OnResetVR);
 }
 
-void AGolemProjectCharacter::Dash()
-{
-	if (dashComponent != nullptr)
-	{
-		if (Controller != NULL)
-		{
-			// find out which way is forward
-			//const FRotator Rotation = Controller->GetControlRotation();
-			//const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-			// get forward vector
-			const FVector Direction = Controller->GetActorForwardVector();
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("dash!"));
-			dashComponent->Dash(Direction);
-		}
-	}
-}
 void AGolemProjectCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
-
 	APlayerController* pc = Cast<APlayerController>(GetController());
-
 	if (pc)
 	{
 		pc->bShowMouseCursor = showCursor;
 	}
 }
 
-void AGolemProjectCharacter::BeginPlay()
+void AGolemProjectCharacter::Dash()
 {
-	Super::BeginPlay();
-	dashComponent = FindComponentByClass<UDashComponent>();
+	if (dashComponent != nullptr)
+	{
+		if (Controller != NULL)
+		{
+			dashComponent->Dash(GetActorForwardVector());
+		}
+	}
 }
 
 void AGolemProjectCharacter::Fire()
