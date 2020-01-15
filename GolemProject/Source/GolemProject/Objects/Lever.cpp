@@ -26,7 +26,7 @@ void ALever::Tick(float DeltaTime)
 
 }
 
-bool ALever::Interact_Implementation(const AActor * caller) const
+const bool ALever::Interact_Implementation(const AActor * caller)
 {
 	bool haveActivate = false;
 	for (auto& objectToActivate : objectsToActivate)
