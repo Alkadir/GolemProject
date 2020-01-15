@@ -90,11 +90,11 @@ void AGolemProjectCharacter::Dash()
 		if (Controller != NULL)
 		{
 			// find out which way is forward
-			const FRotator Rotation = Controller->GetControlRotation();
-			const FRotator YawRotation(0, Rotation.Yaw, 0);
+			//const FRotator Rotation = Controller->GetControlRotation();
+			//const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 			// get forward vector
-			const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			const FVector Direction = Controller->GetActorForwardVector();
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("dash!"));
 			dashComponent->Dash(Direction);
 		}
@@ -139,6 +139,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
+	
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);

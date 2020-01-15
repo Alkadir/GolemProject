@@ -37,10 +37,11 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDashComponent::Dash(FVector _direction)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Some variable values: x: %f, y: %f"), _direction.X, _direction.Y));
 	if (m_character != nullptr)
 	{
-		m_character->LaunchCharacter(_direction* forceDash, false, false);
+		m_character->AddMovementInput(_direction * forceDash);
+		//m_character->LaunchCharacter(_direction* forceDash, false, false);
 	}
 }
 
