@@ -20,6 +20,7 @@ UDashComponent::UDashComponent()
 // Called when the game starts
 void UDashComponent::BeginPlay()
 {
+	//comm
 	Super::BeginPlay();
 	m_character = Cast<AGolemProjectCharacter>(GetOwner());
 	m_canDash = true;

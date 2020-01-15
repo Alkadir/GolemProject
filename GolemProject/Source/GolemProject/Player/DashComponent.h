@@ -31,6 +31,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = TimerDash)
 		float m_cdDash = 1.0f;
 
+	//commentaire
 	bool m_canDash;
 
 	float m_groundFriction;
