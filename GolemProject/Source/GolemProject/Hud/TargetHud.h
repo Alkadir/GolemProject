@@ -13,9 +13,8 @@ UCLASS()
 class GOLEMPROJECT_API UTargetHud : public UWidgetComponent
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, Category = " Hud Sight")
-	TSubclassOf<class UUserWidget> widgetSightClass;
+		UPROPERTY(EditAnywhere, Category = " Hud Sight")
+		TSubclassOf<class UUserWidget> widgetSightClass;
 
 	protected:
 	class UUserWidget* mWidgetSight;
