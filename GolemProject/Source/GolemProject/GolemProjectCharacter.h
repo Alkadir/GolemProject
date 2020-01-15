@@ -60,6 +60,10 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
+	float m_valueForward;
+
+	float m_valueRight;
+
 	/** Handler for when a touch input begins. */
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
 

@@ -38,7 +38,11 @@ void UDashComponent::StopDash()
 	if (m_character != nullptr)
 	{
 		m_character->GetMovementComponent()->StopMovementImmediately();
-		m_character->GetCharacterMovement()->GroundFriction = m_groundFriction;
+		if (UCharacterMovementComponent* cmc = m_character->GetCharacterMovement())
+		{
+			cmc->AddImpulse(currentVelocity, true);
+			cmc->GroundFriction = m_groundFriction;
+		}
 	}
 }
 
@@ -51,7 +55,6 @@ void UDashComponent::CanRedashDash()
 void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	// ...
 }
 
 void UDashComponent::Dash(FVector _direction)
@@ -61,6 +64,8 @@ void UDashComponent::Dash(FVector _direction)
 		if (UCharacterMovementComponent* cmc = m_character->GetCharacterMovement())
 		{
 			cmc->GroundFriction = 0.0f;
+			currentVelocity = m_character->GetVelocity().GetAbs() * _direction;
+			currentVelocity.Z = 0.0f;
 			m_character->LaunchCharacter(_direction * m_forceDash, false, false);
 			m_canDash = false;
 			if (UWorld* world = GetWorld())
