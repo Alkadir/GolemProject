@@ -51,7 +51,7 @@ bool ALever::Interact_Implementation(const AActor * caller) const
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("%s don\'t implement Activable interface"), *objectToActivate->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%s don\'t implement Activable interface"), *(objectToActivate->GetName())));
 		}
 	}
 	return haveActivate;
