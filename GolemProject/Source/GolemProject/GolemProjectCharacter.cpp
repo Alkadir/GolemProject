@@ -31,7 +31,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1620.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
@@ -46,7 +46,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	
+
 
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
@@ -64,7 +64,6 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//Input left Mouse Click
-	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AGolemProjectCharacter::Dash);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AGolemProjectCharacter::Fire);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
@@ -82,8 +81,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &AGolemProjectCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &AGolemProjectCharacter::TouchStopped);
 
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGolemProjectCharacter::OnResetVR);
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -104,7 +102,14 @@ void AGolemProjectCharacter::Dash()
 	{
 		if (Controller != NULL)
 		{
-			dashComponent->Dash(GetActorForwardVector());
+			FVector direction = GetLastMovementInputVector();
+			
+			if (m_valueForward == 0.0f && m_valueRight == 0.0f)
+			{
+				direction = GetActorForwardVector();
+			}
+			direction.Normalize();
+			dashComponent->Dash(direction);
 		}
 	}
 }
@@ -146,6 +151,7 @@ void AGolemProjectCharacter::LookUpAtRate(float Rate)
 
 void AGolemProjectCharacter::MoveForward(float Value)
 {
+	m_valueForward = Value;
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
 
@@ -161,6 +167,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
+	m_valueRight = Value;
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is right
