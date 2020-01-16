@@ -22,16 +22,23 @@ protected:
 
 	class AGolemProjectCharacter* m_character;
 
-	UPROPERTY(EditAnywhere, Category = VelocityDash)
-		float m_forceDash = 2000.0f;
+	class UCharacterMovementComponent* CharacterMovementCmpt;
 
 	UPROPERTY(EditAnywhere, Category = VelocityDash)
-		float m_timerStopDash = 0.2f;
+		float ForceDash = 2000.0f;
+
+	UPROPERTY(EditAnywhere, Category = VelocityDash)
+		float ForceAfterDash = 500.0f;
+
+	UPROPERTY(EditAnywhere, Category = VelocityDash)
+		float TimerStopDash = 0.2f;
 
 	UPROPERTY(EditAnywhere, Category = TimerDash)
-		float m_cdDash = 1.0f;
+		float CDDash = 1.0f;
 
-	FVector currentVelocity;
+	FVector CurrentVelocity;
+
+	FVector CurrentDirection;
 
 	//commentaire
 	bool m_canDash;
@@ -41,6 +48,8 @@ protected:
 	FTimerHandle m_loopTimer;
 
 	FTimerHandle m_timerDash;
+
+	int CptDash;
 
 	void StopDash();
 

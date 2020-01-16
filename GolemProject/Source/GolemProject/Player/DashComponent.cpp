@@ -22,13 +22,15 @@ void UDashComponent::BeginPlay()
 {
 	//comm
 	Super::BeginPlay();
+	CptDash = 2;
 	m_character = Cast<AGolemProjectCharacter>(GetOwner());
 	m_canDash = true;
 	if (m_character != nullptr)
 	{
-		if (UCharacterMovementComponent* cmc = m_character->GetCharacterMovement())
+		CharacterMovementCmpt = m_character->GetCharacterMovement();
+		if (CharacterMovementCmpt != nullptr)
 		{
-			m_groundFriction = m_character->GetCharacterMovement()->GroundFriction;
+			m_groundFriction = CharacterMovementCmpt->GroundFriction;
 		}
 	}
 }
@@ -38,10 +40,17 @@ void UDashComponent::StopDash()
 	if (m_character != nullptr)
 	{
 		m_character->GetMovementComponent()->StopMovementImmediately();
-		if (UCharacterMovementComponent* cmc = m_character->GetCharacterMovement())
+		if (CharacterMovementCmpt != nullptr)
 		{
-			cmc->AddImpulse(currentVelocity, true);
-			cmc->GroundFriction = m_groundFriction;
+			if (CurrentVelocity.IsZero())
+			{
+				CharacterMovementCmpt->AddImpulse(CurrentDirection * ForceAfterDash, true);
+			}
+			else
+			{
+				CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
+			}
+			CharacterMovementCmpt->GroundFriction = m_groundFriction;
 		}
 	}
 }
@@ -59,19 +68,20 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDashComponent::Dash(FVector _direction)
 {
-	if (m_canDash && m_character != nullptr)
+	if (CharacterMovementCmpt != nullptr)
 	{
-		if (UCharacterMovementComponent* cmc = m_character->GetCharacterMovement())
+		if (m_canDash && m_character != nullptr)
 		{
-			cmc->GroundFriction = 0.0f;
-			currentVelocity = m_character->GetVelocity().GetAbs() * _direction;
-			currentVelocity.Z = 0.0f;
-			m_character->LaunchCharacter(_direction * m_forceDash, false, false);
+			CharacterMovementCmpt->GroundFriction = 0.0f;
+			CurrentDirection = _direction;
+			CurrentVelocity = m_character->GetVelocity().GetAbs() * _direction;
+			CurrentVelocity.Z = 0.0f;
+			m_character->LaunchCharacter(_direction * ForceDash, false, false);
 			m_canDash = false;
 			if (UWorld* world = GetWorld())
 			{
-				world->GetTimerManager().SetTimer(m_loopTimer, this, &UDashComponent::StopDash, m_timerStopDash, false);
-				world->GetTimerManager().SetTimer(m_timerDash, this, &UDashComponent::CanRedashDash, m_cdDash, false);
+				world->GetTimerManager().SetTimer(m_loopTimer, this, &UDashComponent::StopDash, TimerStopDash, false);
+				world->GetTimerManager().SetTimer(m_timerDash, this, &UDashComponent::CanRedashDash, CDDash, false);
 			}
 		}
 	}

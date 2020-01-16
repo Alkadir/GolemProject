@@ -31,7 +31,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1620.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
@@ -82,8 +82,6 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindTouch(IE_Released, this, &AGolemProjectCharacter::TouchStopped);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGolemProjectCharacter::OnResetVR);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -104,21 +102,10 @@ void AGolemProjectCharacter::Dash()
 	{
 		if (Controller != NULL)
 		{
-			// find out which way is forward
-			const FRotator Rotation = Controller->GetControlRotation();
-			const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-			// get forward vector
-			const FVector DirectionForward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-			const FVector DirectionRight = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-			//GetLastMovementInputVector()
-			FVector direction = GetLastMovementInputVector();//DirectionForward * m_valueForward + DirectionRight * m_valueRight;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Some variable values: x: %f, y: %f"), m_valueForward, m_valueRight));
+			FVector direction = GetLastMovementInputVector();
 			
 			if (m_valueForward == 0.0f && m_valueRight == 0.0f)
 			{
-				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Some variable values: x: %f, y: %f"), m_valueForward, m_valueRight));
 				direction = GetActorForwardVector();
 			}
 			direction.Normalize();
