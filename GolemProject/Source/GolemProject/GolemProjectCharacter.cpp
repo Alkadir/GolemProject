@@ -11,7 +11,7 @@
 #include "Player/DashComponent.h"
 #include <Engine/Engine.h>
 #include "Player/GrappleComponent.h"
-
+#include "Helpers/HelperLibrary.h"
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
 
@@ -89,6 +89,8 @@ void AGolemProjectCharacter::BeginPlay()
 	Super::BeginPlay();
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
+	sightCamera = HelperLibrary::GetComponentByName<UCameraComponent>(this, "SightCam");
+
 	APlayerController* pc = Cast<APlayerController>(GetController());
 	if (pc)
 	{
@@ -103,7 +105,7 @@ void AGolemProjectCharacter::Dash()
 		if (Controller != NULL)
 		{
 			FVector direction = GetLastMovementInputVector();
-			
+
 			if (m_valueForward == 0.0f && m_valueRight == 0.0f)
 			{
 				direction = GetActorForwardVector();
