@@ -13,6 +13,7 @@ class AGolemProjectCharacter : public ACharacter
 
 	UPROPERTY(EditAnyWhere, Category = "Debug")
 	bool showCursor = false;
+	bool isSightCameraEnabled = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
 	class UGrappleComponent* mGrapple;
@@ -24,6 +25,9 @@ class AGolemProjectCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY()
+	class UChildActorComponent* sightCamera;
 public:
 	AGolemProjectCharacter();
 
@@ -59,6 +63,8 @@ protected:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
+
+	void ChangeCamera();
 
 	float m_valueForward;
 
