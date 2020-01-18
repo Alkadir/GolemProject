@@ -13,8 +13,11 @@ class AGolemProjectCharacter : public ACharacter
 
 	UPROPERTY(EditAnyWhere, Category = "Debug")
 	bool showCursor = false;
+
+	UPROPERTY()
 	bool isSightCameraEnabled = false;
 
+	UPROPERTY()
 	class UUserWidget* currentSightWidget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
