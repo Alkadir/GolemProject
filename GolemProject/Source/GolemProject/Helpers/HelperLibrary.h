@@ -12,7 +12,7 @@ class GOLEMPROJECT_API HelperLibrary
 {
 public:
 	template <class T>
-	static T* GetComponentByName(AActor* _actor, const FString& _name)
+	static T* GetComponentByName(const AActor* _actor, const FString& _name)
 	{
 		TArray<UActorComponent*> objts;
 		_actor->GetComponents<UActorComponent>(objts);
@@ -25,5 +25,7 @@ public:
 				return Cast<T>(component);
 		}
 		return nullptr;
-	}
+	};
+
+	static void Print(const float& _time, const FString& _message);
 };

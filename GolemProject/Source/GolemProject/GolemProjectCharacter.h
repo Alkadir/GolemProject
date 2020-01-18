@@ -15,6 +15,8 @@ class AGolemProjectCharacter : public ACharacter
 	bool showCursor = false;
 	bool isSightCameraEnabled = false;
 
+	class UUserWidget* currentSightWidget = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
 	class UGrappleComponent* mGrapple;
 
@@ -30,6 +32,9 @@ class AGolemProjectCharacter : public ACharacter
 	class UChildActorComponent* sightCamera;
 public:
 	AGolemProjectCharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
+	TSubclassOf<class UUserWidget>  sightHudClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)

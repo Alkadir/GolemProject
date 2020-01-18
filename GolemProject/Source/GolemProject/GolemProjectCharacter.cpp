@@ -11,7 +11,10 @@
 #include "Player/DashComponent.h"
 #include <Engine/Engine.h>
 #include "Player/GrappleComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Helpers/HelperLibrary.h"
+
+
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
 
@@ -90,6 +93,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 void AGolemProjectCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
 
@@ -122,7 +126,7 @@ void AGolemProjectCharacter::Dash()
 
 void AGolemProjectCharacter::Fire()
 {
-	if (mGrapple)
+	if (mGrapple && isSightCameraEnabled)
 	{
 		mGrapple->GoToDestination();
 	}
@@ -166,9 +170,16 @@ void AGolemProjectCharacter::ChangeCamera()
 			{
 				isSightCameraEnabled = true;
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
+
+				if (currentSightWidget)
+					currentSightWidget->AddToViewport();
+
 			}
 			else
 			{
+				if (currentSightWidget)
+					currentSightWidget->RemoveFromViewport();
+
 				isSightCameraEnabled = false;
 				pc->SetViewTargetWithBlend(this, 0.25f);
 			}
