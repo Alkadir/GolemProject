@@ -11,8 +11,8 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
-	class APawn* mPawn;
+	class UCameraComponent* mCamera;
+	class ACharacter* mCharacter;
 	FVector mDestination;
 	FVector mDirection;
 	bool bIsGrappling;
@@ -21,7 +21,9 @@ public:
 	// Sets default values for this component's properties
 	UGrappleComponent();
 protected:
-	
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	float maxDistance = 10000.0f;
+
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 200.0f;
 
