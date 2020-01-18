@@ -98,6 +98,7 @@ void AGolemProjectCharacter::BeginPlay()
 	mGrapple = FindComponentByClass<UGrappleComponent>();
 
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
+	initialGroundFriction = GetCharacterMovement()->GroundFriction;
 
 	APlayerController* pc = Cast<APlayerController>(GetController());
 	if (pc)
@@ -218,4 +219,9 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AGolemProjectCharacter::ResetFriction()
+{
+	GetCharacterMovement()->GroundFriction = initialGroundFriction;
 }
