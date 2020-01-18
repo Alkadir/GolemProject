@@ -42,11 +42,12 @@ void UGrappleComponent::GoToDestination()
 	if (world && mCamera)
 	{
 		FHitResult hitResult;
-		
+
 		if (world->LineTraceSingleByChannel(hitResult, mCamera->GetComponentLocation(), mCamera->GetForwardVector() * maxDistance, ECollisionChannel::ECC_Visibility))
 		{
 			mDestination = hitResult.Location;
 			bIsGrappling = true;
+			mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
 		}
 	}
 
@@ -74,6 +75,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			}
 			else
 			{
+				//Find destination stop player
 				AController* ctrl = mCharacter->GetController();
 
 				if (ctrl)
@@ -81,9 +83,11 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					if (mCharacter)
 					{
 						mCharacter->GetCharacterMovement()->Velocity *= 0.15f;
+						bIsGrappling = false;
+						mCharacter->ResetFriction();
 					}
 				}
-				bIsGrappling = false;
+				
 			}
 		}
 	}

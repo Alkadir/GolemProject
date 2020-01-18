@@ -12,7 +12,7 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 {
 	GENERATED_BODY()
 	class UCameraComponent* mCamera;
-	class ACharacter* mCharacter;
+	class AGolemProjectCharacter* mCharacter;
 	FVector mDestination;
 	FVector mDirection;
 	bool bIsGrappling;
@@ -28,7 +28,7 @@ protected:
 	float velocity = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float offsetStop = 500.0f;
+	float offsetStop = 200.0f;
 	// Called when the game starts
 	virtual void BeginPlay() override;
 

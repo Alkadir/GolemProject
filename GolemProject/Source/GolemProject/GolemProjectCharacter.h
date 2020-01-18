@@ -33,6 +33,8 @@ class AGolemProjectCharacter : public ACharacter
 
 	UPROPERTY()
 	class UChildActorComponent* sightCamera;
+
+	float initialGroundFriction;
 public:
 	AGolemProjectCharacter();
 
@@ -47,8 +49,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	void ResetFriction();
+
 protected:
+
 	virtual void BeginPlay() override;
+
 	void Fire();
 
 	/** Resets HMD orientation in VR. */
@@ -87,7 +93,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UDashComponent* dashComponent;
 
-protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
