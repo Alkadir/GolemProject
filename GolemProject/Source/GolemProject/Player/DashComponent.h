@@ -43,13 +43,14 @@ protected:
 	//commentaire
 	bool m_canDash;
 
+	bool HasDashInAir;
+
 	float m_groundFriction;
 
 	FTimerHandle m_loopTimer;
 
 	FTimerHandle m_timerDash;
 
-	int CptDash;
 
 	void StopDash();
 
@@ -61,5 +62,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Dash(FVector _direction);
+
+	UFUNCTION(BlueprintCallable)
+		void ResetDashInAir();
 		
 };
