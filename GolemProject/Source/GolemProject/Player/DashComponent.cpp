@@ -22,7 +22,7 @@ void UDashComponent::BeginPlay()
 {
 	//comm
 	Super::BeginPlay();
-	CptDash = 2;
+	HasDashInAir = false;
 	m_character = Cast<AGolemProjectCharacter>(GetOwner());
 	m_canDash = true;
 	if (m_character != nullptr)
@@ -70,8 +70,9 @@ void UDashComponent::Dash(FVector _direction)
 {
 	if (CharacterMovementCmpt != nullptr)
 	{
-		if (m_canDash && m_character != nullptr)
+		if (m_canDash && m_character != nullptr && !HasDashInAir)
 		{
+			if (CharacterMovementCmpt->IsFalling())	HasDashInAir = true;
 			CharacterMovementCmpt->GroundFriction = 0.0f;
 			CurrentDirection = _direction;
 			CurrentVelocity = m_character->GetVelocity().GetAbs() * _direction;
@@ -85,5 +86,10 @@ void UDashComponent::Dash(FVector _direction)
 			}
 		}
 	}
+}
+
+void UDashComponent::ResetDashInAir()
+{
+	HasDashInAir = false;
 }
 

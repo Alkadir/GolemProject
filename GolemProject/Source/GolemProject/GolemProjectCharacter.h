@@ -13,6 +13,8 @@ class AGolemProjectCharacter : public ACharacter
 
 	UPROPERTY(EditAnyWhere, Category = "Debug")
 	bool showCursor = false;
+
+	UPROPERTY()
 	bool isSightCameraEnabled = false;
 
 	UPROPERTY()
