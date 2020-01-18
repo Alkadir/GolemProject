@@ -69,6 +69,8 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			if (dist > offsetStop)
 			{
 				mCharacter->LaunchCharacter(mDirection * velocity, false, false);
+				mDirection.Z = 0.0f;
+				mCharacter->SetActorRotation(mDirection.Rotation());
 			}
 			else
 			{
