@@ -4,10 +4,11 @@
 #include "GrappleComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/PlayerController.h"
 #include "GolemProjectCharacter.h"
 #include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Helpers/HelperLibrary.h"
+#include "Camera/CameraComponent.h"
 // Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
 {
@@ -23,8 +24,12 @@ UGrappleComponent::UGrappleComponent()
 void UGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	AActor* owner = GetOwner();
+	mCharacter = Cast<AGolemProjectCharacter>(owner);
 
-	mPawn = Cast<AGolemProjectCharacter>(GetOwner());
+	UChildActorComponent* child = HelperLibrary::GetComponentByName<UChildActorComponent>(mCharacter, "ShoulderCamera");
+	mCamera = HelperLibrary::GetComponentByName<UCameraComponent>(child->GetChildActor(), "Camera");
+
 	bIsGrappling = false;
 }
 
@@ -34,15 +39,13 @@ void UGrappleComponent::GoToDestination()
 	FVector direction = FVector::ZeroVector;
 	UWorld* world = GetWorld();
 
-	if (world && mPawn)
+	if (world && mCamera)
 	{
-		APlayerController* PlayerController = Cast<APlayerController>(mPawn->GetController());
-
-		FHitResult TraceResult;
-
-		if (PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, false, TraceResult))
+		FHitResult hitResult;
+		
+		if (world->LineTraceSingleByChannel(hitResult, mCamera->GetComponentLocation(), mCamera->GetForwardVector() * maxDistance, ECollisionChannel::ECC_Visibility))
 		{
-			mDestination = TraceResult.Location;
+			mDestination = hitResult.Location;
 			bIsGrappling = true;
 		}
 	}
@@ -56,27 +59,28 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 	if (bIsGrappling)
 	{
-		if (mPawn)
+		if (mCharacter)
 		{
-			mDirection = mDestination - mPawn->GetActorLocation();
+			mDirection = mDestination - mCharacter->GetActorLocation();
 			float dist = mDirection.Size();
 
-			mDirection = (mDestination - mPawn->GetActorLocation()).GetSafeNormal();
+			mDirection = (mDestination - mCharacter->GetActorLocation()).GetSafeNormal();
 
 			if (dist > offsetStop)
 			{
-				mPawn->LaunchPawn(mDirection * velocity, false, false);
+				mCharacter->LaunchCharacter(mDirection * velocity, false, false);
+				mDirection.Z = 0.0f;
+				mCharacter->SetActorRotation(mDirection.Rotation());
 			}
 			else
 			{
-				AController* ctrl = mPawn->GetController();
+				AController* ctrl = mCharacter->GetController();
 
 				if (ctrl)
 				{
-					ACharacter* character = ctrl->GetCharacter();
-					if (character)
+					if (mCharacter)
 					{
-						character->GetCharacterMovement()->Velocity *= 0.5f;
+						mCharacter->GetCharacterMovement()->Velocity *= 0.15f;
 					}
 				}
 				bIsGrappling = false;
