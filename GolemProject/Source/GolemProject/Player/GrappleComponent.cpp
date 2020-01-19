@@ -9,6 +9,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Helpers/HelperLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Classes/Components/SkeletalMeshComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Player/ProjectileHand.h"
+
 // Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
 {
@@ -26,49 +30,92 @@ void UGrappleComponent::BeginPlay()
 	Super::BeginPlay();
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
-
+	mSkeletalMesh = mCharacter->GetMesh();
+	mIdBone = mSkeletalMesh->GetBoneIndex("hand_r");
 	UChildActorComponent* child = HelperLibrary::GetComponentByName<UChildActorComponent>(mCharacter, "ShoulderCamera");
 	mCamera = HelperLibrary::GetComponentByName<UCameraComponent>(child->GetChildActor(), "Camera");
-
-	bIsGrappling = false;
 }
 
 
 void UGrappleComponent::GoToDestination()
 {
-	FVector direction = FVector::ZeroVector;
+	if (!currentProjectile)
+	{
+		UWorld* world = GetWorld();
+
+		if (world && mCamera)
+		{
+			FHitResult hitResult;
+
+			if (world->LineTraceSingleByChannel(hitResult, mCamera->GetComponentLocation(), mCamera->GetForwardVector() * maxDistance, ECollisionChannel::ECC_Visibility))
+			{
+				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
+
+				currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
+				if (currentProjectile)
+				{
+					FVector direction = (hitResult.Location - currentProjectile->GetActorLocation()).GetSafeNormal();
+					mDestination = hitResult.Location;
+					currentProjectile->Instigator = mCharacter->GetInstigator();
+					currentProjectile->SetOwner(mCharacter);
+					currentProjectile->LaunchProjectile(direction);
+				}
+			}
+		}
+	}
+}
+
+void UGrappleComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
+{
+	_lookAt = IKposition;
+	_isBlend = (mCharacter->GetSightCameraEnabled() || currentProjectile);
+}
+
+void UGrappleComponent::UpdateIKArm()
+{
 	UWorld* world = GetWorld();
 
 	if (world && mCamera)
 	{
 		FHitResult hitResult;
-
 		if (world->LineTraceSingleByChannel(hitResult, mCamera->GetComponentLocation(), mCamera->GetForwardVector() * maxDistance, ECollisionChannel::ECC_Visibility))
 		{
-			mDestination = hitResult.Location;
-			bIsGrappling = true;
-			mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
+
+			mDirection = hitResult.Location - mCharacter->GetActorLocation();
+			IKposition = hitResult.Location;
+			mDirection.Z = 0.0f;
+			mCharacter->SetActorRotation(mDirection.Rotation());
+
+			//I don't know how anim works in cpp
+			//UAnimInstance* animBp = mSkeletalMesh->GetAnimInstance();
 		}
 	}
-
 }
 
 // Called every frame
 void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (bIsGrappling)
+	if (mCharacter)
+	{
+		if (mCharacter->GetSightCameraEnabled() && !currentProjectile)
+		{
+			UpdateIKArm();
+		}
+	}
+	if (currentProjectile && currentProjectile->IsColliding())
 	{
 		if (mCharacter)
 		{
+
 			mDirection = mDestination - mCharacter->GetActorLocation();
 			float dist = mDirection.Size();
 
-			mDirection = (mDestination - mCharacter->GetActorLocation()).GetSafeNormal();
+			mDirection.Normalize();
 
 			if (dist > offsetStop)
 			{
+				mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
 				mCharacter->LaunchCharacter(mDirection * velocity, false, false);
 				mDirection.Z = 0.0f;
 				mCharacter->SetActorRotation(mDirection.Rotation());
@@ -83,11 +130,16 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					if (mCharacter)
 					{
 						mCharacter->GetCharacterMovement()->Velocity *= 0.15f;
-						bIsGrappling = false;
 						mCharacter->ResetFriction();
+
+						mSkeletalMesh->UnHideBone(mIdBone);
+						mSkeletalMesh->bRequiredBonesUpToDate = false;
+
+						currentProjectile->Destroy();
+						currentProjectile = nullptr;
 					}
 				}
-				
+
 			}
 		}
 	}

@@ -13,16 +13,18 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 	GENERATED_BODY()
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
+	class USkeletalMeshComponent* mSkeletalMesh;
 	FVector mDestination;
 	FVector mDirection;
-	bool bIsGrappling;
+	int32 mIdBone;
+	class AProjectileHand* currentProjectile;
 
-public:
-	// Sets default values for this component's properties
-	UGrappleComponent();
 protected:
+	UPROPERTY(EditAnywhere, Category = "projectile", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AProjectileHand> handProjectileClass;
+
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float maxDistance = 10000.0f;
+	float maxDistance = 100000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 200.0f;
@@ -33,8 +35,26 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY()
+	FVector IKposition;
+	// Sets default values for this component's properties
+	UGrappleComponent();
+
 	UFUNCTION()
 	void GoToDestination();
+
+	UFUNCTION(BlueprintCallable)
+	void SetIKArm(FVector& _lookAt, bool& _isBlend);
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE FVector& GetIKPosition() { return IKposition; };
+
+	FORCEINLINE const FVector& GetDirection() { return mDirection; };
+
+	FORCEINLINE class AProjectileHand* GetProjectile() { return currentProjectile; };
+
+	UFUNCTION()
+	void UpdateIKArm();
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
