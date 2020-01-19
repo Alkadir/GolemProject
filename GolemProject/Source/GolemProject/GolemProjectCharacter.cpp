@@ -170,6 +170,7 @@ void AGolemProjectCharacter::ChangeCamera()
 			if (!isSightCameraEnabled)
 			{
 				isSightCameraEnabled = true;
+				GetCharacterMovement()->bOrientRotationToMovement = false;
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
 
 				if (currentSightWidget)
@@ -182,6 +183,7 @@ void AGolemProjectCharacter::ChangeCamera()
 					currentSightWidget->RemoveFromViewport();
 
 				isSightCameraEnabled = false;
+				GetCharacterMovement()->bOrientRotationToMovement = true;
 				pc->SetViewTargetWithBlend(this, 0.25f);
 			}
 
@@ -200,7 +202,13 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		if (isSightCameraEnabled || mGrapple->GetProjectile())
+		{
+			Direction = mGrapple->GetDirection();
+		}
+
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -217,6 +225,7 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		// get right vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
+
 		AddMovementInput(Direction, Value);
 	}
 }

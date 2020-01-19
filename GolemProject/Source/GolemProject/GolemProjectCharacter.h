@@ -49,6 +49,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UFUNCTION(BlueprintCallable, Category = "Hud")
+	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+
 	void ResetFriction();
 
 protected:
