@@ -11,12 +11,12 @@
 class GOLEMPROJECT_API HelperLibrary
 {
 private:
-	/*static AActor* ActorToCalculateDistanceWith;
+	static AActor* ActorToCalculateDistanceWith;
 
 	inline static bool SortByDistance(const AActor& _actor1, const AActor& _actor2)
 	{
 		return _actor1.GetDistanceTo(ActorToCalculateDistanceWith) < _actor2.GetDistanceTo(ActorToCalculateDistanceWith);
-	}*/
+	}
 
 public:
 

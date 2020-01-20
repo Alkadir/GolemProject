@@ -13,6 +13,9 @@
 #include "Player/GrappleComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Helpers/HelperLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Interfaces/Targetable.h"
+#include "Camera/PlayerCameraManager.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -96,13 +99,13 @@ void AGolemProjectCharacter::BeginPlay()
 	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
-
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
 
 	APlayerController* pc = Cast<APlayerController>(GetController());
 	if (pc)
 	{
+		PlayerCameraManager = pc->PlayerCameraManager;
 		pc->bShowMouseCursor = showCursor;
 	}
 }
@@ -125,8 +128,49 @@ void AGolemProjectCharacter::Dash()
 	}
 }
 
+void AGolemProjectCharacter::CheckElementTargetable()
+{
+	TArray<AActor*> Actors;
+	TArray<AActor*> actorCloseEnough;
+	if (UWorld * world = GetWorld())
+	{
+		UGameplayStatics::GetAllActorsWithInterface(world, UTargetable::StaticClass(), Actors);
+		for (AActor* actor : Actors)
+		{
+			if (!actor->Implements<UTargetable>()) continue;
+
+			if (FVector::DistSquared(actor->GetActorLocation(), GetActorLocation()) < 1000.0f * 1000.0f)
+			{
+				actorCloseEnough.Add(actor);
+			}
+		}
+		HelperLibrary::SortActorsByDistanceTo(actorCloseEnough, this);
+		for (AActor* actor : actorCloseEnough)
+		{
+			// > 0 object seen 	
+			FVector FromSoftware = (actor->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
+			if (FVector::DotProduct(FollowCamera->GetForwardVector(), FromSoftware) > 0.0f)
+			{
+				FHitResult hitResult;
+
+				if (world->LineTraceSingleByChannel(hitResult, GetActorLocation(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
+				{
+					//HelperLibrary::Print(2.0f, hitResult.GetActor()->GetName());
+					ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
+					if (target != nullptr)
+					{
+						ClosestGrapplingHook = actor;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
 void AGolemProjectCharacter::Fire()
 {
+	CheckElementTargetable();
 	if (mGrapple && isSightCameraEnabled)
 	{
 		mGrapple->GoToDestination();
