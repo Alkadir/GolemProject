@@ -62,6 +62,29 @@ void UGrappleComponent::GoToDestination()
 	}
 }
 
+void UGrappleComponent::GoToDestination(FVector _destination)
+{
+	if (!currentProjectile)
+	{
+		UWorld* world = GetWorld();
+
+		if (world)
+		{
+			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
+
+			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
+			if (currentProjectile)
+			{
+				FVector direction = (_destination - currentProjectile->GetActorLocation()).GetSafeNormal();
+
+				currentProjectile->Instigator = mCharacter->GetInstigator();
+				currentProjectile->SetOwner(mCharacter);
+				currentProjectile->LaunchProjectile(direction, this);
+			}
+		}
+	}
+}
+
 //cancel projectile
 void UGrappleComponent::Cancel()
 {
