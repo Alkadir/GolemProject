@@ -40,10 +40,9 @@ public:
 	// Sets default values for this component's properties
 	UGrappleComponent();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void GoToDestination();
 
-	UFUNCTION()
 	void GoToDestination(FVector _destination);
 
 	UFUNCTION()

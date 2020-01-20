@@ -129,6 +129,7 @@ void UGrappleComponent::UpdateIKArm()
 	}
 }
 
+
 // Called every frame
 void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

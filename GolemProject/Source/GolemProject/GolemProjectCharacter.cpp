@@ -16,6 +16,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/Targetable.h"
 #include "Camera/PlayerCameraManager.h"
+#include "GolemProjectGameMode.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -64,6 +65,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 
 void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+	
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
@@ -74,6 +76,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("Fire2", IE_Pressed, this, &AGolemProjectCharacter::ChangeCamera);
 	PlayerInputComponent->BindAction("Fire2", IE_Released, this, &AGolemProjectCharacter::ChangeCamera);
+
+	PlayerInputComponent->BindAction("AssistedGrapple", IE_Pressed, this, &AGolemProjectCharacter::UseAssistedGrapple);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGolemProjectCharacter::MoveRight);
@@ -130,47 +134,57 @@ void AGolemProjectCharacter::Dash()
 
 void AGolemProjectCharacter::CheckElementTargetable()
 {
-	TArray<AActor*> Actors;
 	TArray<AActor*> actorCloseEnough;
 	if (UWorld * world = GetWorld())
 	{
-		UGameplayStatics::GetAllActorsWithInterface(world, UTargetable::StaticClass(), Actors);
-		for (AActor* actor : Actors)
-		{
-			if (!actor->Implements<UTargetable>()) continue;
+		//for (AActor* actor : )
+		//{
+		//	if (!actor->Implements<UTargetable>()) continue;
 
-			if (FVector::DistSquared(actor->GetActorLocation(), GetActorLocation()) < 1000.0f * 1000.0f)
-			{
-				actorCloseEnough.Add(actor);
-			}
-		}
-		HelperLibrary::SortActorsByDistanceTo(actorCloseEnough, this);
-		for (AActor* actor : actorCloseEnough)
-		{
-			// > 0 object seen
-			FVector FromSoftware = (actor->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
-			if (FVector::DotProduct(FollowCamera->GetForwardVector(), FromSoftware) > 0.0f)
-			{
-				FHitResult hitResult;
+		//	if (FVector::DistSquared(actor->GetActorLocation(), GetActorLocation()) < 1000.0f * 1000.0f)
+		//	{
+		//		actorCloseEnough.Add(actor);
+		//	}
+		//}
+		//HelperLibrary::SortActorsByDistanceTo(actorCloseEnough, this);
+		//for (AActor* actor : actorCloseEnough)
+		//{
+		//	// > 0 object seen
+		//	FVector FromSoftware = (actor->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
+		//	if (FVector::DotProduct(FollowCamera->GetForwardVector(), FromSoftware) > 0.0f)
+		//	{
+		//		FHitResult hitResult;
 
-				if (world->LineTraceSingleByChannel(hitResult, GetActorLocation(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
-				{
-					//HelperLibrary::Print(2.0f, hitResult.GetActor()->GetName());
-					ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
-					if (target != nullptr)
-					{
-						ClosestGrapplingHook = actor;
-						break;
-					}
-				}
-			}
+		//		if (world->LineTraceSingleByChannel(hitResult, GetActorLocation(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
+		//		{
+		//			ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
+		//			if (target != nullptr)
+		//			{
+		//				ClosestGrapplingHook = actor;
+		//				break;
+		//			}
+		//		}
+		//	}
+			ClosestGrapplingHook = nullptr;
 		}
+	//}
+}
+
+void AGolemProjectCharacter::UseAssistedGrapple()
+{
+	if (ClosestGrapplingHook != nullptr && mGrapple != nullptr)
+	{
+		mGrapple->GoToDestination(ClosestGrapplingHook->GetActorLocation());
 	}
+}
+
+void AGolemProjectCharacter::Tick(float DeltaTime)
+{
+	CheckElementTargetable();
 }
 
 void AGolemProjectCharacter::Fire()
 {
-	CheckElementTargetable();
 	if (mGrapple)
 	{
 		mGrapple->Cancel();

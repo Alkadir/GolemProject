@@ -35,9 +35,19 @@ class AGolemProjectCharacter : public ACharacter
 	class UChildActorComponent* sightCamera;
 
 	float initialGroundFriction;
+
+	float m_valueForward;
+
+	float m_valueRight;
+
+	AActor* ClosestGrapplingHook;
+
+	APlayerCameraManager* PlayerCameraManager;
+
 public:
 	AGolemProjectCharacter();
 
+	class AGolemProjectGameMode* GameMode;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
 	TSubclassOf<class UUserWidget>  sightHudClass;
 
@@ -57,6 +67,9 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	void Fire();
 
@@ -83,10 +96,6 @@ protected:
 
 	void ChangeCamera();
 
-	float m_valueForward;
-
-	float m_valueRight;
-
 	/** Handler for when a touch input begins. */
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
 
@@ -100,6 +109,10 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Dash();
+
+	void CheckElementTargetable();
+
+	void UseAssistedGrapple();
 
 public:
 	/** Returns CameraBoom subobject **/
