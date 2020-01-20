@@ -17,7 +17,6 @@ ADoor::ADoor(const FObjectInitializer& OI)
 	SetRootComponent(Root);
 	destination = CreateDefaultSubobject<USceneComponent>(TEXT("DestinationDoor"));
 	destination->SetupAttachment(Root);
-	//destination->SetRelativeLocation(FVector::ZeroVector);
 }
 
 // Called when the game starts or when spawned
@@ -25,7 +24,6 @@ void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
 	startPos = GetActorLocation();
-	//RootComponent->SetRelativeLocation(FVector::ZeroVector);
 	destinationPos = destination->GetComponentLocation();
 }
 
@@ -63,12 +61,20 @@ void ADoor::Tick(float DeltaTime)
 
 const bool ADoor::Activate_Implementation(const AActor* caller)
 {
+	if (isActivate)
+	{
+		return false;
+	}
 	isActivate = true;
 	return true;
 }
 
 const bool ADoor::Desactivate_Implementation(const AActor* caller)
 {
+	if (!isActivate)
+	{
+		return false;
+	}
 	isActivate = false;
 	return true;
 }

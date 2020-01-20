@@ -4,10 +4,8 @@
 #include "HelperLibrary.h"
 #include "Engine/Engine.h"
 #include "Containers/Array.h"
-
 AActor* HelperLibrary::ActorToCalculateDistanceWith = nullptr;
-
-void HelperLibrary::Print(const float& _time, const FString& _message, FColor _color)
+void HelperLibrary::Print(const FString& _message, const float& _time, const FColor _color)
 {
 	GEngine->AddOnScreenDebugMessage(-1, _time, _color, _message);
 }

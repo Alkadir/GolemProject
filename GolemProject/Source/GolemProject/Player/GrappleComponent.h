@@ -19,12 +19,14 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 	int32 mIdBone;
 	class AProjectileHand* currentProjectile;
 
+	float accuracy = 100000.0f;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "projectile", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AProjectileHand> handProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float maxDistance = 100000.0f;
+	float maxDistance = 3000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 200.0f;

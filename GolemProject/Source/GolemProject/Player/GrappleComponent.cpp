@@ -51,7 +51,7 @@ void UGrappleComponent::GoToDestination()
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
-				FVector offset = mCamera->GetForwardVector() * maxDistance;
+				FVector offset = mCamera->GetForwardVector() * accuracy;
 				FVector direction = (offset - currentProjectile->GetActorLocation()).GetSafeNormal();
 
 				currentProjectile->Instigator = mCharacter->GetInstigator();
@@ -117,7 +117,7 @@ void UGrappleComponent::UpdateIKArm()
 	if (world && mCamera)
 	{
 
-		FVector offset = mCamera->GetForwardVector() * maxDistance;
+		FVector offset = mCamera->GetForwardVector() * accuracy;
 		mDirection = offset - mCharacter->GetActorLocation();
 		IKposition = offset;
 		mDirection.Z = 0.0f;
@@ -144,27 +144,23 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 	if (currentProjectile)
 	{
+		mDirection = currentProjectile->GetMeshComponent()->GetComponentLocation() - mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
+		float dist = mDirection.Size();
+
 		if (currentProjectile->IsComingBack())
 		{
-			mDirection = currentProjectile->GetMeshComponent()->GetComponentLocation() - mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
-			float dist = mDirection.Size();
-
 			if (dist < offsetStop)
 			{
 				PlayerIsNear();
 				return;
 			}
 		}
-
-		if (currentProjectile->IsColliding())
+		else if (currentProjectile->IsColliding())
 		{
 			if (mCharacter)
 			{
-				mDirection = currentProjectile->GetMeshComponent()->GetComponentLocation() - mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
-				float dist = mDirection.Size();
-
 				mDirection.Normalize();
-				
+
 				if (dist > offsetStop)
 				{
 					mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
@@ -179,7 +175,14 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				}
 			}
 		}
-
+		else
+		{
+			if (dist > maxDistance)
+			{
+				HelperLibrary::Print("dsfsdfsd", 10.0f);
+				currentProjectile->SetComingBack(true);
+			}
+		}
 	}
 }
 
