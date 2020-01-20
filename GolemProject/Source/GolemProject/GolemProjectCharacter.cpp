@@ -227,11 +227,7 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 
-		if (isPushing)
-		{
-			AddMovementInput(GetActorRightVector(), Value);
-		}
-		else
+		if (!isPushing)
 		{
 			AddMovementInput(Direction, Value);
 		}
