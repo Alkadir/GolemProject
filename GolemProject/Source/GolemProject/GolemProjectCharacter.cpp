@@ -145,7 +145,7 @@ void AGolemProjectCharacter::TurnAtRate(float Rate)
 
 void AGolemProjectCharacter::LookUpAtRate(float Rate)
 {
-	if (isPushing)
+	if (!isPushing)
 	{
 		// calculate delta for this frame from the rate information
 		AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
@@ -202,11 +202,13 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 		if (isPushing)
 		{
+			GetCharacterMovement()->bOrientRotationToMovement = false;
 			AddMovementInput(GetActorForwardVector(), Value);
-			UE_LOG(LogTemp, Log, TEXT("Forward : %s - Value : %f"), *GetActorForwardVector().ToString(), Value);
+			//UE_LOG(LogTemp, Log, TEXT("Forward : %s - Value : %f"), *GetActorForwardVector().ToString(), Value);
 		}
 		else
 		{
+			GetCharacterMovement()->bOrientRotationToMovement = true;
 			AddMovementInput(Direction, Value);
 		}
 	}
@@ -215,7 +217,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 void AGolemProjectCharacter::MoveRight(float Value)
 {
 	m_valueRight = Value;
-	if ((Controller != NULL) && (Value != 0.0f) && !isPushing)
+	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -225,7 +227,14 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 
-		AddMovementInput(Direction, Value);
+		if (isPushing)
+		{
+			AddMovementInput(GetActorRightVector(), Value);
+		}
+		else
+		{
+			AddMovementInput(Direction, Value);
+		}
 	}
 }
 
