@@ -4,6 +4,8 @@
 #include "ProjectileHand.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Classes/Components/StaticMeshComponent.h"
+#include "Player/GrappleComponent.h"
+#include "Helpers/HelperLibrary.h"
 // Sets default values
 AProjectileHand::AProjectileHand()
 {
@@ -17,27 +19,42 @@ void AProjectileHand::BeginPlay()
 {
 	Super::BeginPlay();
 	meshComponent = FindComponentByClass<UStaticMeshComponent>();
+
 	bIsColliding = false;
+	bIsComingBack = false;
 	meshComponent->OnComponentHit.AddDynamic(this, &AProjectileHand::OnHit);
 }
 
-void AProjectileHand::LaunchProjectile(const FVector& _direction)
+void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple)
 {
 	direction = _direction;
+	grappleComponent = _grapple;
 }
 
 // Called every frame
 void AProjectileHand::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (meshComponent && meshComponent->IsSimulatingPhysics())
-		meshComponent->SetPhysicsLinearVelocity(direction * velocity);
 
+	if (bIsComingBack)
+	{
+		if (grappleComponent)
+		{
+			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
+			dir.Normalize();
+			meshComponent->SetPhysicsLinearVelocity(dir * velocity);
+		}
+	}
+	else
+	{
+		if (meshComponent && meshComponent->IsSimulatingPhysics())
+			meshComponent->SetPhysicsLinearVelocity(direction * velocity);
+	}
 }
 
 void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HitComponent != nullptr && OtherActor != this)
+	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
 	{
 		meshComponent->SetSimulatePhysics(false);
 		bIsColliding = true;

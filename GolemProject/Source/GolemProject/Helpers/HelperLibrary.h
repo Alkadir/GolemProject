@@ -10,22 +10,34 @@
  */
 class GOLEMPROJECT_API HelperLibrary
 {
+private:
+	/*static AActor* ActorToCalculateDistanceWith;
+
+	inline static bool SortByDistance(const AActor& _actor1, const AActor& _actor2)
+	{
+		return _actor1.GetDistanceTo(ActorToCalculateDistanceWith) < _actor2.GetDistanceTo(ActorToCalculateDistanceWith);
+	}*/
+
 public:
+
 	template <class T>
 	static T* GetComponentByName(const AActor* _actor, const FString& _name)
 	{
 		TArray<UActorComponent*> objts;
 		_actor->GetComponents<UActorComponent>(objts);
 
-		for (int i = 0; i < objts.Num(); i++)
+		for (auto& component : objts)
 		{
-			UActorComponent* component = objts[i];
-
 			if (component && component->GetName() == _name)
+			{
 				return Cast<T>(component);
+			}
 		}
 		return nullptr;
 	};
 
-	static void Print(const float& _time, const FString& _message);
+	static void Print(const FString& _message, const float& _time = 3.0f, const FColor _color = FColor::Silver);
+
+	static void SortActorsByDistanceTo(TArray<AActor*> _inOutActorArray, AActor* _character);
+
 };
