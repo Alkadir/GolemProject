@@ -88,7 +88,7 @@ void UGrappleComponent::GoToDestination(FVector _destination)
 //cancel projectile
 void UGrappleComponent::Cancel()
 {
-	if (currentProjectile)
+	if (currentProjectile&&!currentProjectile->IsColliding())
 	{
 		currentProjectile->SetComingBack(true);
 	}
@@ -178,7 +178,6 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		{
 			if (dist > maxDistance)
 			{
-				HelperLibrary::Print("dsfsdfsd", 10.0f);
 				currentProjectile->SetComingBack(true);
 			}
 		}
