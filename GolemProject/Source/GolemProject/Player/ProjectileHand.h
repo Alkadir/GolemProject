@@ -13,7 +13,10 @@ class GOLEMPROJECT_API AProjectileHand : public AActor
 
 	FVector direction;
 	class UStaticMeshComponent* meshComponent;
+	class UGrappleComponent* grappleComponent;
+
 	bool bIsColliding;
+	bool bIsComingBack;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 3000.0f;
@@ -32,8 +35,12 @@ public:
 	UFUNCTION()
 	const bool& IsColliding();
 
+	FORCEINLINE void SetComingBack(const bool& _isComingBack) {  bIsComingBack = _isComingBack; };
+
+	FORCEINLINE const bool& IsComingBack() { return bIsComingBack; };
+
 	UFUNCTION()
-	void LaunchProjectile(const FVector& _direction);
+		void LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple);
 
 	UFUNCTION()
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return meshComponent; };
