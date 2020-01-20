@@ -38,6 +38,6 @@ public:
 
 	static void Print(const FString& _message, const float& _time = 3.0f, const FColor _color = FColor::Silver);
 
-	static void SortActorsByDistanceTo(TArray<AActor*> _inOutActorArray, AActor* _character);
+	static void SortActorsByDistanceTo(TArray<AActor*>& _inOutActorArray, AActor* _character);
 
 };

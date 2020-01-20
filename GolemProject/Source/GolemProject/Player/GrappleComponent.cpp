@@ -37,12 +37,12 @@ void UGrappleComponent::BeginPlay()
 	mIdBone = mSkeletalMesh->GetBoneIndex("hand_r");
 	UChildActorComponent* child = HelperLibrary::GetComponentByName<UChildActorComponent>(mCharacter, "ShoulderCamera");
 	mCamera = HelperLibrary::GetComponentByName<UCameraComponent>(child->GetChildActor(), "Camera");
-	if (UWorld * world = GetWorld())
+	if (UWorld* world = GetWorld())
 	{
 		GameMode = Cast<AGolemProjectGameMode>(world->GetAuthGameMode());
 
 	}
-	if (APlayerController * ctrl = Cast<APlayerController>(mCharacter->GetController()))
+	if (APlayerController* ctrl = Cast<APlayerController>(mCharacter->GetController()))
 	{
 		PlayerCameraManager = ctrl->PlayerCameraManager;
 	}
@@ -50,14 +50,14 @@ void UGrappleComponent::BeginPlay()
 
 void UGrappleComponent::CheckElementTargetable()
 {
-	TArray<AActor*> actorCloseEnough;
 	if (mCharacter == nullptr) return;
 	TArray<AActor*> allActors = GameMode->GetActorsTargetable();
 	if (allActors.Num() <= 0) return;
+	TArray<AActor*> actorCloseEnough;
 
-	if (UCameraComponent * followingCam = mCharacter->GetFollowCamera())
+	if (UCameraComponent* followingCam = mCharacter->GetFollowCamera())
 	{
-		if (UWorld * world = GetWorld())
+		if (UWorld* world = GetWorld())
 		{
 			for (AActor* actor : allActors)
 			{
@@ -72,10 +72,10 @@ void UGrappleComponent::CheckElementTargetable()
 			for (AActor* actor : actorCloseEnough)
 			{
 				// > 0 object seen
-				FVector FromSoftware = (actor->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
+				FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation()).GetSafeNormal();
+				//to change and finish
 				if (FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware) > 0.0f)
 				{
-					HelperLibrary::Print(actor->GetName(), 2.0f);
 					FHitResult hitResult;
 
 					if (world->LineTraceSingleByChannel(hitResult, mCharacter->GetActorLocation(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
@@ -97,6 +97,8 @@ void UGrappleComponent::CheckElementTargetable()
 //launch projectile
 void UGrappleComponent::GoToDestination(bool _isAssisted)
 {
+	CheckElementTargetable();
+	if (_isAssisted && ClosestGrapplingHook == nullptr) return;
 	if (!currentProjectile)
 	{
 		UWorld* world = GetWorld();
@@ -108,7 +110,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
-				FVector offset = _isAssisted && ClosestGrapplingHook != nullptr ? ClosestGrapplingHook->GetActorLocation() : mCamera->GetForwardVector() * accuracy;
+				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : mCamera->GetForwardVector() * accuracy;
 				FVector direction = (offset - currentProjectile->GetActorLocation()).GetSafeNormal();
 
 				currentProjectile->Instigator = mCharacter->GetInstigator();
@@ -168,7 +170,7 @@ void UGrappleComponent::UpdateIKArm()
 void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	CheckElementTargetable();
+
 	if (mCharacter)
 	{
 		if (mCharacter->GetSightCameraEnabled() && !currentProjectile)
@@ -225,7 +227,7 @@ void UGrappleComponent::PlayerIsNear()
 {
 	//Find destination stop player
 
-	if (AController * ctrl = mCharacter->GetController())
+	if (AController* ctrl = mCharacter->GetController())
 	{
 		if (mCharacter)
 		{
