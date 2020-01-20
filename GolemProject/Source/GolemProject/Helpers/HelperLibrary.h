@@ -26,17 +26,17 @@ public:
 		TArray<UActorComponent*> objts;
 		_actor->GetComponents<UActorComponent>(objts);
 
-		for (int i = 0; i < objts.Num(); i++)
+		for (auto& component : objts)
 		{
-			UActorComponent* component = objts[i];
-
 			if (component && component->GetName() == _name)
+			{
 				return Cast<T>(component);
+			}
 		}
 		return nullptr;
 	};
 
-	static void Print(const float& _time, const FString& _message, FColor _color = FColor::Silver);
+	static void Print(const FString& _message, const float& _time = 3.0f, const FColor _color = FColor::Silver);
 
 	static void SortActorsByDistanceTo(TArray<AActor*> _inOutActorArray, AActor* _character);
 
