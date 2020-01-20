@@ -49,9 +49,6 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-
-
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -63,7 +60,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGolemProjectCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//Input left Mouse Click
@@ -82,10 +79,6 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("TurnRate", this, &AGolemProjectCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGolemProjectCharacter::LookUpAtRate);
-
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AGolemProjectCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AGolemProjectCharacter::TouchStopped);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
 }
@@ -107,9 +100,17 @@ void AGolemProjectCharacter::BeginPlay()
 	}
 }
 
+void AGolemProjectCharacter::Jump()
+{
+	if (!isPushing)
+	{
+		Super::Jump();
+	}
+}
+
 void AGolemProjectCharacter::Dash()
 {
-	if (dashComponent != nullptr)
+	if (dashComponent != nullptr && !isPushing)
 	{
 		if (Controller != NULL)
 		{
@@ -133,36 +134,27 @@ void AGolemProjectCharacter::Fire()
 	}
 }
 
-void AGolemProjectCharacter::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-
-void AGolemProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	Jump();
-}
-
-void AGolemProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	StopJumping();
-}
-
 void AGolemProjectCharacter::TurnAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	if (!isPushing)
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	}
 }
 
 void AGolemProjectCharacter::LookUpAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	if (isPushing)
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	}
 }
 
 void AGolemProjectCharacter::ChangeCamera()
 {
-	if (sightCamera)
+	if (sightCamera && !isPushing)
 	{
 		APlayerController* pc = Cast<APlayerController>(GetController());
 		if (pc)
@@ -196,7 +188,6 @@ void AGolemProjectCharacter::MoveForward(float Value)
 	m_valueForward = Value;
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
-
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -209,14 +200,22 @@ void AGolemProjectCharacter::MoveForward(float Value)
 			Direction = mGrapple->GetDirection();
 		}
 
-		AddMovementInput(Direction, Value);
+		if (isPushing)
+		{
+			AddMovementInput(GetActorForwardVector(), Value);
+			UE_LOG(LogTemp, Log, TEXT("Forward : %s - Value : %f"), *GetActorForwardVector().ToString(), Value);
+		}
+		else
+		{
+			AddMovementInput(Direction, Value);
+		}
 	}
 }
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
 	m_valueRight = Value;
-	if ((Controller != NULL) && (Value != 0.0f))
+	if ((Controller != NULL) && (Value != 0.0f) && !isPushing)
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();

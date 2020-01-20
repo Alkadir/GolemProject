@@ -87,17 +87,16 @@ protected:
 
 	float m_valueRight;
 
-	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
-
-	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	bool isPushing = false;
 
 	UPROPERTY(EditAnywhere)
 	class UDashComponent* dashComponent;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void Jump() override;
 
 	void Dash();
 
