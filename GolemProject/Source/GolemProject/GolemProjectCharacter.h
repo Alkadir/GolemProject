@@ -14,6 +14,12 @@ class AGolemProjectCharacter : public ACharacter
 	UPROPERTY(EditAnyWhere, Category = "Debug")
 	bool showCursor = false;
 
+	UPROPERTY()
+	bool isSightCameraEnabled = false;
+
+	UPROPERTY()
+	class UUserWidget* currentSightWidget = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
 	class UGrappleComponent* mGrapple;
 
@@ -24,8 +30,16 @@ class AGolemProjectCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY()
+	class UChildActorComponent* sightCamera;
+
+	float initialGroundFriction;
 public:
 	AGolemProjectCharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
+	TSubclassOf<class UUserWidget>  sightHudClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -35,8 +49,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UFUNCTION(BlueprintCallable, Category = "Hud")
+	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+
+	void ResetFriction();
+
 protected:
+
 	virtual void BeginPlay() override;
+
 	void Fire();
 
 	/** Resets HMD orientation in VR. */
@@ -60,6 +81,12 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
+	void ChangeCamera();
+
+	float m_valueForward;
+
+	float m_valueRight;
+
 	/** Handler for when a touch input begins. */
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
 
@@ -69,7 +96,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UDashComponent* dashComponent;
 
-protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

@@ -22,17 +22,27 @@ protected:
 
 	class AGolemProjectCharacter* m_character;
 
-	UPROPERTY(EditAnywhere, Category = VelocityDash)
-		float m_forceDash = 2000.0f;
+	class UCharacterMovementComponent* CharacterMovementCmpt;
 
-	UPROPERTY(EditAnywhere, Category = VelocityDash)
-		float m_timerStopDash = 0.2f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
+		float ForceDash = 2000.0f;
 
-	UPROPERTY(EditAnywhere, Category = TimerDash)
-		float m_cdDash = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
+		float ForceAfterDash = 500.0f;
 
-	//commentaire
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
+		float TimerStopDash = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TimerDash)
+		float CDDash = 1.0f;
+
+	FVector CurrentVelocity;
+
+	FVector CurrentDirection;
+
 	bool m_canDash;
+
+	bool HasDashInAir;
 
 	float m_groundFriction;
 
@@ -50,5 +60,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Dash(FVector _direction);
+
+	UFUNCTION(BlueprintCallable)
+		void ResetDashInAir();
 		
 };
