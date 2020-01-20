@@ -44,6 +44,9 @@ public:
 	void GoToDestination();
 
 	UFUNCTION()
+	void GoToDestination(FVector _destination);
+
+	UFUNCTION()
 	void Cancel();
 
 	UFUNCTION(BlueprintCallable)
