@@ -18,6 +18,9 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 	FVector mDirection;
 	int32 mIdBone;
 	class AProjectileHand* currentProjectile;
+	AActor* ClosestGrapplingHook;
+	class AGolemProjectGameMode* GameMode;
+	class APlayerCameraManager* PlayerCameraManager;
 
 	float accuracy = 100000.0f;
 
@@ -33,8 +36,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float offsetStop = 200.0f;
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	void CheckElementTargetable();
 
 public:
 	UPROPERTY()
@@ -43,9 +49,7 @@ public:
 	UGrappleComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void GoToDestination();
-
-	void GoToDestination(FVector _destination);
+	void GoToDestination(bool _isAssisted);
 
 	UFUNCTION()
 	void Cancel();

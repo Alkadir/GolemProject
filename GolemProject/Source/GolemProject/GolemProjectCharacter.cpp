@@ -105,11 +105,10 @@ void AGolemProjectCharacter::BeginPlay()
 	mGrapple = FindComponentByClass<UGrappleComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
-
 	APlayerController* pc = Cast<APlayerController>(GetController());
 	if (pc)
 	{
-		PlayerCameraManager = pc->PlayerCameraManager;
+		
 		pc->bShowMouseCursor = showCursor;
 	}
 }
@@ -132,55 +131,12 @@ void AGolemProjectCharacter::Dash()
 	}
 }
 
-void AGolemProjectCharacter::CheckElementTargetable()
-{
-	TArray<AActor*> actorCloseEnough;
-	if (UWorld * world = GetWorld())
-	{
-		//for (AActor* actor : )
-		//{
-		//	if (!actor->Implements<UTargetable>()) continue;
-
-		//	if (FVector::DistSquared(actor->GetActorLocation(), GetActorLocation()) < 1000.0f * 1000.0f)
-		//	{
-		//		actorCloseEnough.Add(actor);
-		//	}
-		//}
-		//HelperLibrary::SortActorsByDistanceTo(actorCloseEnough, this);
-		//for (AActor* actor : actorCloseEnough)
-		//{
-		//	// > 0 object seen
-		//	FVector FromSoftware = (actor->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
-		//	if (FVector::DotProduct(FollowCamera->GetForwardVector(), FromSoftware) > 0.0f)
-		//	{
-		//		FHitResult hitResult;
-
-		//		if (world->LineTraceSingleByChannel(hitResult, GetActorLocation(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
-		//		{
-		//			ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
-		//			if (target != nullptr)
-		//			{
-		//				ClosestGrapplingHook = actor;
-		//				break;
-		//			}
-		//		}
-		//	}
-			ClosestGrapplingHook = nullptr;
-		}
-	//}
-}
-
 void AGolemProjectCharacter::UseAssistedGrapple()
 {
-	if (ClosestGrapplingHook != nullptr && mGrapple != nullptr)
+	if (mGrapple != nullptr)
 	{
-		mGrapple->GoToDestination(ClosestGrapplingHook->GetActorLocation());
+		mGrapple->GoToDestination(true);
 	}
-}
-
-void AGolemProjectCharacter::Tick(float DeltaTime)
-{
-	CheckElementTargetable();
 }
 
 void AGolemProjectCharacter::Fire()
@@ -190,7 +146,7 @@ void AGolemProjectCharacter::Fire()
 		mGrapple->Cancel();
 
 		if(isSightCameraEnabled)
-			mGrapple->GoToDestination();
+			mGrapple->GoToDestination(false);
 	}
 }
 

@@ -40,14 +40,9 @@ class AGolemProjectCharacter : public ACharacter
 
 	float m_valueRight;
 
-	AActor* ClosestGrapplingHook;
-
-	APlayerCameraManager* PlayerCameraManager;
-
 public:
 	AGolemProjectCharacter();
 
-	class AGolemProjectGameMode* GameMode;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
 	TSubclassOf<class UUserWidget>  sightHudClass;
 
@@ -109,8 +104,6 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Dash();
-
-	void CheckElementTargetable();
 
 	void UseAssistedGrapple();
 
