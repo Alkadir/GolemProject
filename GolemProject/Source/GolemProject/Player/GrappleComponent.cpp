@@ -178,7 +178,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		{
 			if (dist > maxDistance)
 			{
-				HelperLibrary::Print(10.0f, "dsfsdfsd");
+				HelperLibrary::Print("dsfsdfsd", 10.0f);
 				currentProjectile->SetComingBack(true);
 			}
 		}
