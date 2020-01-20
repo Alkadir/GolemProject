@@ -127,9 +127,12 @@ void AGolemProjectCharacter::Dash()
 
 void AGolemProjectCharacter::Fire()
 {
-	if (mGrapple && isSightCameraEnabled)
+	if (mGrapple)
 	{
-		mGrapple->GoToDestination();
+		mGrapple->Cancel();
+
+		if(isSightCameraEnabled)
+			mGrapple->GoToDestination();
 	}
 }
 

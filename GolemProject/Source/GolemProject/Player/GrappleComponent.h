@@ -43,6 +43,9 @@ public:
 	UFUNCTION()
 	void GoToDestination();
 
+	UFUNCTION()
+	void Cancel();
+
 	UFUNCTION(BlueprintCallable)
 	void SetIKArm(FVector& _lookAt, bool& _isBlend);
 
@@ -52,6 +55,12 @@ public:
 	FORCEINLINE const FVector& GetDirection() { return mDirection; };
 
 	FORCEINLINE class AProjectileHand* GetProjectile() { return currentProjectile; };
+
+	UFUNCTION()
+	FVector GetHandPosition();
+
+	UFUNCTION()
+	void PlayerIsNear();
 
 	UFUNCTION()
 	void UpdateIKArm();
