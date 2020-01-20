@@ -54,7 +54,7 @@ void AProjectileHand::Tick(float DeltaTime)
 
 void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HitComponent != nullptr && OtherActor != this)
+	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
 	{
 		meshComponent->SetSimulatePhysics(false);
 		bIsColliding = true;
