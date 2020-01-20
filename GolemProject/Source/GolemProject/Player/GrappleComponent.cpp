@@ -12,6 +12,7 @@
 #include "Classes/Components/SkeletalMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Player/ProjectileHand.h"
+#include "Classes/Components/StaticMeshComponent.h"
 
 // Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
@@ -45,22 +46,23 @@ void UGrappleComponent::GoToDestination()
 
 		if (world && mCamera)
 		{
-			FHitResult hitResult;
+			/*FHitResult hitResult;
 
 			if (world->LineTraceSingleByChannel(hitResult, mCamera->GetComponentLocation(), mCamera->GetForwardVector() * maxDistance, ECollisionChannel::ECC_Visibility))
-			{
+			{*/
 				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 
 				currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 				if (currentProjectile)
 				{
-					FVector direction = (hitResult.Location - currentProjectile->GetActorLocation()).GetSafeNormal();
-					mDestination = hitResult.Location;
+					FVector offset = mCamera->GetForwardVector() * maxDistance;
+					FVector direction = (offset - currentProjectile->GetActorLocation()).GetSafeNormal();//(hitResult.Location - currentProjectile->GetActorLocation()).GetSafeNormal();
+					//mDestination = hitResult.Location;
 					currentProjectile->Instigator = mCharacter->GetInstigator();
 					currentProjectile->SetOwner(mCharacter);
 					currentProjectile->LaunchProjectile(direction);
 				}
-			}
+			//}
 		}
 	}
 }
@@ -107,8 +109,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	{
 		if (mCharacter)
 		{
-
-			mDirection = mDestination - mCharacter->GetActorLocation();
+			mDirection = currentProjectile->GetMeshComponent()->GetComponentLocation() - mCharacter->GetActorLocation();
 			float dist = mDirection.Size();
 
 			mDirection.Normalize();

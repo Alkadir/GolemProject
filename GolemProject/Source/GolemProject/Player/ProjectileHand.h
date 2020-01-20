@@ -29,8 +29,15 @@ protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 public:
+	UFUNCTION()
 	const bool& IsColliding();
+
+	UFUNCTION()
 	void LaunchProjectile(const FVector& _direction);
+
+	UFUNCTION()
+	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return meshComponent; };
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
