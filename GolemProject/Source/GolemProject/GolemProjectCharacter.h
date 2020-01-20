@@ -14,6 +14,12 @@ class AGolemProjectCharacter : public ACharacter
 	UPROPERTY(EditAnyWhere, Category = "Debug")
 	bool showCursor = false;
 
+	UPROPERTY()
+	bool isSightCameraEnabled = false;
+
+	UPROPERTY()
+	class UUserWidget* currentSightWidget = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
 	class UGrappleComponent* mGrapple;
 
@@ -24,8 +30,16 @@ class AGolemProjectCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY()
+	class UChildActorComponent* sightCamera;
+
+	float initialGroundFriction;
 public:
 	AGolemProjectCharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
+	TSubclassOf<class UUserWidget>  sightHudClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -35,7 +49,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UFUNCTION(BlueprintCallable, Category = "Hud")
+	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+
+	void ResetFriction();
+
 protected:
+
+	virtual void BeginPlay() override;
 
 	void Fire();
 
@@ -48,17 +69,23 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Value);
 
-	/** 
-	 * Called via input to turn at a given rate. 
+	/**
+	 * Called via input to turn at a given rate.
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void TurnAtRate(float Rate);
 
 	/**
-	 * Called via input to turn look up/down at a given rate. 
+	 * Called via input to turn look up/down at a given rate.
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
+
+	void ChangeCamera();
+
+	float m_valueForward;
+
+	float m_valueRight;
 
 	/** Handler for when a touch input begins. */
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
@@ -66,11 +93,13 @@ protected:
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
-protected:
+	UPROPERTY(EditAnywhere)
+	class UDashComponent* dashComponent;
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	// End of APawn interface
-	virtual void BeginPlay() override;
+
+	void Dash();
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -78,4 +107,3 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };
-
