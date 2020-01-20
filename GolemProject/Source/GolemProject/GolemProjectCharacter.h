@@ -58,6 +58,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	//To do
+	//virtual void Tick(float _deltaTime) override;
+
 	void Fire();
 
 	/** Resets HMD orientation in VR. */
