@@ -21,7 +21,7 @@ class GOLEMPROJECT_API ADoor : public AActor, public IActivable
 
 public:
 	// Sets default values for this actor's properties
-	ADoor();
+	ADoor(const FObjectInitializer& OI);
 
 protected:
 	// Called when the game starts or when spawned
