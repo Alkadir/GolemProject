@@ -147,7 +147,7 @@ void AGolemProjectCharacter::CheckElementTargetable()
 		HelperLibrary::SortActorsByDistanceTo(actorCloseEnough, this);
 		for (AActor* actor : actorCloseEnough)
 		{
-			// > 0 object seen 	
+			// > 0 object seen
 			FVector FromSoftware = (actor->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
 			if (FVector::DotProduct(FollowCamera->GetForwardVector(), FromSoftware) > 0.0f)
 			{
@@ -171,9 +171,12 @@ void AGolemProjectCharacter::CheckElementTargetable()
 void AGolemProjectCharacter::Fire()
 {
 	CheckElementTargetable();
-	if (mGrapple && isSightCameraEnabled)
+	if (mGrapple)
 	{
-		mGrapple->GoToDestination();
+		mGrapple->Cancel();
+
+		if(isSightCameraEnabled)
+			mGrapple->GoToDestination();
 	}
 }
 
