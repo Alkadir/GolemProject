@@ -24,32 +24,31 @@ protected:
 
 	class UCharacterMovementComponent* CharacterMovementCmpt;
 
-	UPROPERTY(EditAnywhere, Category = VelocityDash)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
 		float ForceDash = 2000.0f;
 
-	UPROPERTY(EditAnywhere, Category = VelocityDash)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
 		float ForceAfterDash = 500.0f;
 
-	UPROPERTY(EditAnywhere, Category = VelocityDash)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
 		float TimerStopDash = 0.2f;
 
-	UPROPERTY(EditAnywhere, Category = TimerDash)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TimerDash)
 		float CDDash = 1.0f;
 
 	FVector CurrentVelocity;
 
 	FVector CurrentDirection;
 
-	//commentaire
 	bool m_canDash;
+
+	bool HasDashInAir;
 
 	float m_groundFriction;
 
 	FTimerHandle m_loopTimer;
 
 	FTimerHandle m_timerDash;
-
-	int CptDash;
 
 	void StopDash();
 
@@ -61,5 +60,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Dash(FVector _direction);
+
+	UFUNCTION(BlueprintCallable)
+		void ResetDashInAir();
 		
 };

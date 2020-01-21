@@ -31,7 +31,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
-		bool Interact(const AActor* caller) const;
-	virtual bool Interact_Implementation(const AActor* caller) const override;
+		const bool Interact(const AActor* caller);
+	virtual const bool Interact_Implementation(const AActor* caller) override;
 
 };

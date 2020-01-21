@@ -11,6 +11,9 @@
 #include "Player/DashComponent.h"
 #include <Engine/Engine.h>
 #include "Player/GrappleComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "Helpers/HelperLibrary.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -64,7 +67,10 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//Input left Mouse Click
-	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AGolemProjectCharacter::Fire);
+	PlayerInputComponent->BindAction("Fire1", IE_Released, this, &AGolemProjectCharacter::Fire);
+
+	PlayerInputComponent->BindAction("Fire2", IE_Pressed, this, &AGolemProjectCharacter::ChangeCamera);
+	PlayerInputComponent->BindAction("Fire2", IE_Released, this, &AGolemProjectCharacter::ChangeCamera);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGolemProjectCharacter::MoveRight);
@@ -87,8 +93,13 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 void AGolemProjectCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
+
+	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
+	initialGroundFriction = GetCharacterMovement()->GroundFriction;
+
 	APlayerController* pc = Cast<APlayerController>(GetController());
 	if (pc)
 	{
@@ -103,7 +114,7 @@ void AGolemProjectCharacter::Dash()
 		if (Controller != NULL)
 		{
 			FVector direction = GetLastMovementInputVector();
-			
+
 			if (m_valueForward == 0.0f && m_valueRight == 0.0f)
 			{
 				direction = GetActorForwardVector();
@@ -118,7 +129,10 @@ void AGolemProjectCharacter::Fire()
 {
 	if (mGrapple)
 	{
-		mGrapple->GoToDestination();
+		mGrapple->Cancel();
+
+		if(isSightCameraEnabled)
+			mGrapple->GoToDestination();
 	}
 }
 
@@ -149,6 +163,37 @@ void AGolemProjectCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AGolemProjectCharacter::ChangeCamera()
+{
+	if (sightCamera)
+	{
+		APlayerController* pc = Cast<APlayerController>(GetController());
+		if (pc)
+		{
+			if (!isSightCameraEnabled)
+			{
+				isSightCameraEnabled = true;
+				GetCharacterMovement()->bOrientRotationToMovement = false;
+				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
+
+				if (currentSightWidget)
+					currentSightWidget->AddToViewport();
+
+			}
+			else
+			{
+				if (currentSightWidget)
+					currentSightWidget->RemoveFromViewport();
+
+				isSightCameraEnabled = false;
+				GetCharacterMovement()->bOrientRotationToMovement = true;
+				pc->SetViewTargetWithBlend(this, 0.25f);
+			}
+
+		}
+	}
+}
+
 void AGolemProjectCharacter::MoveForward(float Value)
 {
 	m_valueForward = Value;
@@ -160,7 +205,13 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		if (isSightCameraEnabled || mGrapple->GetProjectile())
+		{
+			Direction = mGrapple->GetDirection();
+		}
+
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -177,6 +228,12 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		// get right vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
+
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AGolemProjectCharacter::ResetFriction()
+{
+	GetCharacterMovement()->GroundFriction = initialGroundFriction;
 }
