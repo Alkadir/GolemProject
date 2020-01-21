@@ -8,12 +8,15 @@
 #include "UObject/UObjectGlobals.h"
 
 // Sets default values
-ADoor::ADoor()
+ADoor::ADoor(const FObjectInitializer& OI)
+	: Super(OI)
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	USceneComponent* Root = OI.CreateDefaultSubobject<USceneComponent>(this, TEXT("Root"));
+	SetRootComponent(Root);
 	destination = CreateDefaultSubobject<USceneComponent>(TEXT("DestinationDoor"));
-	destination->SetupAttachment(RootComponent);
+	destination->SetupAttachment(Root);
 }
 
 // Called when the game starts or when spawned
@@ -22,8 +25,6 @@ void ADoor::BeginPlay()
 	Super::BeginPlay();
 	startPos = GetActorLocation();
 	destinationPos = destination->GetComponentLocation();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("start  %f %f %f"), startPos.X, startPos.Y, startPos.Z));
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("dest  %f %f %f"), destinationPos.X, destinationPos.Y, destinationPos.Z));
 }
 
 // Called every frame
@@ -60,12 +61,20 @@ void ADoor::Tick(float DeltaTime)
 
 const bool ADoor::Activate_Implementation(const AActor* caller)
 {
+	if (isActivate)
+	{
+		return false;
+	}
 	isActivate = true;
 	return true;
 }
 
 const bool ADoor::Desactivate_Implementation(const AActor* caller)
 {
+	if (!isActivate)
+	{
+		return false;
+	}
 	isActivate = false;
 	return true;
 }
