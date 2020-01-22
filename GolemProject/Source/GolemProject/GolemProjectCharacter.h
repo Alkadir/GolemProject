@@ -35,6 +35,11 @@ class AGolemProjectCharacter : public ACharacter
 	class UChildActorComponent* sightCamera;
 
 	float initialGroundFriction;
+
+	float m_valueForward;
+
+	float m_valueRight;
+
 public:
 	AGolemProjectCharacter();
 
@@ -86,10 +91,6 @@ protected:
 
 	void ChangeCamera();
 
-	float m_valueForward;
-
-	float m_valueRight;
-
 	/** Handler for when a touch input begins. */
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
 
@@ -103,6 +104,8 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Dash();
+
+	void UseAssistedGrapple();
 
 public:
 	/** Returns CameraBoom subobject **/

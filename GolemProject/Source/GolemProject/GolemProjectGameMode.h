@@ -13,6 +13,16 @@ class AGolemProjectGameMode : public AGameModeBase
 
 public:
 	AGolemProjectGameMode();
+
+	inline TArray<AActor*> GetActorsTargetable() const
+	{
+		return ActorsTargetable;
+	}
+
+protected:
+	UPROPERTY(BlueprintReadWrite)
+		TArray<AActor*> ActorsTargetable;
+
 };
 
 
