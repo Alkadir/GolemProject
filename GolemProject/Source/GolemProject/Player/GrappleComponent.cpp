@@ -40,7 +40,6 @@ void UGrappleComponent::BeginPlay()
 	if (UWorld* world = GetWorld())
 	{
 		GameMode = Cast<AGolemProjectGameMode>(world->GetAuthGameMode());
-
 	}
 	if (APlayerController* ctrl = Cast<APlayerController>(mCharacter->GetController()))
 	{
@@ -51,6 +50,7 @@ void UGrappleComponent::BeginPlay()
 void UGrappleComponent::CheckElementTargetable()
 {
 	if (mCharacter == nullptr) return;
+	if (GameMode == nullptr) return;
 	TArray<AActor*> allActors = GameMode->GetActorsTargetable();
 	if (allActors.Num() <= 0) return;
 	TArray<AActor*> actorCloseEnough;
@@ -73,18 +73,19 @@ void UGrappleComponent::CheckElementTargetable()
 			{
 				// > 0 object seen
 				FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation()).GetSafeNormal();
+				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
+					HelperLibrary::Print(FString::SanitizeFloat(dot), 2.0f, FColor::Emerald);
 				//to change and finish
-				if (FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware) > 0.0f)
+				if (dot > minDot && dot < maxDot)
 				{
 					FHitResult hitResult;
-
 					if (world->LineTraceSingleByChannel(hitResult, mCharacter->GetActorLocation(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
 					{
 						ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
 						if (target != nullptr)
 						{
 							ClosestGrapplingHook = actor;
-							break;
+							return;
 						}
 					}
 				}
@@ -124,7 +125,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 //cancel projectile
 void UGrappleComponent::Cancel()
 {
-	if (currentProjectile&&!currentProjectile->IsColliding())
+	if (currentProjectile && !currentProjectile->IsColliding())
 	{
 		currentProjectile->SetComingBack(true);
 	}
