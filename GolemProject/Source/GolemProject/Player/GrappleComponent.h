@@ -18,21 +18,35 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 	FVector mDirection;
 	int32 mIdBone;
 	class AProjectileHand* currentProjectile;
+	AActor* ClosestGrapplingHook;
+	class AGolemProjectGameMode* GameMode;
+	class APlayerCameraManager* PlayerCameraManager;
+
+	float accuracy = 100000.0f;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "projectile", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AProjectileHand> handProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float maxDistance = 100000.0f;
+	float maxDistance = 3000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float offsetStop = 200.0f;
+
+	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))
+		float maxDot = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))
+		float minDot = 0.0f;
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	void CheckElementTargetable();
 
 public:
 	UPROPERTY()
@@ -40,8 +54,8 @@ public:
 	// Sets default values for this component's properties
 	UGrappleComponent();
 
-	UFUNCTION()
-	void GoToDestination();
+	UFUNCTION(BlueprintCallable)
+	void GoToDestination(bool _isAssisted);
 
 	UFUNCTION()
 	void Cancel();

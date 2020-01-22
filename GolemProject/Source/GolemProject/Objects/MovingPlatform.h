@@ -54,7 +54,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 		int startIndexCheckpoint = 0;
 	UPROPERTY(EditAnywhere)
-		TArray<float> speed;
+		TArray<float> speeds;
 	UPROPERTY(EditAnywhere)
 		TArray<float> waitTimes;
 
@@ -69,6 +69,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 		USceneComponent* pathParent;
+	UPROPERTY(EditDefaultsOnly)
+		USceneComponent* path1;
 
 	TArray<FVector> worldCheckpoint;
 

@@ -13,6 +13,10 @@
 #include "Player/GrappleComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Helpers/HelperLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Interfaces/Targetable.h"
+#include "Camera/PlayerCameraManager.h"
+#include "GolemProjectGameMode.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -61,6 +65,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 
 void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
@@ -71,6 +76,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("Fire2", IE_Pressed, this, &AGolemProjectCharacter::ChangeCamera);
 	PlayerInputComponent->BindAction("Fire2", IE_Released, this, &AGolemProjectCharacter::ChangeCamera);
+
+	PlayerInputComponent->BindAction("AssistedGrapple", IE_Pressed, this, &AGolemProjectCharacter::UseAssistedGrapple);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGolemProjectCharacter::MoveRight);
@@ -96,13 +103,12 @@ void AGolemProjectCharacter::BeginPlay()
 	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
-
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
-
 	APlayerController* pc = Cast<APlayerController>(GetController());
 	if (pc)
 	{
+
 		pc->bShowMouseCursor = showCursor;
 	}
 }
@@ -125,6 +131,14 @@ void AGolemProjectCharacter::Dash()
 	}
 }
 
+void AGolemProjectCharacter::UseAssistedGrapple()
+{
+	if (mGrapple != nullptr)
+	{
+		mGrapple->GoToDestination(true);
+	}
+}
+
 void AGolemProjectCharacter::Fire()
 {
 	if (mGrapple)
@@ -132,7 +146,7 @@ void AGolemProjectCharacter::Fire()
 		mGrapple->Cancel();
 
 		if(isSightCameraEnabled)
-			mGrapple->GoToDestination();
+			mGrapple->GoToDestination(false);
 	}
 }
 
@@ -176,13 +190,13 @@ void AGolemProjectCharacter::ChangeCamera()
 				GetCharacterMovement()->bOrientRotationToMovement = false;
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
 
-				if (currentSightWidget)
+				if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
 					currentSightWidget->AddToViewport();
 
 			}
 			else
 			{
-				if (currentSightWidget)
+				if (currentSightWidget && currentSightWidget->IsInViewport())
 					currentSightWidget->RemoveFromViewport();
 
 				isSightCameraEnabled = false;
@@ -226,9 +240,19 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get right vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
+		if (isSightCameraEnabled || mGrapple->GetProjectile())
+		{
+			Direction = mGrapple->GetDirection();
 
+			float X = Direction.X;
+			float Y = Direction.Y;
+			float Z = Direction.Z;
+
+			Direction.X = -Y;
+			Direction.Y = X;
+		}
 		AddMovementInput(Direction, Value);
 	}
 }

@@ -2,6 +2,7 @@
 
 
 #include "MovingPlatform.h"
+#include "Helpers/HelperLibrary.h"
 
 // Sets default values
 AMovingPlatform::AMovingPlatform(const FObjectInitializer& OI)
@@ -12,6 +13,8 @@ AMovingPlatform::AMovingPlatform(const FObjectInitializer& OI)
 	SetRootComponent(Root);
 	pathParent = CreateDefaultSubobject<USceneComponent>(TEXT("pathParen"));
 	pathParent->SetupAttachment(Root);
+	path1 = CreateDefaultSubobject<USceneComponent>(TEXT("Path1"));
+	path1->SetupAttachment(pathParent);
 
 }
 
@@ -26,6 +29,17 @@ void AMovingPlatform::BeginPlay()
 void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (speeds.Num() < worldCheckpoint.Num())
+	{
+		HelperLibrary::Print("ERROR Speed is not initialized for all path points", 15.f, FColor::Red);
+		return;
+	}
+	if (waitTimes.Num() < worldCheckpoint.Num())
+	{
+		HelperLibrary::Print("ERROR WaitTime is not initialized for all path points", 15.f, FColor::Red);
+		return;
+	}
 
 	if (worldCheckpoint.Num() <= 1 || !isActivate || direction == EMovingDirection::None || isPause)
 	{
@@ -53,11 +67,22 @@ void AMovingPlatform::Init()
 {
 	TArray<USceneComponent*> childrens;
 	pathParent->GetChildrenComponents(false, childrens);
+	if (childrens.Num() == 0)
+	{
+		HelperLibrary::Print("WARNING There is no path", 15.f, FColor::Yellow);
+	}
 	for (auto& path : childrens)
 	{
 		worldCheckpoint.Add(path->GetComponentLocation());
 	}
-	waitTime = waitTimes[0];
+	if (waitTimes.Num() > 0)
+	{
+		waitTime = waitTimes[0];
+	}
+	else
+	{
+		waitTime = 0.f;
+	}
 	if (startIndexCheckpoint >= 0 && startIndexCheckpoint < worldCheckpoint.Num())
 	{
 		currentIndex = startIndexCheckpoint;
@@ -96,7 +121,7 @@ void AMovingPlatform::MoveLine(float dt)
 	float totalDistance = (endPos - startPos).Size();
 	float traveledDistance = (GetActorLocation() - startPos).Size();
 	float percentageTraveledDistance = traveledDistance / totalDistance;
-	float distanceToGo = (direction == EMovingDirection::Forward ? speed[currentIndex] : speed[nextIndex]) * dt;/* *
+	float distanceToGo = (direction == EMovingDirection::Forward ? speeds[currentIndex] : speeds[nextIndex]) * dt;/* *
 		(direction == EMovingDirection::Forward ? speedCurve[currentIndex].Evaluate(percentageTraveledDistance) : speedCurve[nextIndex].Evaluate(percentageTraveledDistance));*/
 	while (distanceToGo > 0 && waitTime <= 0.f)
 	{
