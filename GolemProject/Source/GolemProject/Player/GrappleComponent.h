@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))
 		float minDot = 0.0f;
 
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+		float minDistance = 100.0f;
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
