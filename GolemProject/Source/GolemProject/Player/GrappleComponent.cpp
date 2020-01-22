@@ -37,6 +37,7 @@ void UGrappleComponent::BeginPlay()
 	mIdBone = mSkeletalMesh->GetBoneIndex("hand_r");
 	UChildActorComponent* child = HelperLibrary::GetComponentByName<UChildActorComponent>(mCharacter, "ShoulderCamera");
 	mCamera = HelperLibrary::GetComponentByName<UCameraComponent>(child->GetChildActor(), "Camera");
+	IsFiring = false;
 	if (UWorld* world = GetWorld())
 	{
 		GameMode = Cast<AGolemProjectGameMode>(world->GetAuthGameMode());
@@ -132,6 +133,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				currentProjectile->Instigator = mCharacter->GetInstigator();
 				currentProjectile->SetOwner(mCharacter);
 				currentProjectile->LaunchProjectile(direction, this);
+				IsFiring = true;
 			}
 		}
 	}
@@ -254,6 +256,7 @@ void UGrappleComponent::PlayerIsNear()
 
 			currentProjectile->Destroy();
 			currentProjectile = nullptr;
+			IsFiring = false;
 		}
 	}
 }

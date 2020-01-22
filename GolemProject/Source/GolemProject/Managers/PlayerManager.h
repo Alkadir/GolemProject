@@ -63,7 +63,7 @@ private:
 	int Life;
 	FVector LastPositionGrounded;
 	FVector PositionCheckPoint;
-	FTimerHandler TimerHandlerInvul;
+	//FTimerHandler TimerHandlerInvul;
 	float TimerInvulnerability;
 	bool CanTakeDamage;
 	class AGolemProjectCharacter* Player;
