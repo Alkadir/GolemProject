@@ -65,7 +65,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 
 void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	
+
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
@@ -108,7 +108,7 @@ void AGolemProjectCharacter::BeginPlay()
 	APlayerController* pc = Cast<APlayerController>(GetController());
 	if (pc)
 	{
-		
+
 		pc->bShowMouseCursor = showCursor;
 	}
 }
@@ -190,13 +190,13 @@ void AGolemProjectCharacter::ChangeCamera()
 				GetCharacterMovement()->bOrientRotationToMovement = false;
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
 
-				if (currentSightWidget)
+				if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
 					currentSightWidget->AddToViewport();
 
 			}
 			else
 			{
-				if (currentSightWidget)
+				if (currentSightWidget && currentSightWidget->IsInViewport())
 					currentSightWidget->RemoveFromViewport();
 
 				isSightCameraEnabled = false;
@@ -240,9 +240,19 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get right vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
+		if (isSightCameraEnabled || mGrapple->GetProjectile())
+		{
+			Direction = mGrapple->GetDirection();
 
+			float X = Direction.X;
+			float Y = Direction.Y;
+			float Z = Direction.Z;
+
+			Direction.X = -Y;
+			Direction.Y = X;
+		}
 		AddMovementInput(Direction, Value);
 	}
 }

@@ -73,7 +73,8 @@ void UGrappleComponent::CheckElementTargetable()
 			for (AActor* actor : actorCloseEnough)
 			{
 				// > 0 object seen
-				FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation()).GetSafeNormal();
+				FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation());
+				FromSoftware /= FromSoftware.Size();
 				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
 				//to change and finish
 				if (dot > minDot&& dot < maxDot)
@@ -123,8 +124,10 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
+
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : mCamera->GetForwardVector() * accuracy;
-				FVector direction = (offset - currentProjectile->GetActorLocation()).GetSafeNormal();
+				FVector direction = (offset - currentProjectile->GetActorLocation());
+				direction /= direction.Size();
 
 				currentProjectile->Instigator = mCharacter->GetInstigator();
 				currentProjectile->SetOwner(mCharacter);
@@ -209,7 +212,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		{
 			if (mCharacter)
 			{
-				mDirection.Normalize();
+				mDirection/= mDirection.Size();
 
 				if (dist > offsetStop)
 				{
@@ -254,4 +257,3 @@ void UGrappleComponent::PlayerIsNear()
 		}
 	}
 }
-
