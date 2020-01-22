@@ -29,6 +29,7 @@ void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleCompon
 {
 	direction = _direction;
 	grappleComponent = _grapple;
+	
 }
 
 // Called every frame
@@ -41,7 +42,7 @@ void AProjectileHand::Tick(float DeltaTime)
 		if (grappleComponent)
 		{
 			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
-			dir.Normalize();
+			dir/=dir.Size();
 			meshComponent->SetPhysicsLinearVelocity(dir * velocity);
 		}
 	}
