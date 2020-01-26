@@ -11,7 +11,9 @@ UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 {
 	GENERATED_BODY()
-		class UCameraComponent* mCamera;
+
+	class UWorld* world;
+	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
 	class USkeletalMeshComponent* mSkeletalMesh;
 	FVector mDestination;
@@ -54,6 +56,12 @@ protected:
 
 	void CheckElementTargetable();
 
+	UFUNCTION()
+		void AttractCharacter();
+
+	UFUNCTION()
+		void PlayerIsNear();
+
 public:
 	UPROPERTY()
 		FVector IKposition;
@@ -80,9 +88,6 @@ public:
 
 	UFUNCTION()
 		FVector GetHandPosition();
-
-	UFUNCTION()
-		void PlayerIsNear();
 
 	UFUNCTION()
 		void UpdateIKArm();
