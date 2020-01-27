@@ -2,9 +2,8 @@
 
 
 #include "PlayerManager.h"
-#include "GolemProjectCharacter.h"
 
-void PlayerManager::InflictDamage(int _damage)
+void UPlayerManager::InflictDamage(int _damage)
 {
 	Life -= _damage;
 	CanTakeDamage = false;
@@ -12,12 +11,4 @@ void PlayerManager::InflictDamage(int _damage)
 	{
 		//kill player
 	}
-}
-
-PlayerManager::PlayerManager()
-{
-}
-
-PlayerManager::~PlayerManager()
-{
 }

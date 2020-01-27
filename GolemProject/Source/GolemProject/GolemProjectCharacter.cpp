@@ -94,7 +94,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &AGolemProjectCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &AGolemProjectCharacter::TouchStopped);
 
-	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
+		PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -115,7 +115,7 @@ void AGolemProjectCharacter::BeginPlay()
 
 void AGolemProjectCharacter::Dash()
 {
-	if (dashComponent != nullptr)
+	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr)
 	{
 		if (Controller != NULL)
 		{
@@ -145,7 +145,7 @@ void AGolemProjectCharacter::Fire()
 	{
 		mGrapple->Cancel();
 
-		if(isSightCameraEnabled)
+		if (isSightCameraEnabled)
 			mGrapple->GoToDestination(false);
 	}
 }

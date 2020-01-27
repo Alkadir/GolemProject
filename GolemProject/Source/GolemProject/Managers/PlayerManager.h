@@ -3,16 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
+#include "PlayerManager.generated.h"
 
 /**
- *
+ * 
  */
-class GOLEMPROJECT_API PlayerManager
+UCLASS()
+class GOLEMPROJECT_API UPlayerManager : public UObject
 {
+	GENERATED_BODY()
 public:
-	inline static PlayerManager* GetInstance()
+	inline static UPlayerManager* GetInstance()
 	{
-		static PlayerManager Instance;
+		static UPlayerManager Instance;
 
 		return &Instance;
 	};
@@ -23,7 +27,7 @@ public:
 	};
 	void InflictDamage(int _damage);
 
-	inline FVector GetLastPositionGrounded() const 
+	inline FVector GetLastPositionGrounded() const
 	{
 		return LastPositionGrounded;
 	};
@@ -59,11 +63,9 @@ private:
 	int Life;
 	FVector LastPositionGrounded;
 	FVector PositionCheckPoint;
+	//FTimerHandler TimerHandlerInvul;
 	float TimerInvulnerability;
 	bool CanTakeDamage;
 	class AGolemProjectCharacter* Player;
 
-private:
-	PlayerManager();
-	~PlayerManager();
 };

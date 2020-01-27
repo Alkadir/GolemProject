@@ -32,15 +32,17 @@ protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 public:
-	UFUNCTION()
-	const bool& IsColliding();
+
+	FORCEINLINE	void SetColliding(const bool& _isColliding) { bIsColliding = _isColliding; };
+	
+	FORCEINLINE const bool& IsColliding() { return bIsColliding; };
 
 	FORCEINLINE void SetComingBack(const bool& _isComingBack) {  bIsComingBack = _isComingBack; };
 
 	FORCEINLINE const bool& IsComingBack() { return bIsComingBack; };
 
 	UFUNCTION()
-		void LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple);
+	void LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple);
 
 	UFUNCTION()
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return meshComponent; };

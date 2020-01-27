@@ -37,7 +37,10 @@ void UGrappleComponent::BeginPlay()
 	mIdBone = mSkeletalMesh->GetBoneIndex("hand_r");
 	UChildActorComponent* child = HelperLibrary::GetComponentByName<UChildActorComponent>(mCharacter, "ShoulderCamera");
 	mCamera = HelperLibrary::GetComponentByName<UCameraComponent>(child->GetChildActor(), "Camera");
-	if (UWorld* world = GetWorld())
+	IsFiring = false;
+	world = GetWorld();
+
+	if (world)
 	{
 		GameMode = Cast<AGolemProjectGameMode>(world->GetAuthGameMode());
 	}
@@ -57,13 +60,14 @@ void UGrappleComponent::CheckElementTargetable()
 
 	if (UCameraComponent* followingCam = mCharacter->GetFollowCamera())
 	{
-		if (UWorld* world = GetWorld())
+		if (world)
 		{
 			for (AActor* actor : allActors)
 			{
 				if (!actor->Implements<UTargetable>()) continue;
 
-				if (FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) < maxDistance * maxDistance)
+				if (FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) < maxDistance * maxDistance &&
+					FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) > minDistance* minDistance)
 				{
 					actorCloseEnough.Add(actor);
 				}
@@ -72,22 +76,35 @@ void UGrappleComponent::CheckElementTargetable()
 			for (AActor* actor : actorCloseEnough)
 			{
 				// > 0 object seen
-				FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation()).GetSafeNormal();
+				FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation());
+				FromSoftware /= FromSoftware.Size();
 				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
-					HelperLibrary::Print(FString::SanitizeFloat(dot), 2.0f, FColor::Emerald);
 				//to change and finish
-				if (dot > minDot && dot < maxDot)
+				if (dot > minDot&& dot < maxDot)
 				{
 					FHitResult hitResult;
 					if (world->LineTraceSingleByChannel(hitResult, mCharacter->GetActorLocation(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
 					{
+						if (ClosestGrapplingHook != nullptr && ClosestGrapplingHook == hitResult.GetActor()) return;
 						ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
 						if (target != nullptr)
 						{
+							if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+							{
+								Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
+							}
+							target->Execute_CreateHUD(hitResult.GetActor());
 							ClosestGrapplingHook = actor;
 							return;
 						}
 					}
+				}
+			}
+			if (ClosestGrapplingHook != nullptr)
+			{
+				if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+				{
+					Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
 				}
 				ClosestGrapplingHook = nullptr;
 			}
@@ -98,25 +115,24 @@ void UGrappleComponent::CheckElementTargetable()
 //launch projectile
 void UGrappleComponent::GoToDestination(bool _isAssisted)
 {
-	CheckElementTargetable();
 	if (_isAssisted && ClosestGrapplingHook == nullptr) return;
 	if (!currentProjectile)
 	{
-		UWorld* world = GetWorld();
-
 		if (world && mCamera)
 		{
 			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
-
+			
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : mCamera->GetForwardVector() * accuracy;
-				FVector direction = (offset - currentProjectile->GetActorLocation()).GetSafeNormal();
+				FVector direction = (offset - currentProjectile->GetActorLocation());
+				direction /= direction.Size();
 
 				currentProjectile->Instigator = mCharacter->GetInstigator();
 				currentProjectile->SetOwner(mCharacter);
 				currentProjectile->LaunchProjectile(direction, this);
+				IsFiring = true;
 			}
 		}
 	}
@@ -133,7 +149,11 @@ void UGrappleComponent::Cancel()
 
 void UGrappleComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 {
-	_lookAt = IKposition;
+	if(!currentProjectile)
+		_lookAt = IKposition;
+	else 
+		_lookAt = currentProjectile->GetMeshComponent()->GetComponentLocation();
+
 	_isBlend = (mCharacter->GetSightCameraEnabled() || currentProjectile);
 }
 
@@ -149,8 +169,6 @@ FVector UGrappleComponent::GetHandPosition()
 
 void UGrappleComponent::UpdateIKArm()
 {
-	UWorld* world = GetWorld();
-
 	if (world && mCamera)
 	{
 
@@ -171,7 +189,9 @@ void UGrappleComponent::UpdateIKArm()
 void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	CheckElementTargetable();
 
+	//Update Ik Arm animation
 	if (mCharacter)
 	{
 		if (mCharacter->GetSightCameraEnabled() && !currentProjectile)
@@ -197,14 +217,11 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		{
 			if (mCharacter)
 			{
-				mDirection.Normalize();
+				mDirection /= mDirection.Size();
 
 				if (dist > offsetStop)
 				{
-					mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
-					mCharacter->LaunchCharacter(mDirection * velocity, false, false);
-					mDirection.Z = 0.0f;
-					mCharacter->SetActorRotation(mDirection.Rotation());
+					AttractCharacter();
 				}
 				else
 				{
@@ -239,7 +256,27 @@ void UGrappleComponent::PlayerIsNear()
 
 			currentProjectile->Destroy();
 			currentProjectile = nullptr;
+			IsFiring = false;
 		}
 	}
 }
 
+void UGrappleComponent::AttractCharacter()
+{
+	mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
+	mCharacter->LaunchCharacter(mDirection * velocity, false, false);
+	mDirection.Z = 0.0f;
+	mCharacter->SetActorRotation(mDirection.Rotation());
+
+	if (world)
+	{
+		FHitResult hit;
+		float offset = 100.0f;
+		if (world->LineTraceSingleByChannel(hit, mCharacter->GetActorLocation(), mCharacter->GetActorLocation() + mDirection * offset, ECollisionChannel::ECC_Visibility))
+		{
+			
+			currentProjectile->SetComingBack(true);
+			currentProjectile->SetColliding(false);
+		}
+	}
+}
