@@ -12,8 +12,6 @@ UDashComponent::UDashComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// ...
 }
 
 
@@ -28,10 +26,6 @@ void UDashComponent::BeginPlay()
 	if (m_character != nullptr)
 	{
 		CharacterMovementCmpt = m_character->GetCharacterMovement();
-		if (CharacterMovementCmpt != nullptr)
-		{
-			m_groundFriction = CharacterMovementCmpt->GroundFriction;
-		}
 	}
 }
 
@@ -50,7 +44,7 @@ void UDashComponent::StopDash()
 			{
 				CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
 			}
-			CharacterMovementCmpt->GroundFriction = m_groundFriction;
+			m_character->ResetFriction();
 		}
 	}
 }

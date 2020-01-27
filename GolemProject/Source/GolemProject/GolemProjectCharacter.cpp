@@ -17,6 +17,7 @@
 #include "Interfaces/Targetable.h"
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
+#include "Player/HealthComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -94,7 +95,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &AGolemProjectCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &AGolemProjectCharacter::TouchStopped);
 
-		PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -103,12 +104,13 @@ void AGolemProjectCharacter::BeginPlay()
 	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
+	HealthComponent = FindComponentByClass<UHealthComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
 	APlayerController* pc = Cast<APlayerController>(GetController());
+	HealthComponent->SetLastPositionGrounded(GetActorLocation());
 	if (pc)
 	{
-
 		pc->bShowMouseCursor = showCursor;
 	}
 }

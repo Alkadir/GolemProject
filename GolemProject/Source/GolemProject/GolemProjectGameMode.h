@@ -18,11 +18,12 @@ public:
 	{
 		return ActorsTargetable;
 	}
+	UPROPERTY(BlueprintReadWrite)
+	class UPlayerManager* PlayerManager;
 
 protected:
 	UPROPERTY(BlueprintReadWrite)
 		TArray<AActor*> ActorsTargetable;
-
 };
 
 
