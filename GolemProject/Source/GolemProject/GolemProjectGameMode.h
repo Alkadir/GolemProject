@@ -24,7 +24,6 @@ public:
 protected:
 	UPROPERTY(BlueprintReadWrite)
 		TArray<AActor*> ActorsTargetable;
-
 };
 
 

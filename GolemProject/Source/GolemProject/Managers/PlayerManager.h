@@ -17,6 +17,7 @@ private :
 	void ResetInvulnerability();
 
 public:
+
 	UPlayerManager(const FObjectInitializer& ObjectInitializer);
 	/*inline static UPlayerManager* GetInstance()
 	{
@@ -49,6 +50,7 @@ public:
 	{
 		PositionCheckPoint = _positionCheckPoint;
 	};
+
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	class AGolemProjectCharacter* GetPlayer() const
 	{
@@ -66,7 +68,6 @@ public:
 	void RespawnPlayerAfterDeath();
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void RespawnPlayerAfterFall();
-
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void Initialize(int _maxLife, float _timerInvulnerability, class AGolemProjectCharacter* _player);
 
@@ -79,5 +80,4 @@ private:
 	bool CanTakeDamage;
 	FTimerHandle TimerHandlerInvul;
 	class AGolemProjectCharacter* Player;
-
 };

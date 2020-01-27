@@ -17,7 +17,7 @@
 #include "Interfaces/Targetable.h"
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
-#include "Managers/PlayerManager.h"
+#include "Player/HealthComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -104,6 +104,7 @@ void AGolemProjectCharacter::BeginPlay()
 	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
+	HealthComponent = FindComponentByClass<UHealthComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
 	APlayerController* pc = Cast<APlayerController>(GetController());
