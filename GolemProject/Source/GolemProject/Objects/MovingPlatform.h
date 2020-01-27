@@ -57,6 +57,10 @@ protected:
 		TArray<float> speeds;
 	UPROPERTY(EditAnywhere)
 		TArray<float> waitTimes;
+	UPROPERTY(EditAnywhere)
+		bool isStair = false;
+	UPROPERTY(EditAnywhere)
+		bool alwaysActive = false;
 
 	int currentIndex;
 	int nextIndex;
@@ -68,7 +72,7 @@ protected:
 
 
 	UPROPERTY(EditDefaultsOnly)
-		USceneComponent* pathParent;
+		class USceneComponent* pathParent;
 	UPROPERTY(EditDefaultsOnly)
 		USceneComponent* path1;
 

@@ -3,6 +3,7 @@
 
 #include "MovingPlatform.h"
 #include "Helpers/HelperLibrary.h"
+#include "Components/SceneComponent.h"
 
 // Sets default values
 AMovingPlatform::AMovingPlatform(const FObjectInitializer& OI)
@@ -98,6 +99,17 @@ void AMovingPlatform::Init()
 	else
 	{
 		dir = 1;
+	}
+	if (isStair)
+	{
+		if (alwaysActive)
+		{
+			platformType = EMovingPlatformType::PingPong;
+		}
+		else
+		{
+			platformType = EMovingPlatformType::Once;
+		}
 	}
 	nextIndex = currentIndex + dir;
 	if (nextIndex < 0)
@@ -214,6 +226,7 @@ const bool AMovingPlatform::Activate_Implementation(const AActor* caller)
 	{
 		return false;
 	}
+	direction = EMovingDirection::Forward;
 	isActivate = true;
 	return true;
 }
@@ -224,6 +237,7 @@ const bool AMovingPlatform::Desactivate_Implementation(const AActor* caller)
 	{
 		return false;
 	}
+	direction = EMovingDirection::Backward;
 	isActivate = false;
 	return true;
 }
@@ -231,6 +245,14 @@ const bool AMovingPlatform::Desactivate_Implementation(const AActor* caller)
 const bool AMovingPlatform::Switch_Implementation(const AActor* caller)
 {
 	isActivate = !isActivate;
+	if (isActivate)
+	{
+		direction = EMovingDirection::Forward;
+	}
+	else
+	{
+		direction = EMovingDirection::Backward;
+	}
 	return true;
 }
 
