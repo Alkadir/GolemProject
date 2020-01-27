@@ -108,6 +108,7 @@ void AGolemProjectCharacter::BeginPlay()
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
 	APlayerController* pc = Cast<APlayerController>(GetController());
+	HealthComponent->SetLastPositionGrounded(GetActorLocation());
 	if (pc)
 	{
 		pc->bShowMouseCursor = showCursor;

@@ -3,6 +3,9 @@
 
 #include "HealthComponent.h"
 #include "GolemProjectCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Helpers/HelperLibrary.h"
+#include "GameFramework/Controller.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -22,24 +25,39 @@ void UHealthComponent::BeginPlay()
 	if (AActor* owner = GetOwner())
 	{
 		Player = Cast<AGolemProjectCharacter>(owner);
+		PlayerController = Player->GetController();
 	}
-	// ...
-	
+	CanTakeDamage = true;
 }
 
 
 void UHealthComponent::InflictDamage(int _damage)
 {
-	Life -= _damage;
-	CanTakeDamage = false;
-	if (UWorld* world = GetWorld())
+	if (CanTakeDamage)
 	{
-		world->GetTimerManager().SetTimer(TimerHandlerInvul, this, &UHealthComponent::ResetInvulnerability, TimerInvulnerability, true);
-	}
-	if (Life <= 0)
-	{
-		Life = 0;
-		//kill player
+		Life -= _damage;
+		CanTakeDamage = false;
+		if (Life <= 0)
+		{
+			Life = 0;
+			if (UWorld* world = GetWorld())
+			{
+				world->GetTimerManager().SetTimer(TimerHandlerRespawn, this, &UHealthComponent::Respawn, TimerRespawn, false);
+			}
+			if (UCharacterMovementComponent* cmc = Player->GetCharacterMovement())
+			{
+				cmc->Deactivate();
+
+			}
+			//kill player
+		}
+		else
+		{
+			if (UWorld* world = GetWorld())
+			{
+				world->GetTimerManager().SetTimer(TimerHandlerInvul, this, &UHealthComponent::ResetInvulnerability, TimerInvulnerability, false);
+			}
+		}
 	}
 }
 
@@ -48,11 +66,33 @@ void UHealthComponent::ResetInvulnerability()
 	CanTakeDamage = true;
 }
 
+void UHealthComponent::Respawn()
+{
+	Life = MaxLife;
+	CanTakeDamage = true;
+	Player->SetActorLocation(LastPositionGrounded);
+	if (UCharacterMovementComponent* cmc = Player->GetCharacterMovement())
+	{
+		cmc->Activate();
+
+	}
+}
+
 // Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UHealthComponent::SetLastPositionGrounded(FVector _lastPositionGrounded)
+{
+	LastPositionGrounded = _lastPositionGrounded;
+}
+
+void UHealthComponent::SetPositionCheckPoint(FVector _positionCheckPoint)
+{
+	PositionCheckPoint = _positionCheckPoint;
 }
 

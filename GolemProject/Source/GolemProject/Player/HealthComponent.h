@@ -20,40 +20,51 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
-	int MaxLife;
+	int MaxLife = 10;
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
-	int Life;
+	int Life = 10;
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
-	float TimerInvulnerability;
+	float TimerInvulnerability = 0.5f;
+	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
+	float TimerRespawn = 3.0f;
+
 	bool CanTakeDamage;
 	FTimerHandle TimerHandlerInvul;
-	class AGolemProjectCharacter* Player;
+	FTimerHandle TimerHandlerRespawn;
+	class AGolemProjectCharacter* Player;	
+	class AController* PlayerController;
+	FVector LastPositionGrounded;
+	FVector PositionCheckPoint;
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
-		inline int GetLife() const
+	inline int GetLife() const
 	{
 		return Life;
 	};
-
-	UFUNCTION(BlueprintCallable, Category = "Gameplay")
-		class AGolemProjectCharacter* GetPlayer() const
-	{
-		return Player;
-	};
-
-	void SetPlayer(class AGolemProjectCharacter* _player)
-	{
-		Player = _player;
-	}
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void InflictDamage(int _damage);
 
 private:
 	void ResetInvulnerability();
+	void Respawn();
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+		inline FVector GetLastPositionGrounded() const
+	{
+		return LastPositionGrounded;
+	};
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void SetLastPositionGrounded(FVector _lastPositionGrounded);
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+		inline FVector GetPositionCheckPoint() const
+	{
+		return PositionCheckPoint;
+	};
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void SetPositionCheckPoint(FVector _positionCheckPoint);
 		
 };
