@@ -13,7 +13,10 @@ class GOLEMPROJECT_API AProjectileHand : public AActor
 
 	FVector direction;
 	class UStaticMeshComponent* meshComponent;
+	class UGrappleComponent* grappleComponent;
+
 	bool bIsColliding;
+	bool bIsComingBack;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 3000.0f;
@@ -29,8 +32,21 @@ protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 public:
-	const bool& IsColliding();
-	void LaunchProjectile(const FVector& _direction);
+
+	FORCEINLINE	void SetColliding(const bool& _isColliding) { bIsColliding = _isColliding; };
+	
+	FORCEINLINE const bool& IsColliding() { return bIsColliding; };
+
+	FORCEINLINE void SetComingBack(const bool& _isComingBack) {  bIsComingBack = _isComingBack; };
+
+	FORCEINLINE const bool& IsComingBack() { return bIsComingBack; };
+
+	UFUNCTION()
+	void LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple);
+
+	UFUNCTION()
+	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return meshComponent; };
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

@@ -31,10 +31,18 @@ class AGolemProjectCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
+	class UHealthComponent* HealthComponent;
+
 	UPROPERTY()
 	class UChildActorComponent* sightCamera;
 
 	float initialGroundFriction;
+
+	float m_valueForward;
+
+	float m_valueRight;
+
 public:
 	AGolemProjectCharacter();
 
@@ -57,6 +65,9 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	//To do
+	//virtual void Tick(float _deltaTime) override;
 
 	void Fire();
 
@@ -99,6 +110,8 @@ protected:
 	void Jump() override;
 
 	void Dash();
+
+	void UseAssistedGrapple();
 
 public:
 	/** Returns CameraBoom subobject **/

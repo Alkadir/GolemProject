@@ -26,7 +26,7 @@ void ALever::Tick(float DeltaTime)
 
 }
 
-bool ALever::Interact_Implementation(const AActor * caller) const
+const bool ALever::Interact_Implementation(const AActor * caller)
 {
 	bool haveActivate = false;
 	for (auto& objectToActivate : objectsToActivate)
@@ -35,17 +35,17 @@ bool ALever::Interact_Implementation(const AActor * caller) const
 		{
 			if (activationType == EActivationType::Activate)
 			{
-				activable->Activate(this);
+				activable->Execute_Activate(objectToActivate, this);
 				haveActivate = true;
 			}
 			else if (activationType == EActivationType::Desactivate)
 			{
-				activable->Desactivate(this);
+				activable->Execute_Desactivate(objectToActivate, this);
 				haveActivate = true;
 			}
 			else if (activationType == EActivationType::Switch)
 			{
-				activable->Switch(this);
+				activable->Execute_Switch(objectToActivate, this);
 				haveActivate = true;
 			}
 		}

@@ -12,4 +12,5 @@ AGolemProjectGameMode::AGolemProjectGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
 }
