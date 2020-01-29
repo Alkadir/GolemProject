@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "GolemProjectCharacter.generated.h"
 
+class IInteractable;
+
 UCLASS(config=Game)
 class AGolemProjectCharacter : public ACharacter
 {
@@ -16,6 +18,12 @@ class AGolemProjectCharacter : public ACharacter
 
 	UPROPERTY()
 	bool isSightCameraEnabled = false;
+
+	float m_valueForward;
+
+	float m_valueRight;
+
+	IInteractable* toInteract = nullptr;
 
 	UPROPERTY()
 	class UUserWidget* currentSightWidget = nullptr;
@@ -67,9 +75,6 @@ protected:
 
 	void Fire();
 
-	/** Resets HMD orientation in VR. */
-	void OnResetVR();
-
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
@@ -90,10 +95,6 @@ protected:
 
 	void ChangeCamera();
 
-	float m_valueForward;
-
-	float m_valueRight;
-
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	bool isPushing = false;
 
@@ -109,9 +110,17 @@ protected:
 
 	void UseAssistedGrapple();
 
+	void Interact();
+
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	//Set interactable interface reference
+	FORCEINLINE void SetInteractable(IInteractable* pToInteract) { toInteract = pToInteract; }
+	
+	void PushBloc();
 };

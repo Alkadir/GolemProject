@@ -18,7 +18,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
 #include "Player/HealthComponent.h"
-
+#include "Interfaces/Interactable.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -66,7 +66,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGolemProjectCharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGolemProjectCharacter::Interact);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//Input left Mouse Click
@@ -89,6 +89,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGolemProjectCharacter::LookUpAtRate);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
+
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AGolemProjectCharacter::Interact);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -139,6 +141,51 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 	if (mGrapple != nullptr)
 	{
 		mGrapple->GoToDestination(true);
+	}
+}
+
+void AGolemProjectCharacter::Interact()
+{
+	if (toInteract != nullptr)
+	{
+		toInteract->Interact_Implementation(this);
+	}
+}
+
+void AGolemProjectCharacter::PushBloc()
+{
+	isPushing = !isPushing;
+
+	float blocAngle = 0.0f;
+	AActor* actorToInteract = Cast<AActor>(toInteract);
+
+	if (isPushing && actorToInteract != nullptr)
+	{
+		FVector blocDelta = actorToInteract->GetActorLocation() - GetActorLocation();
+
+		float angleDelta = FMath::Atan2(blocDelta.X, blocDelta.Y);
+		angleDelta = FMath::RadiansToDegrees(angleDelta) - 90.0f;
+
+		if (angleDelta >= -45.0f && angleDelta <= 45.0f)
+		{
+			blocAngle = 0.0f;
+		}
+		else if (angleDelta >= -135.0f && angleDelta <= -45.0f)
+		{
+			blocAngle = 90.0f;
+		}
+		else if (angleDelta >= -225.0f && angleDelta <= -135.0f)
+		{
+			blocAngle = 180.0f;
+		}
+		else if ((angleDelta >= -315.0f && angleDelta <= -225.0f) || (angleDelta >= 45.0f && angleDelta <= 90.0f))
+		{
+			blocAngle = 270.0f;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("%f"), angleDelta);
+
+		SetActorRotation(FRotator(0.0f, blocAngle, 0.0f));
 	}
 }
 
