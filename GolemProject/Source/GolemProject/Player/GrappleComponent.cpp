@@ -194,7 +194,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	//Update Ik Arm animation
 	if (mCharacter)
 	{
-		if (mCharacter->GetSightCameraEnabled() && !currentProjectile)
+		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
 		}

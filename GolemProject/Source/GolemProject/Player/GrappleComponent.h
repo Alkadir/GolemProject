@@ -49,7 +49,7 @@ protected:
 		float minDistance = 100.0f;
 
 	UPROPERTY()
-		bool IsFiring;
+	bool IsFiring;
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -64,36 +64,39 @@ protected:
 
 public:
 	UPROPERTY()
-		FVector IKposition;
+	FVector IKposition;
 	// Sets default values for this component's properties
 	UGrappleComponent();
 
 	UFUNCTION(BlueprintCallable)
-		void GoToDestination(bool _isAssisted);
+	void GoToDestination(bool _isAssisted);
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsTargetingGrapple;
 
 	UFUNCTION()
-		void Cancel();
+	void Cancel();
 
 	UFUNCTION(BlueprintCallable)
-		void SetIKArm(FVector& _lookAt, bool& _isBlend);
+	void SetIKArm(FVector& _lookAt, bool& _isBlend);
 
 	FORCEINLINE bool& GetIsFiring() { return IsFiring; }
 
 	UFUNCTION(BlueprintCallable)
-		FORCEINLINE FVector& GetIKPosition() { return IKposition; };
+	FORCEINLINE FVector& GetIKPosition() { return IKposition; };
 
 	FORCEINLINE const FVector& GetDirection() { return mDirection; };
 
 	FORCEINLINE class AProjectileHand* GetProjectile() { return currentProjectile; };
 
 	UFUNCTION()
-		FVector GetHandPosition();
+	FVector GetHandPosition();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; }
 
 	UFUNCTION()
-		void UpdateIKArm();
+	void UpdateIKArm();
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

@@ -18,6 +18,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
 #include "Player/HealthComponent.h"
+#include "Player/FistComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,6 +75,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("Fire2", IE_Pressed, this, &AGolemProjectCharacter::ChangeCamera);
 	PlayerInputComponent->BindAction("Fire2", IE_Released, this, &AGolemProjectCharacter::ChangeCamera);
+	PlayerInputComponent->BindAction("ChangeToGrapple", IE_Pressed, this, &AGolemProjectCharacter::ChangeToGrapple);
+	PlayerInputComponent->BindAction("ChangeToFist", IE_Pressed, this, &AGolemProjectCharacter::ChangeToFist);
 
 	PlayerInputComponent->BindAction("AssistedGrapple", IE_Pressed, this, &AGolemProjectCharacter::UseAssistedGrapple);
 
@@ -97,6 +100,7 @@ void AGolemProjectCharacter::BeginPlay()
 	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
+	FistComp = FindComponentByClass<UFistComponent>();
 	HealthComponent = FindComponentByClass<UHealthComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
@@ -106,6 +110,9 @@ void AGolemProjectCharacter::BeginPlay()
 	{
 		pc->bShowMouseCursor = showCursor;
 	}
+
+	mGrapple->IsTargetingGrapple = true;
+	FistComp->IsTargetingFist = false;
 }
 
 void AGolemProjectCharacter::Jump()
@@ -141,6 +148,19 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 		mGrapple->GoToDestination(true);
 	}
 }
+
+void AGolemProjectCharacter::ChangeToGrapple()
+{
+	mGrapple->IsTargetingGrapple = true;
+	FistComp->IsTargetingFist = false;
+}
+
+void AGolemProjectCharacter::ChangeToFist()
+{
+	FistComp->IsTargetingFist = true;
+	mGrapple->IsTargetingGrapple = false;
+}
+
 
 void AGolemProjectCharacter::Fire()
 {
@@ -214,9 +234,13 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		// get forward vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		if (isSightCameraEnabled || mGrapple->GetProjectile())
+		if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()))
 		{
 			Direction = mGrapple->GetDirection();
+		}
+		else if (FistComp->IsTargetingFist && (isSightCameraEnabled || FistComp->GetProjectile()))
+		{
+			Direction = FistComp->GetDirection();
 		}
 
 		if (isPushing)
@@ -245,9 +269,20 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		// get right vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
-		if (isSightCameraEnabled || mGrapple->GetProjectile() && !isPushing)
+		if (isSightCameraEnabled && (mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) && !isPushing)
 		{
 			Direction = mGrapple->GetDirection();
+
+			float X = Direction.X;
+			float Y = Direction.Y;
+			float Z = Direction.Z;
+
+			Direction.X = -Y;
+			Direction.Y = X; 
+		}
+		else if (isSightCameraEnabled && (FistComp->IsTargetingFist || FistComp->GetProjectile()) && !isPushing)
+		{
+			Direction = FistComp->GetDirection();
 
 			float X = Direction.X;
 			float Y = Direction.Y;
