@@ -85,24 +85,15 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Platform")
-		FORCEINLINE FVector GetPlatformVelocity()
-	{
-		return velocity;
-	}
+		const FVector GetPlatformVelocity()const { return velocity; }
 
 	UFUNCTION(BlueprintCallable, Category = "Platform")
-		FORCEINLINE EMovingDirection GetDirection()
-	{
-		return direction;
-	}
+		const EMovingDirection GetDirection()const { return direction; }
 
 	UFUNCTION(BlueprintCallable, Category = "Platform")
-		FORCEINLINE EMovingPlatformType GetPlatformType()
-	{
-		return platformType;
-	}
+		const EMovingPlatformType GetPlatformType()const { return platformType; }
 
-	inline const bool IsActivate() const { return isActivate; }
+		const bool IsActivate() const { return isActivate; }
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -112,16 +103,16 @@ public:
 		void UnPause() { isPause = false; }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		const bool Activate(const AActor* caller);
-	virtual const bool Activate_Implementation(const AActor* caller) override;
+		const bool Activate(AActor* caller);
+	virtual const bool Activate_Implementation(AActor* caller) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		bool Desactivate(const AActor* caller) const;
-	virtual const bool Desactivate_Implementation(const AActor* caller) override;
+		bool Desactivate(AActor* caller) const;
+	virtual const bool Desactivate_Implementation(AActor* caller) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		bool Switch(const AActor* caller) const;
-	virtual const bool Switch_Implementation(const AActor* caller) override;
+		bool Switch(AActor* caller);
+	virtual const bool Switch_Implementation(AActor* caller) override;
 
 
 };

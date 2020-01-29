@@ -29,8 +29,8 @@ public:
 	APushableBloc();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
-		const bool Interact(const AActor* caller);
-	virtual const bool Interact_Implementation(const AActor* caller) override;
+		const bool Interact(AActor* caller);
+	virtual const bool Interact_Implementation(AActor* caller) override;
 
 private:
 	void BeginPlay();

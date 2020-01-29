@@ -31,14 +31,14 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Trap")
-		const bool Activate(const AActor* caller);
-	virtual const bool Activate_Implementation(const AActor* caller) override;
+		const bool Activate(AActor* caller);
+	virtual const bool Activate_Implementation(AActor* caller) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Trap")
-		bool Desactivate(const AActor* caller) const;
-	virtual const bool Desactivate_Implementation(const AActor* caller) override;
+		const bool Desactivate(AActor* caller);
+	virtual const bool Desactivate_Implementation(AActor* caller) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Trap")
-		bool Switch(const AActor* caller) const;
-	virtual const bool Switch_Implementation(const AActor* caller) override;
+		const bool Switch(AActor* caller) ;
+	virtual const bool Switch_Implementation(AActor* caller) override;
 };
