@@ -44,22 +44,22 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool isActivate;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		EMovingPlatformType platformType = EMovingPlatformType::PingPong;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		EMovingDirection direction = EMovingDirection::Forward;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		int startIndexCheckpoint = 0;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		TArray<float> speeds;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		TArray<float> waitTimes;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool isStair = false;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool alwaysActive = false;
 
 	int currentIndex;
@@ -84,17 +84,20 @@ protected:
 
 public:
 
-	inline const FVector GetVelocity()
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		FORCEINLINE FVector GetPlatformVelocity()
 	{
 		return velocity;
 	}
 
-	inline const EMovingDirection GetDirection()
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		FORCEINLINE EMovingDirection GetDirection()
 	{
 		return direction;
 	}
 
-	inline const EMovingPlatformType GetPlatformType()
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		FORCEINLINE EMovingPlatformType GetPlatformType()
 	{
 		return platformType;
 	}
@@ -102,6 +105,11 @@ public:
 	inline const bool IsActivate() const { return isActivate; }
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		void Pause() { isPause = true; }
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		void UnPause() { isPause = false; }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
 		const bool Activate(const AActor* caller);

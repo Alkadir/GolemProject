@@ -8,7 +8,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Player/DashComponent.h"
 #include <Engine/Engine.h>
 #include "Player/GrappleComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -18,7 +17,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
 #include "Player/HealthComponent.h"
-
+#include "Interfaces/Interactable.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -54,9 +53,6 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-
-
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -69,7 +65,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGolemProjectCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//Input left Mouse Click
@@ -91,11 +87,9 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGolemProjectCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AGolemProjectCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AGolemProjectCharacter::TouchStopped);
-
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
+
+	PlayerInputComponent->BindAction("Interacte", IE_Pressed, this, &AGolemProjectCharacter::Interact);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -115,9 +109,17 @@ void AGolemProjectCharacter::BeginPlay()
 	}
 }
 
+void AGolemProjectCharacter::Jump()
+{
+	if (!isPushing)
+	{
+		Super::Jump();
+	}
+}
+
 void AGolemProjectCharacter::Dash()
 {
-	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr)
+	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr && !isPushing)
 	{
 		if (Controller != NULL)
 		{
@@ -141,6 +143,56 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 	}
 }
 
+void AGolemProjectCharacter::Interact()
+{
+	if (toInteract != nullptr)
+	{
+		toInteract->Interact_Implementation(this);
+	}
+}
+
+void AGolemProjectCharacter::PushBloc()
+{
+	isPushing = !isPushing;
+	GetCharacterMovement()->bOrientRotationToMovement = !isPushing;
+
+	float blocAngle = 0.0f;
+	AActor* actorToInteract = Cast<AActor>(toInteract);
+
+	if (isPushing && actorToInteract != nullptr)
+	{
+		FVector blocDelta = actorToInteract->GetActorLocation() - GetActorLocation();
+
+		float angleDelta = FMath::Atan2(blocDelta.X, blocDelta.Y);
+		angleDelta = FMath::RadiansToDegrees(angleDelta) - 90.0f;
+
+		if (angleDelta > -45.0f && angleDelta <= 45.0f)
+		{
+			blocAngle = 0.0f;
+		}
+		else if (angleDelta > -135.0f && angleDelta <= -45.0f)
+		{
+			blocAngle = 90.0f;
+		}
+		else if (angleDelta > -225.0f && angleDelta <= -135.0f)
+		{
+			blocAngle = 180.0f;
+		}
+		else if ((angleDelta > -315.0f && angleDelta <= -225.0f) || (angleDelta > 45.0f && angleDelta <= 90.0f))
+		{
+			blocAngle = 270.0f;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not in range"));
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("%f"), blocAngle);
+
+		SetActorRotation(FRotator(0.0f, blocAngle, 0.0f));
+	}
+}
+
 void AGolemProjectCharacter::Fire()
 {
 	if (mGrapple)
@@ -152,36 +204,27 @@ void AGolemProjectCharacter::Fire()
 	}
 }
 
-void AGolemProjectCharacter::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-
-void AGolemProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	Jump();
-}
-
-void AGolemProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	StopJumping();
-}
-
 void AGolemProjectCharacter::TurnAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	if (!isPushing)
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	}
 }
 
 void AGolemProjectCharacter::LookUpAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	if (!isPushing)
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	}
 }
 
 void AGolemProjectCharacter::ChangeCamera()
 {
-	if (sightCamera)
+	if (sightCamera && !isPushing)
 	{
 		APlayerController* pc = Cast<APlayerController>(GetController());
 		if (pc)
@@ -215,7 +258,6 @@ void AGolemProjectCharacter::MoveForward(float Value)
 	m_valueForward = Value;
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
-
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -228,7 +270,14 @@ void AGolemProjectCharacter::MoveForward(float Value)
 			Direction = mGrapple->GetDirection();
 		}
 
-		AddMovementInput(Direction, Value);
+		if (isPushing)
+		{
+			AddMovementInput(GetActorForwardVector(), Value);
+		}
+		else
+		{
+			AddMovementInput(Direction, Value);
+		}
 	}
 }
 
@@ -244,7 +293,7 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		// get right vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
-		if (isSightCameraEnabled || mGrapple->GetProjectile())
+		if (isSightCameraEnabled || mGrapple->GetProjectile() && !isPushing)
 		{
 			Direction = mGrapple->GetDirection();
 
