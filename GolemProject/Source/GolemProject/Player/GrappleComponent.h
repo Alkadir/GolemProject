@@ -16,14 +16,16 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
 	class USkeletalMeshComponent* mSkeletalMesh;
+	class AProjectileHand* currentProjectile;
+	class AActor* ClosestGrapplingHook;
+	class AGolemProjectGameMode* GameMode;
+	class APlayerCameraManager* PlayerCameraManager;
+	class SwingPhysics* swingPhysics = nullptr;
+
 	FVector mDestination;
 	FVector mDirection;
 	int32 mIdBone;
-	class AProjectileHand* currentProjectile;
-	AActor* ClosestGrapplingHook;
-	class AGolemProjectGameMode* GameMode;
-	class APlayerCameraManager* PlayerCameraManager;
-	class SwingPhysics* swingPhysics;
+	bool bIsAssisted = false;
 	float accuracy = 100000.0f;
 
 protected:

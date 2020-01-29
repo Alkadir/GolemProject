@@ -134,6 +134,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				currentProjectile->SetOwner(mCharacter);
 				currentProjectile->LaunchProjectile(direction, this);
 				IsFiring = true;
+				bIsAssisted = _isAssisted;
 			}
 		}
 	}
@@ -218,16 +219,25 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		{
 			if (mCharacter)
 			{
-				mDirection /= mDirection.Size();
-
-				if (dist > offsetStop)
+				if (!bIsAssisted)
 				{
-					AttractCharacter();
+					if (dist > offsetStop)
+					{
+						AttractCharacter();
+					}
+					else
+					{
+						PlayerIsNear();
+						return;
+					}
 				}
 				else
 				{
-					PlayerIsNear();
-					return;
+					if (!swingPhysics) 
+					{
+						ACharacter* c = Cast<ACharacter>(mCharacter);
+						swingPhysics = new SwingPhysics(c, ClosestGrapplingHook);
+					}
 				}
 			}
 		}
@@ -238,6 +248,9 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				currentProjectile->SetComingBack(true);
 			}
 		}
+
+		if (swingPhysics)
+			swingPhysics->Tick(DeltaTime);
 	}
 }
 
@@ -265,6 +278,7 @@ void UGrappleComponent::PlayerIsNear()
 
 void UGrappleComponent::AttractCharacter()
 {
+	mDirection /= mDirection.Size();
 	mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
 	mCharacter->LaunchCharacter(mDirection * velocity, false, false);
 	mDirection.Z = 0.0f;
