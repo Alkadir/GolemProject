@@ -39,10 +39,6 @@ class AGolemProjectCharacter : public ACharacter
 
 	float initialGroundFriction;
 
-	float m_valueForward;
-
-	float m_valueRight;
-
 public:
 	AGolemProjectCharacter();
 
