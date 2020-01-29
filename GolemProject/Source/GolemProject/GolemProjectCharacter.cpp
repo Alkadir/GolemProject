@@ -66,7 +66,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGolemProjectCharacter::Interact);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGolemProjectCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//Input left Mouse Click
@@ -90,7 +90,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
 
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AGolemProjectCharacter::Interact);
+	PlayerInputComponent->BindAction("Interacte", IE_Pressed, this, &AGolemProjectCharacter::Interact);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -166,24 +166,28 @@ void AGolemProjectCharacter::PushBloc()
 		float angleDelta = FMath::Atan2(blocDelta.X, blocDelta.Y);
 		angleDelta = FMath::RadiansToDegrees(angleDelta) - 90.0f;
 
-		if (angleDelta >= -45.0f && angleDelta <= 45.0f)
+		if (angleDelta > -45.0f && angleDelta <= 45.0f)
 		{
 			blocAngle = 0.0f;
 		}
-		else if (angleDelta >= -135.0f && angleDelta <= -45.0f)
+		else if (angleDelta > -135.0f && angleDelta <= -45.0f)
 		{
 			blocAngle = 90.0f;
 		}
-		else if (angleDelta >= -225.0f && angleDelta <= -135.0f)
+		else if (angleDelta > -225.0f && angleDelta <= -135.0f)
 		{
 			blocAngle = 180.0f;
 		}
-		else if ((angleDelta >= -315.0f && angleDelta <= -225.0f) || (angleDelta >= 45.0f && angleDelta <= 90.0f))
+		else if ((angleDelta > -315.0f && angleDelta <= -225.0f) || (angleDelta > 45.0f && angleDelta <= 90.0f))
 		{
 			blocAngle = 270.0f;
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not in range"));
+		}
 
-		UE_LOG(LogTemp, Warning, TEXT("%f"), angleDelta);
+		UE_LOG(LogTemp, Warning, TEXT("%f"), blocAngle);
 
 		SetActorRotation(FRotator(0.0f, blocAngle, 0.0f));
 	}
