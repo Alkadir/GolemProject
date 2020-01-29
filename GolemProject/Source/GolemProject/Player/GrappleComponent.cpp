@@ -15,6 +15,7 @@
 #include "Classes/Components/StaticMeshComponent.h"
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
+#include "SwingPhysics.h"
 
 // Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
@@ -121,7 +122,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 		if (world && mCamera)
 		{
 			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
-			
+
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
@@ -149,9 +150,9 @@ void UGrappleComponent::Cancel()
 
 void UGrappleComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 {
-	if(!currentProjectile)
+	if (!currentProjectile)
 		_lookAt = IKposition;
-	else 
+	else
 		_lookAt = currentProjectile->GetMeshComponent()->GetComponentLocation();
 
 	_isBlend = (mCharacter->GetSightCameraEnabled() || currentProjectile);
@@ -248,7 +249,8 @@ void UGrappleComponent::PlayerIsNear()
 	{
 		if (mCharacter)
 		{
-			mCharacter->GetCharacterMovement()->Velocity *= 0.15f;
+
+			mCharacter->GetCharacterMovement()->Velocity *= (currentProjectile->IsComingBack()) ? 1.0f : 0.15f;
 			mCharacter->ResetFriction();
 
 			mSkeletalMesh->UnHideBone(mIdBone);
@@ -274,7 +276,7 @@ void UGrappleComponent::AttractCharacter()
 		float offset = 100.0f;
 		if (world->LineTraceSingleByChannel(hit, mCharacter->GetActorLocation(), mCharacter->GetActorLocation() + mDirection * offset, ECollisionChannel::ECC_Visibility))
 		{
-			
+
 			currentProjectile->SetComingBack(true);
 			currentProjectile->SetColliding(false);
 		}

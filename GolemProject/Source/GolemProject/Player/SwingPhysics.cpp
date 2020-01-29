@@ -4,7 +4,15 @@
 #include "SwingPhysics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
-#include "Actor.h"
+#include "GameFramework/Actor.h"
+
+SwingPhysics::SwingPhysics()
+{
+}
+
+SwingPhysics::~SwingPhysics()
+{
+}
 
 SwingPhysics::SwingPhysics(class ACharacter*& _character, class AActor*& _hook)
 {
@@ -24,14 +32,6 @@ SwingPhysics::SwingPhysics(class ACharacter*& _character, class AActor*& _hook)
 			length = FVector::Dist(character->GetActorLocation(), target->GetActorLocation());
 		}
 	}
-}
-
-SwingPhysics::SwingPhysics()
-{
-}
-
-SwingPhysics::~SwingPhysics()
-{
 }
 
 void SwingPhysics::Tick(float _deltaTime)

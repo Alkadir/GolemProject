@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
+/*"*/
 /**
  *
  */
@@ -21,9 +21,9 @@ private:
 	float friction;
 
 public:
-	SwingPhysics(class ACharacter*& _character, class AActor*& _hook);
 	SwingPhysics();
 	~SwingPhysics();
+	SwingPhysics(class ACharacter*& _character, class AActor*& _hook);
 
 	FORCEINLINE void SetTarget(AActor*& _target) { target = _target; };
 	FORCEINLINE AActor*& GetTarget() { return target; };
