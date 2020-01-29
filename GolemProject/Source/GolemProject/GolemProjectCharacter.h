@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Player/DashComponent.h"
+#include "Interfaces/Interactable.h"
 #include "GolemProjectCharacter.generated.h"
 
 UCLASS(config = Game)
