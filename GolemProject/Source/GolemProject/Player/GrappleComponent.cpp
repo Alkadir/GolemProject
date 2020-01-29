@@ -65,7 +65,7 @@ void UGrappleComponent::CheckElementTargetable()
 			for (AActor* actor : allActors)
 			{
 				if (!actor->Implements<UTargetable>()) continue;
-
+				//get all the actors that are close to the player
 				if (FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) < maxDistance * maxDistance &&
 					FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) > minDistance* minDistance)
 				{
@@ -80,10 +80,10 @@ void UGrappleComponent::CheckElementTargetable()
 				FromSoftware /= FromSoftware.Size();
 				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
 				//to change and finish
-				if (dot > minDot&& dot < maxDot)
+				if (dot > minDot && dot < maxDot)
 				{
 					FHitResult hitResult;
-					if (world->LineTraceSingleByChannel(hitResult, mCharacter->GetActorLocation(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
+					if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
 					{
 						if (ClosestGrapplingHook != nullptr && ClosestGrapplingHook == hitResult.GetActor()) return;
 						ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
