@@ -155,6 +155,7 @@ void AGolemProjectCharacter::Interact()
 void AGolemProjectCharacter::PushBloc()
 {
 	isPushing = !isPushing;
+	GetCharacterMovement()->bOrientRotationToMovement = !isPushing;
 
 	float blocAngle = 0.0f;
 	AActor* actorToInteract = Cast<AActor>(toInteract);
@@ -272,13 +273,10 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 		if (isPushing)
 		{
-			GetCharacterMovement()->bOrientRotationToMovement = false;
 			AddMovementInput(GetActorForwardVector(), Value);
-			//UE_LOG(LogTemp, Log, TEXT("Forward : %s - Value : %f"), *GetActorForwardVector().ToString(), Value);
 		}
 		else
 		{
-			GetCharacterMovement()->bOrientRotationToMovement = true;
 			AddMovementInput(Direction, Value);
 		}
 	}
