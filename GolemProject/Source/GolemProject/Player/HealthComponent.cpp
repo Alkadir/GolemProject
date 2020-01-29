@@ -5,7 +5,7 @@
 #include "GolemProjectCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Helpers/HelperLibrary.h"
-#include "GameFramework/Controller.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -25,7 +25,7 @@ void UHealthComponent::BeginPlay()
 	if (AActor* owner = GetOwner())
 	{
 		Player = Cast<AGolemProjectCharacter>(owner);
-		PlayerController = Player->GetController();
+		PlayerController = Cast<APlayerController>(Player->GetController());
 	}
 	CanTakeDamage = true;
 }
@@ -44,12 +44,15 @@ void UHealthComponent::InflictDamage(int _damage)
 			{
 				world->GetTimerManager().SetTimer(TimerHandlerRespawn, this, &UHealthComponent::Respawn, TimerRespawn, false);
 			}
-			if (UCharacterMovementComponent* cmc = Player->GetCharacterMovement())
+			if (PlayerController != nullptr && Player != nullptr)
+			{
+				Player->DisableInput(PlayerController);
+			}
+			/*if (UCharacterMovementComponent* cmc = Player->GetCharacterMovement())
 			{
 				cmc->Deactivate();
 
-			}
-			//kill player
+			}*/
 		}
 		else
 		{
@@ -71,10 +74,9 @@ void UHealthComponent::Respawn()
 	Life = MaxLife;
 	CanTakeDamage = true;
 	Player->SetActorLocation(LastPositionGrounded);
-	if (UCharacterMovementComponent* cmc = Player->GetCharacterMovement())
+	if (PlayerController != nullptr && Player != nullptr)
 	{
-		cmc->Activate();
-
+		Player->EnableInput(PlayerController);
 	}
 }
 

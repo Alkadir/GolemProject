@@ -32,7 +32,7 @@ protected:
 	FTimerHandle TimerHandlerInvul;
 	FTimerHandle TimerHandlerRespawn;
 	class AGolemProjectCharacter* Player;	
-	class AController* PlayerController;
+	class APlayerController* PlayerController;
 	FVector LastPositionGrounded;
 	FVector PositionCheckPoint;
 
