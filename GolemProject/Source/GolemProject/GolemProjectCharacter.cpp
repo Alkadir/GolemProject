@@ -118,8 +118,7 @@ void AGolemProjectCharacter::Jump()
 
 void AGolemProjectCharacter::Dash()
 {
-	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr)
-	if (dashComponent != nullptr && !isPushing)
+	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr && !isPushing)
 	{
 		if (Controller != NULL)
 		{
@@ -246,7 +245,7 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		// get right vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
-		if (isSightCameraEnabled || mGrapple->GetProjectile())
+		if (isSightCameraEnabled || mGrapple->GetProjectile() && !isPushing)
 		{
 			Direction = mGrapple->GetDirection();
 
@@ -258,10 +257,6 @@ void AGolemProjectCharacter::MoveRight(float Value)
 			Direction.Y = X;
 		}
 		AddMovementInput(Direction, Value);
-		if (!isPushing)
-		{
-			AddMovementInput(Direction, Value);
-		}
 	}
 }
 
