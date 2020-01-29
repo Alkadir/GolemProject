@@ -29,7 +29,7 @@ void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleCompon
 {
 	direction = _direction;
 	grappleComponent = _grapple;
-	
+
 }
 
 // Called every frame
@@ -42,14 +42,16 @@ void AProjectileHand::Tick(float DeltaTime)
 		if (grappleComponent)
 		{
 			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
-			dir/=dir.Size();
+			dir /= dir.Size();
 			meshComponent->SetPhysicsLinearVelocity(dir * velocity);
 		}
 	}
 	else
 	{
-		if (meshComponent && meshComponent->IsSimulatingPhysics())
+		if (!bIsColliding)
 			meshComponent->SetPhysicsLinearVelocity(direction * velocity);
+		else
+			meshComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	}
 }
 
@@ -57,14 +59,9 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
 	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
 	{
-		meshComponent->SetSimulatePhysics(false);
 		bIsColliding = true;
 	}
 }
 
-const bool& AProjectileHand::IsColliding()
-{
-	return bIsColliding;
-}
 
 

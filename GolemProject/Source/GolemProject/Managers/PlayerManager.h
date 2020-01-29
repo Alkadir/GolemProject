@@ -3,27 +3,35 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
+#include "UObject/NoExportTypes.h"
+#include "Engine/EngineTypes.h"
+#include "PlayerManager.generated.h"
 /**
- *
+ * 
  */
-class GOLEMPROJECT_API PlayerManager
+UCLASS()
+class GOLEMPROJECT_API UPlayerManager : public UObject
 {
+	GENERATED_BODY()
+private :
+	void ResetInvulnerability();
+
 public:
-	inline static PlayerManager* GetInstance()
+
+	UPlayerManager(const FObjectInitializer& ObjectInitializer);
+	/*inline static UPlayerManager* GetInstance()
 	{
-		static PlayerManager Instance;
+		static UPlayerManager Instance;
 
 		return &Instance;
-	};
-
+	};*/
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	inline int GetLife() const
 	{
 		return Life;
 	};
-	void InflictDamage(int _damage);
 
-	inline FVector GetLastPositionGrounded() const 
+	inline FVector GetLastPositionGrounded() const
 	{
 		return LastPositionGrounded;
 	};
@@ -43,6 +51,7 @@ public:
 		PositionCheckPoint = _positionCheckPoint;
 	};
 
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	class AGolemProjectCharacter* GetPlayer() const
 	{
 		return Player;
@@ -53,6 +62,14 @@ public:
 		Player = _player;
 	}
 
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void InflictDamage(int _damage);
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void RespawnPlayerAfterDeath();
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void RespawnPlayerAfterFall();
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void Initialize(int _maxLife, float _timerInvulnerability, class AGolemProjectCharacter* _player);
 
 private:
 	int MaxLife;
@@ -61,9 +78,6 @@ private:
 	FVector PositionCheckPoint;
 	float TimerInvulnerability;
 	bool CanTakeDamage;
+	FTimerHandle TimerHandlerInvul;
 	class AGolemProjectCharacter* Player;
-
-private:
-	PlayerManager();
-	~PlayerManager();
 };

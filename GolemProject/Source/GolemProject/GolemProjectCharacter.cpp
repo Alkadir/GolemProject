@@ -17,6 +17,7 @@
 #include "Interfaces/Targetable.h"
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
+#include "Player/HealthComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -103,19 +104,20 @@ void AGolemProjectCharacter::BeginPlay()
 	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
+	HealthComponent = FindComponentByClass<UHealthComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
 	APlayerController* pc = Cast<APlayerController>(GetController());
+	HealthComponent->SetLastPositionGrounded(GetActorLocation());
 	if (pc)
 	{
-
 		pc->bShowMouseCursor = showCursor;
 	}
 }
 
 void AGolemProjectCharacter::Dash()
 {
-	if (dashComponent != nullptr)
+	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr)
 	{
 		if (Controller != NULL)
 		{
@@ -145,7 +147,7 @@ void AGolemProjectCharacter::Fire()
 	{
 		mGrapple->Cancel();
 
-		if(isSightCameraEnabled)
+		if (isSightCameraEnabled)
 			mGrapple->GoToDestination(false);
 	}
 }

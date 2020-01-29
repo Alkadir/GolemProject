@@ -22,6 +22,10 @@ void AGrapplingHook::CreateHUD_Implementation()
 {
 }
 
+void AGrapplingHook::DestroyHUD_Implementation()
+{
+}
+
 // Called every frame
 void AGrapplingHook::Tick(float DeltaTime)
 {

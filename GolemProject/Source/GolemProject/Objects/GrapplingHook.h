@@ -21,8 +21,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Targetable")
-		void CreateHUD() const;
+		void CreateHUD();
 	virtual void CreateHUD_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Targetable")
+		void DestroyHUD();
+	virtual void DestroyHUD_Implementation() override;
 
 public:	
 	// Called every frame

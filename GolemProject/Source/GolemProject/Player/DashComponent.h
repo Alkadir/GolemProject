@@ -44,8 +44,6 @@ protected:
 
 	bool HasDashInAir;
 
-	float m_groundFriction;
-
 	FTimerHandle m_loopTimer;
 
 	FTimerHandle m_timerDash;
