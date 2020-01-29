@@ -31,6 +31,16 @@ void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (worldCheckpoint.Num() <= 1 || !isActivate || direction == EMovingDirection::None || isPause)
+	{
+		return;
+	}
+	if (waitTime > 0)
+	{
+		waitTime -= DeltaTime;
+		return;
+	}
+
 	if (speeds.Num() < worldCheckpoint.Num())
 	{
 		HelperLibrary::Print("ERROR Speed is not initialized for all path points", 15.f, FColor::Red);
@@ -39,16 +49,6 @@ void AMovingPlatform::Tick(float DeltaTime)
 	if (waitTimes.Num() < worldCheckpoint.Num())
 	{
 		HelperLibrary::Print("ERROR WaitTime is not initialized for all path points", 15.f, FColor::Red);
-		return;
-	}
-
-	if (worldCheckpoint.Num() <= 1 || !isActivate || direction == EMovingDirection::None || isPause)
-	{
-		return;
-	}
-	if (waitTime > 0)
-	{
-		waitTime -= DeltaTime;
 		return;
 	}
 
@@ -137,17 +137,17 @@ void AMovingPlatform::MoveLine(float dt)
 		(direction == EMovingDirection::Forward ? speedCurve[currentIndex].Evaluate(percentageTraveledDistance) : speedCurve[nextIndex].Evaluate(percentageTraveledDistance));*/
 	while (distanceToGo > 0 && waitTime <= 0.f)
 	{
-		FVector direction = worldCheckpoint[nextIndex] - GetActorLocation();
+		FVector directionToNextCheckpoint = worldCheckpoint[nextIndex] - GetActorLocation();
 		float dist = distanceToGo;
-		if (direction.SizeSquared() < dist * dist)
+		if (directionToNextCheckpoint.SizeSquared() < dist * dist)
 		{
 			if (platformType != EMovingPlatformType::Once)
 			{
-				dist = direction.Size();
+				dist = directionToNextCheckpoint.Size();
 			}
 			SetNextIndex();
 		}
-		velocity = direction.GetSafeNormal() * dist;
+		velocity = directionToNextCheckpoint.GetSafeNormal() * dist;
 		SetActorLocation(GetActorLocation() + velocity);
 		distanceToGo -= dist;
 	}
@@ -226,7 +226,10 @@ const bool AMovingPlatform::Activate_Implementation(const AActor* caller)
 	{
 		return false;
 	}
-	direction = EMovingDirection::Forward;
+	if (isStair)
+	{
+		direction = EMovingDirection::Forward;
+	}
 	isActivate = true;
 	return true;
 }
@@ -237,7 +240,10 @@ const bool AMovingPlatform::Desactivate_Implementation(const AActor* caller)
 	{
 		return false;
 	}
-	direction = EMovingDirection::Backward;
+	if (isStair)
+	{
+		direction = EMovingDirection::Backward;
+	}
 	isActivate = false;
 	return true;
 }
@@ -245,13 +251,16 @@ const bool AMovingPlatform::Desactivate_Implementation(const AActor* caller)
 const bool AMovingPlatform::Switch_Implementation(const AActor* caller)
 {
 	isActivate = !isActivate;
-	if (isActivate)
+	if (isStair)
 	{
-		direction = EMovingDirection::Forward;
-	}
-	else
-	{
-		direction = EMovingDirection::Backward;
+		if (isActivate)
+		{
+			direction = EMovingDirection::Forward;
+		}
+		else
+		{
+			direction = EMovingDirection::Backward;
+		}
 	}
 	return true;
 }
