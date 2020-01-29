@@ -84,17 +84,20 @@ protected:
 
 public:
 
-	inline const FVector GetVelocity()
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		FORCEINLINE FVector GetPlatformVelocity()
 	{
 		return velocity;
 	}
 
-	inline const EMovingDirection GetDirection()
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		FORCEINLINE EMovingDirection GetDirection()
 	{
 		return direction;
 	}
 
-	inline const EMovingPlatformType GetPlatformType()
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		FORCEINLINE EMovingPlatformType GetPlatformType()
 	{
 		return platformType;
 	}
@@ -102,6 +105,11 @@ public:
 	inline const bool IsActivate() const { return isActivate; }
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		void Pause() { isPause = true; }
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		void UnPause() { isPause = false; }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
 		const bool Activate(const AActor* caller);
