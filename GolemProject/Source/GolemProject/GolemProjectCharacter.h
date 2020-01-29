@@ -94,17 +94,20 @@ protected:
 
 	void ChangeCamera();
 
-	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
+	float m_valueForward;
 
-	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+	float m_valueRight;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	bool isPushing = false;
 
 	UPROPERTY(EditAnywhere)
 	class UDashComponent* dashComponent;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void Jump() override;
 
 	void Dash();
 
