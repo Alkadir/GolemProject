@@ -17,7 +17,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
 #include "Player/HealthComponent.h"
-
+#include "Interfaces/Interactable.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -88,6 +88,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGolemProjectCharacter::LookUpAtRate);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
+
+	PlayerInputComponent->BindAction("Interacte", IE_Pressed, this, &AGolemProjectCharacter::Interact);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -138,6 +140,56 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 	if (mGrapple != nullptr)
 	{
 		mGrapple->GoToDestination(true);
+	}
+}
+
+void AGolemProjectCharacter::Interact()
+{
+	if (toInteract != nullptr)
+	{
+		toInteract->Interact_Implementation(this);
+	}
+}
+
+void AGolemProjectCharacter::PushBloc()
+{
+	isPushing = !isPushing;
+	GetCharacterMovement()->bOrientRotationToMovement = !isPushing;
+
+	float blocAngle = 0.0f;
+	AActor* actorToInteract = Cast<AActor>(toInteract);
+
+	if (isPushing && actorToInteract != nullptr)
+	{
+		FVector blocDelta = actorToInteract->GetActorLocation() - GetActorLocation();
+
+		float angleDelta = FMath::Atan2(blocDelta.X, blocDelta.Y);
+		angleDelta = FMath::RadiansToDegrees(angleDelta) - 90.0f;
+
+		if (angleDelta > -45.0f && angleDelta <= 45.0f)
+		{
+			blocAngle = 0.0f;
+		}
+		else if (angleDelta > -135.0f && angleDelta <= -45.0f)
+		{
+			blocAngle = 90.0f;
+		}
+		else if (angleDelta > -225.0f && angleDelta <= -135.0f)
+		{
+			blocAngle = 180.0f;
+		}
+		else if ((angleDelta > -315.0f && angleDelta <= -225.0f) || (angleDelta > 45.0f && angleDelta <= 90.0f))
+		{
+			blocAngle = 270.0f;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not in range"));
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("%f"), blocAngle);
+
+		SetActorRotation(FRotator(0.0f, blocAngle, 0.0f));
 	}
 }
 
@@ -220,13 +272,10 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 		if (isPushing)
 		{
-			GetCharacterMovement()->bOrientRotationToMovement = false;
 			AddMovementInput(GetActorForwardVector(), Value);
-			//UE_LOG(LogTemp, Log, TEXT("Forward : %s - Value : %f"), *GetActorForwardVector().ToString(), Value);
 		}
 		else
 		{
-			GetCharacterMovement()->bOrientRotationToMovement = true;
 			AddMovementInput(Direction, Value);
 		}
 	}
