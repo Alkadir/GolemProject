@@ -89,6 +89,9 @@ public:
 	UFUNCTION()
 		FVector GetHandPosition();
 
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; }
+
 	UFUNCTION()
 		void UpdateIKArm();
 	// Called every frame

@@ -50,16 +50,16 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		const bool Activate(const AActor* caller);
-	virtual const bool Activate_Implementation(const AActor* caller) override;
+		const bool Activate(AActor* caller);
+	virtual const bool Activate_Implementation(AActor* caller) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		bool Desactivate(const AActor* caller) const;
-	virtual const bool Desactivate_Implementation(const AActor* caller) override;
+		bool Desactivate(AActor* caller);
+	virtual const bool Desactivate_Implementation(AActor* caller) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		bool Switch(const AActor* caller) const;
-	virtual const bool Switch_Implementation(const AActor* caller) override;
+		bool Switch(AActor* caller);
+	virtual const bool Switch_Implementation(AActor* caller) override;
 
 
 };

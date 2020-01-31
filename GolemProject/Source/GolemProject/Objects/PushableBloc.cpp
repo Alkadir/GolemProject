@@ -2,33 +2,91 @@
 
 
 #include "PushableBloc.h"
+#include "Components/SceneComponent.h"
+#include "Components/BoxComponent.h"
+#include "GolemProjectCharacter.h"
+#include "Components/StaticMeshComponent.h"
 
-// Sets default values for this component's properties
-UPushableBloc::UPushableBloc()
+APushableBloc::APushableBloc()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	USceneComponent* root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(root);
 
-	// ...
+	boxCollider = CreateDefaultSubobject<UBoxComponent>(FName("Box collider"));
+	boxCollider->SetupAttachment(GetRootComponent());
+
 }
 
-
-// Called when the game starts
-void UPushableBloc::BeginPlay()
+void APushableBloc::BeginPlay()
 {
-	Super::BeginPlay();
+	boxCollider->SetBoxExtent(FVector::OneVector * colliderSize);
+	//boxCollider->SetRelativeLocation(FVector(0.0f, 0.0f, colliderSize / 2.0f));
 
-	// ...
-	
+	boxCollider->OnComponentBeginOverlap.AddUniqueDynamic(this, &APushableBloc::OnOverlapBegin);
+	boxCollider->OnComponentEndOverlap.AddUniqueDynamic(this, &APushableBloc::OnOverlapEnd);
 }
 
-
-// Called every frame
-void UPushableBloc::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+const bool APushableBloc::Interact_Implementation(AActor* caller)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (playerActor != nullptr)
+	{
+		playerActor->PushBloc();
 
-	// ...
+		isUsed = !isUsed;
+
+		UStaticMeshComponent* mesh = this->FindComponentByClass<UStaticMeshComponent>();
+
+		//Attach to player and don't collide with pawn anymore
+		if (isUsed)
+		{
+			if (mesh != nullptr)
+			{
+				mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Ignore);
+			}
+
+			AttachToActor(playerActor, FAttachmentTransformRules::KeepWorldTransform);
+		}
+		//Detach from player and block pawn again
+		else
+		{
+			if (mesh != nullptr)
+			{
+				mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Block);
+			}
+			
+			DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
+void APushableBloc::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AGolemProjectCharacter* player = Cast<AGolemProjectCharacter>(OtherActor);
+	if (player != nullptr)
+	{
+		playerActor = player;
+
+		if (!isUsed)
+		{
+			playerActor->SetInteractable(this);
+		}
+	}
+}
+
+void APushableBloc::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AGolemProjectCharacter* player = Cast<AGolemProjectCharacter>(OtherActor);
+	if (player != nullptr)
+	{
+		if (!isUsed && playerActor != nullptr)
+		{
+			playerActor->SetInteractable(nullptr);
+		}
+
+		playerActor = nullptr;
+	}
+}

@@ -31,6 +31,16 @@ void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (worldCheckpoint.Num() <= 1 || !isActivate || direction == EMovingDirection::None || isPause)
+	{
+		return;
+	}
+	if (waitTime > 0)
+	{
+		waitTime -= DeltaTime;
+		return;
+	}
+
 	if (speeds.Num() < worldCheckpoint.Num())
 	{
 		HelperLibrary::Print("ERROR Speed is not initialized for all path points", 15.f, FColor::Red);
@@ -39,16 +49,6 @@ void AMovingPlatform::Tick(float DeltaTime)
 	if (waitTimes.Num() < worldCheckpoint.Num())
 	{
 		HelperLibrary::Print("ERROR WaitTime is not initialized for all path points", 15.f, FColor::Red);
-		return;
-	}
-
-	if (worldCheckpoint.Num() <= 1 || !isActivate || direction == EMovingDirection::None || isPause)
-	{
-		return;
-	}
-	if (waitTime > 0)
-	{
-		waitTime -= DeltaTime;
 		return;
 	}
 
@@ -105,6 +105,7 @@ void AMovingPlatform::Init()
 		if (alwaysActive)
 		{
 			platformType = EMovingPlatformType::PingPong;
+			isActivate = true;
 		}
 		else
 		{
@@ -123,7 +124,6 @@ void AMovingPlatform::Init()
 	velocity = FVector::ZeroVector;
 	SetActorLocation(worldCheckpoint[currentIndex]);
 	isPause = false;
-	//parents = new Dictionary<Collider, Transform>();
 }
 
 void AMovingPlatform::MoveLine(float dt)
@@ -137,17 +137,17 @@ void AMovingPlatform::MoveLine(float dt)
 		(direction == EMovingDirection::Forward ? speedCurve[currentIndex].Evaluate(percentageTraveledDistance) : speedCurve[nextIndex].Evaluate(percentageTraveledDistance));*/
 	while (distanceToGo > 0 && waitTime <= 0.f)
 	{
-		FVector direction = worldCheckpoint[nextIndex] - GetActorLocation();
+		FVector directionToNextCheckpoint = worldCheckpoint[nextIndex] - GetActorLocation();
 		float dist = distanceToGo;
-		if (direction.SizeSquared() < dist * dist)
+		if (directionToNextCheckpoint.SizeSquared() < dist * dist)
 		{
 			if (platformType != EMovingPlatformType::Once)
 			{
-				dist = direction.Size();
+				dist = directionToNextCheckpoint.Size();
 			}
 			SetNextIndex();
 		}
-		velocity = direction.GetSafeNormal() * dist;
+		velocity = directionToNextCheckpoint.GetSafeNormal() * dist;
 		SetActorLocation(GetActorLocation() + velocity);
 		distanceToGo -= dist;
 	}
@@ -180,13 +180,13 @@ void AMovingPlatform::SetNextIndex()
 				nextIndex = worldCheckpoint.Num() - 2;
 				direction = EMovingDirection::Backward;
 				dir = -1;
-				Desactivate(this);
+				isActivate = false;
 				break;
 			}
 		}
 		else if (nextIndex == 1 && platformType == EMovingPlatformType::OnceLoop)
 		{
-			Desactivate(this);
+			isActivate = false;
 		}
 	}
 	else
@@ -207,51 +207,74 @@ void AMovingPlatform::SetNextIndex()
 				break;
 			case EMovingPlatformType::OnceLoop:
 				nextIndex = worldCheckpoint.Num() - 1;
-				Desactivate(this);
+				isActivate = false;
 				break;
 			case EMovingPlatformType::Once:
 				nextIndex = 1;
 				direction = EMovingDirection::Forward;
 				dir = 1;
-				Desactivate(this);
+				isActivate = false;
 				break;
 			}
 		}
 	}
 }
 
-const bool AMovingPlatform::Activate_Implementation(const AActor* caller)
+const bool AMovingPlatform::Activate_Implementation(AActor* caller)
 {
+	if (isStair && direction != EMovingDirection::Forward)
+	{
+		direction = EMovingDirection::Forward;
+		isActivate = true;
+		SetNextIndex();
+		return true;
+	}
 	if (isActivate)
 	{
 		return false;
 	}
-	direction = EMovingDirection::Forward;
 	isActivate = true;
 	return true;
 }
 
-const bool AMovingPlatform::Desactivate_Implementation(const AActor* caller)
+const bool AMovingPlatform::Desactivate_Implementation(AActor* caller)
 {
+	if (isStair && direction != EMovingDirection::Backward)
+	{
+		direction = EMovingDirection::Backward;
+		SetNextIndex();
+		isActivate = true;
+		return true;
+	}
 	if (!isActivate)
 	{
 		return false;
 	}
-	direction = EMovingDirection::Backward;
-	isActivate = false;
+	else
+	{
+		isActivate = false;
+	}
 	return true;
 }
 
-const bool AMovingPlatform::Switch_Implementation(const AActor* caller)
+const bool AMovingPlatform::Switch_Implementation(AActor* caller)
 {
-	isActivate = !isActivate;
-	if (isActivate)
+	if (isStair)
 	{
-		direction = EMovingDirection::Forward;
+		if (direction == EMovingDirection::Forward)
+		{
+			direction = EMovingDirection::Backward;
+		}
+		else if(direction == EMovingDirection::Backward)
+		{
+			direction = EMovingDirection::Forward;
+		}
+		SetNextIndex();
+		isActivate = true;
 	}
 	else
 	{
-		direction = EMovingDirection::Backward;
+		isActivate = !isActivate;
 	}
 	return true;
 }
