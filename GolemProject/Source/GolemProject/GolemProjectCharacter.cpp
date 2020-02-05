@@ -18,7 +18,8 @@
 #include "GolemProjectGameMode.h"
 #include "Player/HealthComponent.h"
 #include "Interfaces/Interactable.h"
-#include "Player/FistComponent"
+#include "Player/FistComponent.h"
+
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
 
