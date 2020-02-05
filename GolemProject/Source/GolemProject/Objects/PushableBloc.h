@@ -23,14 +23,13 @@ protected:
 	UBoxComponent* boxCollider = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Collision")
-		float colliderSize = 50.0f;
+		FVector colliderSize = FVector::OneVector * 50.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Collision")
+		FVector boxOffset = FVector::ZeroVector;
 
 public:
 	APushableBloc();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
-		const bool Interact(AActor* caller);
-	virtual const bool Interact_Implementation(AActor* caller) override;
 
 private:
 	void BeginPlay();
@@ -40,4 +39,13 @@ private:
 
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
+		const bool Interact(AActor* caller);
+	virtual const bool Interact_Implementation(AActor* caller) override;
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif //WITH_EDITOR
 };

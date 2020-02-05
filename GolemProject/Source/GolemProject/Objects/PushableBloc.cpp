@@ -14,14 +14,10 @@ APushableBloc::APushableBloc()
 
 	boxCollider = CreateDefaultSubobject<UBoxComponent>(FName("Box collider"));
 	boxCollider->SetupAttachment(GetRootComponent());
-
 }
 
 void APushableBloc::BeginPlay()
 {
-	boxCollider->SetBoxExtent(FVector::OneVector * colliderSize);
-	//boxCollider->SetRelativeLocation(FVector(0.0f, 0.0f, colliderSize / 2.0f));
-
 	boxCollider->OnComponentBeginOverlap.AddUniqueDynamic(this, &APushableBloc::OnOverlapBegin);
 	boxCollider->OnComponentEndOverlap.AddUniqueDynamic(this, &APushableBloc::OnOverlapEnd);
 }
@@ -89,4 +85,12 @@ void APushableBloc::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Ot
 
 		playerActor = nullptr;
 	}
+}
+
+void APushableBloc::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	boxCollider->SetBoxExtent(colliderSize);
+	boxCollider->SetRelativeLocation(boxOffset);
+
+	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
