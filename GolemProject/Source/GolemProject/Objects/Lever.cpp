@@ -14,24 +14,6 @@ ALever::ALever()
 
 }
 
-// Called when the game starts or when spawned
-void ALever::BeginPlay()
-{
-	Super::BeginPlay();
-
-	collider = FindComponentByClass<UStaticMeshComponent>();
-
-	collider->OnComponentBeginOverlap.AddUniqueDynamic(this, &ALever::OnOverlapBegin);
-	collider->OnComponentEndOverlap.AddUniqueDynamic(this, &ALever::OnOverlapEnd);
-}
-
-// Called every frame
-void ALever::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 const bool ALever::Interact_Implementation(AActor* caller)
 {
 	bool haveActivate = false;
@@ -62,22 +44,4 @@ const bool ALever::Interact_Implementation(AActor* caller)
 		}
 	}
 	return haveActivate;
-}
-
-void ALever::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	AGolemProjectCharacter* player = Cast<AGolemProjectCharacter>(OtherActor);
-	if (player != nullptr)
-	{
-		player->SetInteractable(this);
-	}
-}
-
-void ALever::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	AGolemProjectCharacter* player = Cast<AGolemProjectCharacter>(OtherActor);
-	if (player != nullptr)
-	{
-		player->SetInteractable(nullptr);
-	}
 }
