@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Destroy, meta = (AllowPrivateAccess = "true"))
 	float TimerDisappear = 2.0f;
 
+	UPROPERTY(EditAnywhere)
+	FName BoucingTag;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

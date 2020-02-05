@@ -6,18 +6,19 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "GameFramework/Actor.h"
+#include "Helpers/HelperLibrary.h"
 
 // Sets default values
 AFistProjectile::AFistProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
 void AFistProjectile::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 	ProjectileComponent = FindComponentByClass<UProjectileMovementComponent>();
 	MeshComponent = FindComponentByClass <UStaticMeshComponent>();
 	ProjectileComponent->MaxSpeed = Speed;
@@ -30,6 +31,15 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
 	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
 	{
+		if (OtherComponent->ComponentHasTag(BoucingTag))
+		{		
+			ProjectileComponent->bShouldBounce = true;
+		}
+		else
+		{
+			ProjectileComponent->bShouldBounce = false;
+		}
+
 		if (UWorld * world = GetWorld())
 		{
 			world->GetTimerManager().SetTimer(TimerHandleFXDisappear, this, &AFistProjectile::Event_DestructionFistFX_BP, TimerDisappear - 1.0f, false);
@@ -49,7 +59,6 @@ void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce)
 {
 	Direction = _direction;
 	ProjectileComponent->Velocity = Direction * Speed;
-	ProjectileComponent->bShouldBounce = true;
 }
 
 void AFistProjectile::DestroyFist()
