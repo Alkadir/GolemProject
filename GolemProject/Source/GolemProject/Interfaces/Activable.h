@@ -31,9 +31,9 @@ class GOLEMPROJECT_API IActivable
 		// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		const bool Activate(const AActor* caller);
+		const bool Activate(AActor* caller);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		const bool Desactivate(const AActor* caller);
+		const bool Desactivate(AActor* caller);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		const bool Switch(const AActor* caller);
+		const bool Switch(AActor* caller);
 };

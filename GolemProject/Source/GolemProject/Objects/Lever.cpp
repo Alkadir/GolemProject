@@ -3,6 +3,8 @@
 
 #include "Lever.h"
 #include "Engine/Engine.h"
+#include "Components/StaticMeshComponent.h"
+#include "GolemProjectCharacter.h"
 
 // Sets default values
 ALever::ALever()
@@ -12,26 +14,13 @@ ALever::ALever()
 
 }
 
-// Called when the game starts or when spawned
-void ALever::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-// Called every frame
-void ALever::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-const bool ALever::Interact_Implementation(const AActor * caller)
+const bool ALever::Interact_Implementation(AActor* caller)
 {
 	bool haveActivate = false;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Interact")));
 	for (auto& objectToActivate : objectsToActivate)
 	{
-		if (IActivable* activable = Cast<IActivable>(objectToActivate))
+		if (IActivable * activable = Cast<IActivable>(objectToActivate))
 		{
 			if (activationType == EActivationType::Activate)
 			{
@@ -56,4 +45,3 @@ const bool ALever::Interact_Implementation(const AActor * caller)
 	}
 	return haveActivate;
 }
-

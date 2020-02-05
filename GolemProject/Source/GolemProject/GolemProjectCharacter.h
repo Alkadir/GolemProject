@@ -4,41 +4,48 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Player/DashComponent.h"
+#include "Interfaces/Interactable.h"
 #include "GolemProjectCharacter.generated.h"
 
-UCLASS(config=Game)
+UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnyWhere, Category = "Debug")
-	bool showCursor = false;
+		UPROPERTY(EditAnyWhere, Category = "Debug")
+		bool showCursor = false;
 
 	UPROPERTY()
-	bool isSightCameraEnabled = false;
+		bool isSightCameraEnabled = false;
+
+	float m_valueForward;
+
+	float m_valueRight;
+
 
 	UPROPERTY()
-	class UUserWidget* currentSightWidget = nullptr;
+		class UUserWidget* currentSightWidget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
-	class UGrappleComponent* mGrapple;
+		class UGrappleComponent* mGrapple;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FistComp , meta = (AllowPrivateAccess = "true"))
 		class UFistComponent* FistComp;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+		class USpringArmComponent* CameraBoom;
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+		class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	class UHealthComponent* HealthComponent;
+		class UHealthComponent* HealthComponent;
 
 	UPROPERTY()
-	class UChildActorComponent* sightCamera;
+		class UChildActorComponent* sightCamera;
 
 	UPROPERTY()
 	class UChildActorComponent* sightCameraL;
@@ -49,22 +56,25 @@ public:
 	AGolemProjectCharacter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
-	TSubclassOf<class UUserWidget>  sightHudClass;
+		TSubclassOf<class UUserWidget>  sightHudClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	float BaseTurnRate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	float BaseLookUpRate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		float BaseLookUpRate;
 
 	UFUNCTION(BlueprintCallable, Category = "Hud")
-	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+		FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
 
 	void ResetFriction();
 
 protected:
+
+	UPROPERTY(BlueprintReadWrite)
+		AActor* actorToInteract;
 
 	virtual void BeginPlay() override;
 
@@ -93,15 +103,11 @@ protected:
 
 	void ChangeCamera();
 
-	float m_valueForward;
-
-	float m_valueRight;
-
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	bool isPushing = false;
+		bool isPushing = false;
 
 	UPROPERTY(EditAnywhere)
-	class UDashComponent* dashComponent;
+		UDashComponent* dashComponent;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -121,4 +127,10 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UFUNCTION(BlueprintCallable, Category = "Dash")
+		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
+
+
+	void PushBloc();
 };

@@ -8,7 +8,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Player/DashComponent.h"
 #include <Engine/Engine.h>
 #include "Player/GrappleComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -18,9 +17,8 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
 #include "Player/HealthComponent.h"
-#include "Player/FistComponent.h"
-
-
+#include "Interfaces/Interactable.h"
+#include "Player/FistComponent"
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
 
@@ -92,6 +90,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGolemProjectCharacter::LookUpAtRate);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
+
+	//PlayerInputComponent->BindAction("Interacte", IE_Pressed, this, &AGolemProjectCharacter::Interact);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -171,6 +171,47 @@ void AGolemProjectCharacter::ChangeToFist()
 	if (isSightCameraEnabled && pc)
 	{
 		pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
+	}
+}
+
+void AGolemProjectCharacter::PushBloc()
+{
+	isPushing = !isPushing;
+	GetCharacterMovement()->bOrientRotationToMovement = !isPushing;
+
+	float blocAngle = 0.0f;
+
+	if (isPushing && actorToInteract != nullptr)
+	{
+		FVector blocDelta = actorToInteract->GetActorLocation() - GetActorLocation();
+
+		float angleDelta = FMath::Atan2(blocDelta.X, blocDelta.Y);
+		angleDelta = FMath::RadiansToDegrees(angleDelta) - 90.0f;
+
+		if (angleDelta > -45.0f && angleDelta <= 45.0f)
+		{
+			blocAngle = 0.0f;
+		}
+		else if (angleDelta > -135.0f && angleDelta <= -45.0f)
+		{
+			blocAngle = 90.0f;
+		}
+		else if (angleDelta > -225.0f && angleDelta <= -135.0f)
+		{
+			blocAngle = 180.0f;
+		}
+		else if ((angleDelta > -315.0f && angleDelta <= -225.0f) || (angleDelta > 45.0f && angleDelta <= 90.0f))
+		{
+			blocAngle = 270.0f;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not in range"));
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("%f"), blocAngle);
+
+		SetActorRotation(FRotator(0.0f, blocAngle, 0.0f));
 	}
 }
 
@@ -266,12 +307,10 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 		if (isPushing)
 		{
-			GetCharacterMovement()->bOrientRotationToMovement = false;
 			AddMovementInput(GetActorForwardVector(), Value);
 		}
 		else
 		{
-			GetCharacterMovement()->bOrientRotationToMovement = true;
 			AddMovementInput(Direction, Value);
 		}
 	}

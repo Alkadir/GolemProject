@@ -24,14 +24,10 @@ protected:
 		EActivationType activationType;
 
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
-		const bool Interact(const AActor* caller);
-	virtual const bool Interact_Implementation(const AActor* caller) override;
+		const bool Interact(AActor* caller);
+	virtual const bool Interact_Implementation(AActor* caller) override;
 
 };

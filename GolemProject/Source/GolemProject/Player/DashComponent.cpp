@@ -33,9 +33,9 @@ void UDashComponent::StopDash()
 {
 	if (m_character != nullptr)
 	{
-		m_character->GetMovementComponent()->StopMovementImmediately();
 		if (CharacterMovementCmpt != nullptr)
 		{
+			CharacterMovementCmpt->StopMovementImmediately();
 			if (CurrentVelocity.IsZero())
 			{
 				CharacterMovementCmpt->AddImpulse(CurrentDirection * ForceAfterDash, true);
@@ -45,6 +45,7 @@ void UDashComponent::StopDash()
 				CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
 			}
 			m_character->ResetFriction();
+			isDashing = true;
 		}
 	}
 }
@@ -72,8 +73,9 @@ void UDashComponent::Dash(FVector _direction)
 			CurrentVelocity = m_character->GetVelocity().GetAbs() * _direction;
 			CurrentVelocity.Z = 0.0f;
 			m_character->LaunchCharacter(_direction * ForceDash, false, false);
+			isDashing = true;
 			m_canDash = false;
-			if (UWorld* world = GetWorld())
+			if (UWorld * world = GetWorld())
 			{
 				world->GetTimerManager().SetTimer(m_loopTimer, this, &UDashComponent::StopDash, TimerStopDash, false);
 				world->GetTimerManager().SetTimer(m_timerDash, this, &UDashComponent::CanRedashDash, CDDash, false);

@@ -16,37 +16,39 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
 	class USkeletalMeshComponent* mSkeletalMesh;
+	class AProjectileHand* currentProjectile;
+	class AActor* ClosestGrapplingHook;
+	class AGolemProjectGameMode* GameMode;
+	class APlayerCameraManager* PlayerCameraManager;
+	class SwingPhysics* swingPhysics = nullptr;
+
 	FVector mDestination;
 	FVector mDirection;
 	int32 mIdBone;
-	class AProjectileHand* currentProjectile;
-	AActor* ClosestGrapplingHook;
-	class AGolemProjectGameMode* GameMode;
-	class APlayerCameraManager* PlayerCameraManager;
-
+	bool bIsAssisted = false;
 	float accuracy = 100000.0f;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "projectile", meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<class AProjectileHand> handProjectileClass;
+	TSubclassOf<class AProjectileHand> handProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-		float maxDistance = 3000.0f;
+	float maxDistance = 3000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-		float velocity = 200.0f;
+	float velocity = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-		float offsetStop = 200.0f;
+	float offsetStop = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))
-		float maxDot = 1.0f;
+	float maxDot = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))
-		float minDot = 0.0f;
+	float minDot = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-		float minDistance = 100.0f;
+	float minDistance = 100.0f;
 
 	UPROPERTY()
 	bool IsFiring;
@@ -57,10 +59,10 @@ protected:
 	void CheckElementTargetable();
 
 	UFUNCTION()
-		void AttractCharacter();
+	void AttractCharacter();
 
 	UFUNCTION()
-		void PlayerIsNear();
+	void PlayerIsNear();
 
 public:
 	UPROPERTY()

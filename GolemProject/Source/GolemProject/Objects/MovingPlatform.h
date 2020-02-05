@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/Activable.h"
+#include "Interfaces/Spawnable.h"
 #include "MovingPlatform.generated.h"
 
 UENUM(BlueprintType)
@@ -32,7 +33,7 @@ enum class EMovingType : uint8
 };
 
 UCLASS()
-class GOLEMPROJECT_API AMovingPlatform : public AActor, public IActivable
+class GOLEMPROJECT_API AMovingPlatform : public AActor, public IActivable, public ISpawnable
 {
 	GENERATED_BODY()
 
@@ -58,6 +59,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		TArray<float> waitTimes;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		TArray<EMovingType> movingType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool isStair = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool alwaysActive = false;
@@ -76,44 +79,53 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		USceneComponent* path1;
 
+	TArray<USceneComponent*> childrens;
+
 	TArray<FVector> worldCheckpoint;
 
 	void Init();
 	void MoveLine(float dt);
+	void MoveCurve(float dt, int refIndex);
 	void SetNextIndex();
+
+	UPROPERTY(BlueprintReadWrite)
+		AActor* spawner = nullptr;
 
 public:
 
-	inline const FVector GetVelocity()
-	{
-		return velocity;
-	}
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		const FVector GetPlatformVelocity()const { return velocity; }
 
-	inline const EMovingDirection GetDirection()
-	{
-		return direction;
-	}
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		const EMovingDirection GetDirection()const { return direction; }
 
-	inline const EMovingPlatformType GetPlatformType()
-	{
-		return platformType;
-	}
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		const EMovingPlatformType GetPlatformType()const { return platformType; }
 
-	inline const bool IsActivate() const { return isActivate; }
+	const bool IsActivate() const { return isActivate; }
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		const bool Activate(const AActor* caller);
-	virtual const bool Activate_Implementation(const AActor* caller) override;
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		void Pause() { isPause = true; }
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		void UnPause() { isPause = false; }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		bool Desactivate(const AActor* caller) const;
-	virtual const bool Desactivate_Implementation(const AActor* caller) override;
+		const bool Activate(AActor* caller);
+	virtual const bool Activate_Implementation(AActor* caller) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
-		bool Switch(const AActor* caller) const;
-	virtual const bool Switch_Implementation(const AActor* caller) override;
+		bool Desactivate(AActor* caller) const;
+	virtual const bool Desactivate_Implementation(AActor* caller) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
+		bool Switch(AActor* caller);
+	virtual const bool Switch_Implementation(AActor* caller) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Spawnable")
+		void SetSpawner(AActor* _spawner);
+	virtual void SetSpawner_Implementation(AActor* _spawner) override;
 
 
 };
