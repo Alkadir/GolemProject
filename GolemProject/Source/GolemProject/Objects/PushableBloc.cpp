@@ -14,6 +14,9 @@ APushableBloc::APushableBloc()
 
 	boxCollider = CreateDefaultSubobject<UBoxComponent>(FName("Box collider"));
 	boxCollider->SetupAttachment(GetRootComponent());
+
+	boxCollider->SetBoxExtent(colliderSize);
+	boxCollider->SetRelativeLocation(boxOffset);
 }
 
 void APushableBloc::BeginPlay()
