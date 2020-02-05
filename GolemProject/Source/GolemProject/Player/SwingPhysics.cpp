@@ -5,6 +5,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Actor.h"
+#include "PhysicsEngine/PhysicsConstraintActor.h"
+#include "Engine/World.h"
 
 SwingPhysics::SwingPhysics()
 {
@@ -16,9 +18,15 @@ SwingPhysics::~SwingPhysics()
 
 SwingPhysics::SwingPhysics(class ACharacter*& _character, class AActor*& _hook)
 {
+	UWorld* world = _character->GetWorld();
 	character = _character;
 	target = _hook;
 
+	if (world)
+	{
+		constraintActor = world->SpawnActor<APhysicsConstraintActor>();
+	}
+	
 	if (character)
 	{
 		characterMovement = character->GetCharacterMovement();
@@ -36,22 +44,4 @@ SwingPhysics::SwingPhysics(class ACharacter*& _character, class AActor*& _hook)
 
 void SwingPhysics::Tick(float _deltaTime)
 {
-	float dist, diff, percent;
-
-	lastPosition = character->GetActorLocation();
-
-	newPosition = character->GetActorLocation()
-		+ velocity * friction
-		+ characterMovement->GetGravityZ() * _deltaTime*_deltaTime;
-
-	FVector segment = newPosition - target->GetActorLocation();
-
-	dist = segment.Size();
-	diff = length - dist;
-
-	percent = (diff / dist) / 2.0f;
-
-	newPosition += segment * percent;
-
-	character->SetActorLocation(newPosition);
 }

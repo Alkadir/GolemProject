@@ -128,8 +128,14 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			{
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : mCamera->GetForwardVector() * accuracy;
 				FVector direction = (offset - currentProjectile->GetActorLocation());
-				direction /= direction.Size();
+				
+				FHitResult hit;
+				if (world->LineTraceSingleByChannel(hit, mCamera->GetComponentLocation(), offset,ECollisionChannel::ECC_Visibility))
+				{
+					direction = hit.Location - currentProjectile->GetActorLocation();
+				}
 
+				direction /= direction.Size();
 				currentProjectile->Instigator = mCharacter->GetInstigator();
 				currentProjectile->SetOwner(mCharacter);
 				currentProjectile->LaunchProjectile(direction, this);

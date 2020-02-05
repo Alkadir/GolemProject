@@ -10,6 +10,8 @@
 class GOLEMPROJECT_API SwingPhysics
 {
 private:
+	class APhysicsConstraintActor* constraintActor;
+	class UPhysicsConstraintComponent* constraintComponent;
 	class ACharacter* character;
 	class UCharacterMovementComponent* characterMovement;
 	class AActor* target;
