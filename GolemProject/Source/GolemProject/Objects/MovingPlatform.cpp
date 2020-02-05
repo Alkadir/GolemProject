@@ -67,6 +67,7 @@ void AMovingPlatform::Init()
 		if (isStair)
 		{
 			platformType = EMovingPlatformType::PingPong;
+			isActivate = true;
 		}
 	}
 	nextIndex = currentIndex + dir;
@@ -315,4 +316,3 @@ const bool AMovingPlatform::Switch_Implementation(AActor* caller)
 	}
 	return true;
 }
-
