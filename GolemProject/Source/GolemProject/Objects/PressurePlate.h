@@ -13,14 +13,21 @@ class GOLEMPROJECT_API APressurePlate : public AActor
 {
 	GENERATED_BODY()
 
+private:
+	FTimerHandle pressedTimerHandle;
+	FTimerHandle releasedTimerHandle;
+
 protected:
 	UBoxComponent* boxCollider = nullptr;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Collision")
 		FVector colliderSize = FVector::OneVector * 50.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Collision")
 		FVector boxOffset = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool isPressed = false;
 
 public:
 	APressurePlate();
@@ -31,6 +38,12 @@ private:
 
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		void OnPressed();
+
+	UFUNCTION()
+		void OnReleased();
 
 protected:
 	virtual void BeginPlay() override;

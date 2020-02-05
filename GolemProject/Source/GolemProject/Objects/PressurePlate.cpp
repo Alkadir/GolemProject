@@ -4,6 +4,10 @@
 #include "PressurePlate.h"
 
 #include "Engine/Engine.h"
+#include "Engine/EngineTypes.h"
+#include "Engine/World.h"
+#include "TimerManager.h"
+
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
 
@@ -19,11 +23,45 @@ APressurePlate::APressurePlate()
 void APressurePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Begin overlap"));
+
+	UWorld* world = GetWorld();
+	if (world)
+	{
+		if (!isPressed)
+		{
+			world->GetTimerManager().SetTimer(pressedTimerHandle, this, &APressurePlate::OnPressed, 1.0f);
+		}
+
+		world->GetTimerManager().ClearTimer(releasedTimerHandle);
+	}
 }
 
 void APressurePlate::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("End overlap"));
+
+	UWorld* world = GetWorld();
+	if (world)
+	{
+		if (isPressed)
+		{
+			world->GetTimerManager().SetTimer(releasedTimerHandle, this, &APressurePlate::OnReleased, 1.0f);
+		}
+
+		world->GetTimerManager().ClearTimer(pressedTimerHandle);
+	}
+}
+
+void APressurePlate::OnPressed()
+{
+	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Yellow, TEXT("Pressed!"));
+	isPressed = true;
+}
+
+void APressurePlate::OnReleased()
+{
+	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Yellow, TEXT("Released!"));
+	isPressed = false;
 }
 
 void APressurePlate::BeginPlay()
@@ -32,6 +70,7 @@ void APressurePlate::BeginPlay()
 	boxCollider->OnComponentEndOverlap.AddUniqueDynamic(this, &APressurePlate::OnOverlapEnd);
 }
 
+#if WITH_EDITOR
 void APressurePlate::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	boxCollider->SetBoxExtent(colliderSize);
@@ -39,3 +78,4 @@ void APressurePlate::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
+#endif
