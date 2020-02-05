@@ -92,10 +92,14 @@ public:
 	FVector GetHandPosition();
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; }
+	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
 
 	UFUNCTION()
 	void UpdateIKArm();
+
+	UFUNCTION()
+	FORCEINLINE class AGolemProjectCharacter* GetCharacter() { return mCharacter; };
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

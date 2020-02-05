@@ -12,20 +12,20 @@ class GOLEMPROJECT_API SwingPhysics
 private:
 	class APhysicsConstraintActor* constraintActor;
 	class UPhysicsConstraintComponent* constraintComponent;
-	class ACharacter* character;
+	class AGolemProjectCharacter* character;
 	class UCharacterMovementComponent* characterMovement;
 	class AActor* target;
 
-	FVector lastPosition;
+	/*FVector lastPosition;
 	FVector newPosition;
 	FVector velocity;
 	float length;
-	float friction;
+	float friction;*/
 
 public:
 	SwingPhysics();
 	~SwingPhysics();
-	SwingPhysics(class ACharacter*& _character, class AActor*& _hook);
+	SwingPhysics(class UGrappleComponent* _grappleHook);
 
 	FORCEINLINE void SetTarget(AActor*& _target) { target = _target; };
 	FORCEINLINE AActor*& GetTarget() { return target; };

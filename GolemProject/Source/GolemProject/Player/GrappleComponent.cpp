@@ -239,7 +239,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					if (!swingPhysics)
 					{
 						ACharacter* c = Cast<ACharacter>(mCharacter);
-						swingPhysics = new SwingPhysics(c, ClosestGrapplingHook);
+						swingPhysics = new SwingPhysics(this);
 					}
 				}
 			}
