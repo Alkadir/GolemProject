@@ -13,18 +13,24 @@ class GOLEMPROJECT_API AFistProjectile : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
-	AFistProjectile(const FObjectInitializer& ObjectInitializer);
+	AFistProjectile();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
 	UPROPERTY(EditAnywhere)
 	float Speed;
-	UPROPERTY(BlueprintReadOnly)
-	bool IsColliding;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float maxDistance = 3000.0f;
+
+	UPROPERTY(EditAnywhere, Category = Destroy, meta = (AllowPrivateAccess = "true"))
+	float TimerDisappear = 2.0f;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -37,12 +43,20 @@ public:
 
 	UFUNCTION(Blueprintcallable)
 	void LaunchFist(const FVector& _direction);
-private :
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Event_DestructionFistFX_BP();
+
+	UFUNCTION()
+	void DestroyFist();
+
+private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Fist, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* MeshComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Fist, meta = (AllowPrivateAccess = "true"))
 	class UProjectileMovementComponent* ProjectileComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Fist, meta = (AllowPrivateAccess = "true"))
-	class USceneComponent* RootComp;
 	FVector Direction;
+
+	FTimerHandle TimerHandleDisappear;
+	FTimerHandle TimerHandleFXDisappear;
 };

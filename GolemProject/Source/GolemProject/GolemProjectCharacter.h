@@ -40,6 +40,9 @@ class AGolemProjectCharacter : public ACharacter
 	UPROPERTY()
 	class UChildActorComponent* sightCamera;
 
+	UPROPERTY()
+	class UChildActorComponent* sightCameraL;
+
 	float initialGroundFriction;
 
 public:

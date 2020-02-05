@@ -103,6 +103,7 @@ void AGolemProjectCharacter::BeginPlay()
 	FistComp = FindComponentByClass<UFistComponent>();
 	HealthComponent = FindComponentByClass<UHealthComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
+	sightCameraL = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCameraL");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
 	APlayerController* pc = Cast<APlayerController>(GetController());
 	HealthComponent->SetLastPositionGrounded(GetActorLocation());
@@ -151,25 +152,42 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 
 void AGolemProjectCharacter::ChangeToGrapple()
 {
+	if (mGrapple->IsTargetingGrapple) return;
 	mGrapple->IsTargetingGrapple = true;
 	FistComp->IsTargetingFist = false;
+	APlayerController* pc = Cast<APlayerController>(GetController());
+	if (isSightCameraEnabled && pc)
+	{
+		pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
+	}
 }
 
 void AGolemProjectCharacter::ChangeToFist()
 {
+	if (FistComp->IsTargetingFist) return;
 	FistComp->IsTargetingFist = true;
 	mGrapple->IsTargetingGrapple = false;
+	APlayerController* pc = Cast<APlayerController>(GetController());
+	if (isSightCameraEnabled && pc)
+	{
+		pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
+	}
 }
 
 
 void AGolemProjectCharacter::Fire()
 {
-	if (mGrapple)
+	if (mGrapple && mGrapple->IsTargetingGrapple)
 	{
 		mGrapple->Cancel();
 
 		if (isSightCameraEnabled)
 			mGrapple->GoToDestination(false);
+	}
+	else if (FistComp && FistComp->IsTargetingFist)
+	{
+		if (isSightCameraEnabled)
+			FistComp->GoToDestination();
 	}
 }
 
@@ -202,7 +220,10 @@ void AGolemProjectCharacter::ChangeCamera()
 			{
 				isSightCameraEnabled = true;
 				GetCharacterMovement()->bOrientRotationToMovement = false;
-				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
+				if (mGrapple->IsTargetingGrapple)
+					pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
+				else if (FistComp->IsTargetingFist)
+					pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 
 				if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
 					currentSightWidget->AddToViewport();
@@ -238,7 +259,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		{
 			Direction = mGrapple->GetDirection();
 		}
-		else if (FistComp->IsTargetingFist && (isSightCameraEnabled || FistComp->GetProjectile()))
+		else if (FistComp->IsTargetingFist && isSightCameraEnabled)
 		{
 			Direction = FistComp->GetDirection();
 		}
@@ -247,7 +268,6 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		{
 			GetCharacterMovement()->bOrientRotationToMovement = false;
 			AddMovementInput(GetActorForwardVector(), Value);
-			//UE_LOG(LogTemp, Log, TEXT("Forward : %s - Value : %f"), *GetActorForwardVector().ToString(), Value);
 		}
 		else
 		{
@@ -278,9 +298,9 @@ void AGolemProjectCharacter::MoveRight(float Value)
 			float Z = Direction.Z;
 
 			Direction.X = -Y;
-			Direction.Y = X; 
+			Direction.Y = X;
 		}
-		else if (isSightCameraEnabled && (FistComp->IsTargetingFist || FistComp->GetProjectile()) && !isPushing)
+		else if (isSightCameraEnabled && FistComp->IsTargetingFist && !isPushing)
 		{
 			Direction = FistComp->GetDirection();
 

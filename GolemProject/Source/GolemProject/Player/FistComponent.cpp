@@ -34,9 +34,12 @@ void UFistComponent::BeginPlay()
 	Super::BeginPlay();
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
+	mSkeletalMesh = mCharacter->GetMesh();
+	mIdBone = mSkeletalMesh->GetBoneIndex("hand_l");
 	UChildActorComponent* child = HelperLibrary::GetComponentByName<UChildActorComponent>(mCharacter, "ShoulderCamera");
 	mCamera = HelperLibrary::GetComponentByName<UCameraComponent>(child->GetChildActor(), "Camera");
 	world = GetWorld();
+	CanFire = true;
 }
 
 void UFistComponent::UpdateIKArm()
@@ -59,9 +62,40 @@ void UFistComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 {
 	if (!currentProjectile)
 		_lookAt = IKposition;
-	else
-		_lookAt = currentProjectile->GetMeshComponent()->GetComponentLocation();
-	_isBlend = (mCharacter->GetSightCameraEnabled() || currentProjectile);
+	_isBlend = (mCharacter->GetSightCameraEnabled());
+}
+
+void UFistComponent::GoToDestination()
+{
+	if (!currentProjectile && CanFire)
+	{
+		if (world && mCamera)
+		{
+			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
+
+			currentProjectile = world->SpawnActor<AFistProjectile>(fistProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
+			if (currentProjectile)
+			{
+				FVector offset = mCamera->GetForwardVector() * accuracy;
+				FVector direction = (offset - currentProjectile->GetActorLocation());
+				direction /= direction.Size();
+
+				currentProjectile->Instigator = mCharacter->GetInstigator();
+				currentProjectile->SetOwner(mCharacter);
+				currentProjectile->LaunchFist(direction);
+				currentProjectile = nullptr;
+				world->GetTimerManager().SetTimer(TimerHandleFire, this, &UFistComponent::ResetFire, TimerFire, false);
+				CanFire = false;
+			}
+		}
+	}
+}
+
+void UFistComponent::ResetFire()
+{
+	CanFire = true;
+	mSkeletalMesh->UnHideBone(mIdBone);
+	mSkeletalMesh->bRequiredBonesUpToDate = false;
 }
 
 // Called every frame

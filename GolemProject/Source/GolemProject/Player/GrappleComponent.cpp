@@ -154,7 +154,7 @@ void UGrappleComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 	else 
 		_lookAt = currentProjectile->GetMeshComponent()->GetComponentLocation();
 
-	_isBlend = (mCharacter->GetSightCameraEnabled() || currentProjectile);
+	_isBlend = (!IsTargetingGrapple || mCharacter->GetSightCameraEnabled() || currentProjectile);
 }
 
 FVector UGrappleComponent::GetHandPosition()
@@ -171,7 +171,6 @@ void UGrappleComponent::UpdateIKArm()
 {
 	if (world && mCamera)
 	{
-
 		FVector offset = mCamera->GetForwardVector() * accuracy;
 		mDirection = offset - mCharacter->GetActorLocation();
 		IKposition = offset;

@@ -14,10 +14,17 @@ class GOLEMPROJECT_API UFistComponent : public UActorComponent
 
 	class UWorld* world;
 	class AFistProjectile* currentProjectile;
+	class USkeletalMeshComponent* mSkeletalMesh;
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
 	FVector mDirection;
 	float accuracy = 100000.0f;
+	int32 mIdBone;
+	bool CanFire;
+	FTimerHandle TimerHandleFire;
+
+private :
+	void ResetFire();
 public:	
 	// Sets default values for this component's properties
 	UFistComponent();
@@ -31,6 +38,14 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SetIKArm(FVector& _lookAt, bool& _isBlend);
 
+	UPROPERTY(EditAnywhere)
+	float TimerFire = 1.0f;
+
+	UFUNCTION()
+	void UpdateIKArm();
+
+	UPROPERTY()
+	FVector IKposition;
 
 public:	
 	// Called every frame
@@ -39,11 +54,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsTargetingFist;
 
-	UFUNCTION()
-	void UpdateIKArm();
-
-	UPROPERTY()
-	FVector IKposition;
+	UFUNCTION(BlueprintCallable)
+	void GoToDestination();
 
 	FORCEINLINE const FVector& GetDirection() { return mDirection; };
 
