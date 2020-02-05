@@ -42,7 +42,7 @@ public:
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return MeshComponent; };
 
 	UFUNCTION(Blueprintcallable)
-	void LaunchFist(const FVector& _direction);
+	void LaunchFist(const FVector& _direction, bool _shouldBounce);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_DestructionFistFX_BP();

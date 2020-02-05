@@ -45,10 +45,11 @@ void AFistProjectile::Tick(float DeltaTime)
 
 }
 
-void AFistProjectile::LaunchFist(const FVector& _direction)
+void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce)
 {
 	Direction = _direction;
 	ProjectileComponent->Velocity = Direction * Speed;
+	ProjectileComponent->bShouldBounce = true;
 }
 
 void AFistProjectile::DestroyFist()

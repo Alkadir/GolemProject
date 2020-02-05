@@ -76,13 +76,13 @@ void UFistComponent::GoToDestination()
 			currentProjectile = world->SpawnActor<AFistProjectile>(fistProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
-				FVector offset = mCamera->GetForwardVector() * accuracy;
+				FVector offset = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
 				FVector direction = (offset - currentProjectile->GetActorLocation());
 				direction /= direction.Size();
 
 				currentProjectile->Instigator = mCharacter->GetInstigator();
 				currentProjectile->SetOwner(mCharacter);
-				currentProjectile->LaunchFist(direction);
+				currentProjectile->LaunchFist(direction, true);
 				currentProjectile = nullptr;
 				world->GetTimerManager().SetTimer(TimerHandleFire, this, &UFistComponent::ResetFire, TimerFire, false);
 				CanFire = false;
