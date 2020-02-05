@@ -15,6 +15,8 @@
 #include "Classes/Components/StaticMeshComponent.h"
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
+#include "SwingPhysics.h"
+//#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
@@ -121,18 +123,21 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 		if (world && mCamera)
 		{
 			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
-			
+
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
-				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : mCamera->GetForwardVector() * accuracy;
+				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
 				FVector direction = (offset - currentProjectile->GetActorLocation());
 				direction /= direction.Size();
+
+				//DrawDebugLine(world, mCamera->GetComponentLocation(), offset, FColor::Red, true);
 
 				currentProjectile->Instigator = mCharacter->GetInstigator();
 				currentProjectile->SetOwner(mCharacter);
 				currentProjectile->LaunchProjectile(direction, this);
 				IsFiring = true;
+				bIsAssisted = _isAssisted;
 			}
 		}
 	}
@@ -149,9 +154,9 @@ void UGrappleComponent::Cancel()
 
 void UGrappleComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 {
-	if(!currentProjectile)
+	if (!currentProjectile)
 		_lookAt = IKposition;
-	else 
+	else
 		_lookAt = currentProjectile->GetMeshComponent()->GetComponentLocation();
 
 	_isBlend = (mCharacter->GetSightCameraEnabled() || currentProjectile);
@@ -217,16 +222,25 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		{
 			if (mCharacter)
 			{
-				mDirection /= mDirection.Size();
-
-				if (dist > offsetStop)
+				if (!bIsAssisted)
 				{
-					AttractCharacter();
+					if (dist > offsetStop)
+					{
+						AttractCharacter();
+					}
+					else
+					{
+						PlayerIsNear();
+						return;
+					}
 				}
 				else
 				{
-					PlayerIsNear();
-					return;
+					if (!swingPhysics)
+					{
+						ACharacter* c = Cast<ACharacter>(mCharacter);
+						swingPhysics = new SwingPhysics(c, ClosestGrapplingHook);
+					}
 				}
 			}
 		}
@@ -237,6 +251,9 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				currentProjectile->SetComingBack(true);
 			}
 		}
+
+		if (swingPhysics)
+			swingPhysics->Tick(DeltaTime);
 	}
 }
 
@@ -248,7 +265,8 @@ void UGrappleComponent::PlayerIsNear()
 	{
 		if (mCharacter)
 		{
-			mCharacter->GetCharacterMovement()->Velocity *= 0.15f;
+
+			mCharacter->GetCharacterMovement()->Velocity *= (currentProjectile->IsComingBack()) ? 1.0f : 0.15f;
 			mCharacter->ResetFriction();
 
 			mSkeletalMesh->UnHideBone(mIdBone);
@@ -263,6 +281,7 @@ void UGrappleComponent::PlayerIsNear()
 
 void UGrappleComponent::AttractCharacter()
 {
+	mDirection /= mDirection.Size();
 	mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
 	mCharacter->LaunchCharacter(mDirection * velocity, false, false);
 	mDirection.Z = 0.0f;
@@ -274,7 +293,7 @@ void UGrappleComponent::AttractCharacter()
 		float offset = 100.0f;
 		if (world->LineTraceSingleByChannel(hit, mCharacter->GetActorLocation(), mCharacter->GetActorLocation() + mDirection * offset, ECollisionChannel::ECC_Visibility))
 		{
-			
+
 			currentProjectile->SetComingBack(true);
 			currentProjectile->SetColliding(false);
 		}
