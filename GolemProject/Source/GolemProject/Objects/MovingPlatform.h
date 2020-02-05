@@ -58,6 +58,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		TArray<float> waitTimes;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		TArray<EMovingType> movingType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool isStair = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool alwaysActive = false;
@@ -76,10 +78,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		USceneComponent* path1;
 
+	TArray<USceneComponent*> childrens;
+
 	TArray<FVector> worldCheckpoint;
 
 	void Init();
 	void MoveLine(float dt);
+	void MoveCurve(float dt, int refIndex);
 	void SetNextIndex();
 
 public:
