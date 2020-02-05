@@ -4,6 +4,7 @@
 #include "MovingPlatform.h"
 #include "Helpers/HelperLibrary.h"
 #include "Components/SceneComponent.h"
+#include "Components/SplineComponent.h"
 
 // Sets default values
 AMovingPlatform::AMovingPlatform(const FObjectInitializer& OI)
@@ -19,54 +20,14 @@ AMovingPlatform::AMovingPlatform(const FObjectInitializer& OI)
 
 }
 
-// Called when the game starts or when spawned
 void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	Init();
 }
 
-// Called every frame
-void AMovingPlatform::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (worldCheckpoint.Num() <= 1 || !isActivate || direction == EMovingDirection::None || isPause)
-	{
-		return;
-	}
-	if (waitTime > 0)
-	{
-		waitTime -= DeltaTime;
-		return;
-	}
-
-	if (speeds.Num() < worldCheckpoint.Num())
-	{
-		HelperLibrary::Print("ERROR Speed is not initialized for all path points", 15.f, FColor::Red);
-		return;
-	}
-	if (waitTimes.Num() < worldCheckpoint.Num())
-	{
-		HelperLibrary::Print("ERROR WaitTime is not initialized for all path points", 15.f, FColor::Red);
-		return;
-	}
-
-	int refIndex = direction == EMovingDirection::Forward ? currentIndex : nextIndex;
-	MoveLine(DeltaTime);
-	//if (movingType[refIndex] == MovingType.line)
-	//{
-	//	MoveLine();
-	//}
-	//else if (movingType[refIndex] == MovingType.curve)
-	//{
-	//	MoveCurve();
-	//}
-}
-
 void AMovingPlatform::Init()
 {
-	TArray<USceneComponent*> childrens;
 	pathParent->GetChildrenComponents(false, childrens);
 	if (childrens.Num() == 0)
 	{
@@ -100,16 +61,12 @@ void AMovingPlatform::Init()
 	{
 		dir = 1;
 	}
-	if (isStair)
+	if (alwaysActive)
 	{
-		if (alwaysActive)
+		isActivate = true;
+		if (isStair)
 		{
 			platformType = EMovingPlatformType::PingPong;
-			isActivate = true;
-		}
-		else
-		{
-			platformType = EMovingPlatformType::Once;
 		}
 	}
 	nextIndex = currentIndex + dir;
@@ -126,13 +83,57 @@ void AMovingPlatform::Init()
 	isPause = false;
 }
 
+void AMovingPlatform::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (worldCheckpoint.Num() <= 1 || !isActivate || direction == EMovingDirection::None || isPause)
+	{
+		return;
+	}
+	if (waitTime > 0)
+	{
+		waitTime -= DeltaTime;
+		return;
+	}
+
+	if (speeds.Num() < worldCheckpoint.Num())
+	{
+		HelperLibrary::Print("ERROR Speed is not initialized for all path points", 15.f, FColor::Red);
+		return;
+	}
+	if (waitTimes.Num() < worldCheckpoint.Num())
+	{
+		HelperLibrary::Print("ERROR WaitTime is not initialized for all path points", 15.f, FColor::Red);
+		return;
+	}
+
+	int refIndex = direction == EMovingDirection::Forward ? currentIndex : nextIndex;
+
+	if (movingType.IsValidIndex(refIndex))
+	{
+		if (movingType[refIndex] == EMovingType::Line)
+		{
+			MoveLine(DeltaTime);
+		}
+		else if (movingType[refIndex] == EMovingType::Curve)
+		{
+			MoveCurve(DeltaTime, refIndex);
+		}
+	}
+	else
+	{
+		MoveLine(DeltaTime);
+	}
+}
+
 void AMovingPlatform::MoveLine(float dt)
 {
-	FVector startPos = worldCheckpoint[direction == EMovingDirection::Forward ? currentIndex : nextIndex];
-	FVector endPos = worldCheckpoint[direction == EMovingDirection::Forward ? nextIndex : currentIndex];
-	float totalDistance = (endPos - startPos).Size();
-	float traveledDistance = (GetActorLocation() - startPos).Size();
-	float percentageTraveledDistance = traveledDistance / totalDistance;
+	//FVector startPos = worldCheckpoint[direction == EMovingDirection::Forward ? currentIndex : nextIndex];
+	//FVector endPos = worldCheckpoint[direction == EMovingDirection::Forward ? nextIndex : currentIndex];
+	//float totalDistance = (endPos - startPos).Size();
+	//float traveledDistance = (GetActorLocation() - startPos).Size();
+	//float percentageTraveledDistance = traveledDistance / totalDistance;
 	float distanceToGo = (direction == EMovingDirection::Forward ? speeds[currentIndex] : speeds[nextIndex]) * dt;/* *
 		(direction == EMovingDirection::Forward ? speedCurve[currentIndex].Evaluate(percentageTraveledDistance) : speedCurve[nextIndex].Evaluate(percentageTraveledDistance));*/
 	while (distanceToGo > 0 && waitTime <= 0.f)
@@ -150,6 +151,42 @@ void AMovingPlatform::MoveLine(float dt)
 		velocity = directionToNextCheckpoint.GetSafeNormal() * dist;
 		SetActorLocation(GetActorLocation() + velocity);
 		distanceToGo -= dist;
+	}
+}
+
+void AMovingPlatform::MoveCurve(float dt, int refIndex)
+{
+	float distanceToGo = (direction == EMovingDirection::Forward ? speeds[currentIndex] : speeds[nextIndex]) * dt; /**
+		(direction == EMovingDirection::Forward ? speedCurve[currentIndex].Evaluate(timerLerp) : speedCurve[nextIndex].Evaluate(1.f - timerLerp));*/
+	while (distanceToGo > 0.f && waitTime <= 0.f)
+	{
+		if (USplineComponent * spline = Cast<USplineComponent>(childrens[refIndex]))
+		{
+			FVector nextPos = worldCheckpoint[refIndex] + spline->GetLocationAtTime(direction == EMovingDirection::Forward ? timerLerp : 1.f - timerLerp, ESplineCoordinateSpace::Local, true);
+
+			FVector directionNextPos = nextPos - GetActorLocation();
+			float dist = distanceToGo;
+			if (directionNextPos.SizeSquared() < dist * dist)
+			{
+				dist = directionNextPos.Size();
+				if (timerLerp >= 1.f)
+				{
+					SetNextIndex();
+					timerLerp = 0.f;
+				}
+				else
+				{
+					timerLerp += 0.01f;
+					if (timerLerp > 1.f)
+					{
+						timerLerp = 1.f;
+					}
+				}
+			}
+			velocity = directionNextPos.GetSafeNormal() * dist;
+			SetActorLocation(GetActorLocation() + velocity);
+			distanceToGo -= dist;
+		}
 	}
 }
 
@@ -265,7 +302,7 @@ const bool AMovingPlatform::Switch_Implementation(AActor* caller)
 		{
 			direction = EMovingDirection::Backward;
 		}
-		else if(direction == EMovingDirection::Backward)
+		else if (direction == EMovingDirection::Backward)
 		{
 			direction = EMovingDirection::Forward;
 		}
