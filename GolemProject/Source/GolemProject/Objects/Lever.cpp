@@ -3,6 +3,8 @@
 
 #include "Lever.h"
 #include "Engine/Engine.h"
+#include "Components/StaticMeshComponent.h"
+#include "GolemProjectCharacter.h"
 
 // Sets default values
 ALever::ALever()
@@ -17,6 +19,10 @@ void ALever::BeginPlay()
 {
 	Super::BeginPlay();
 
+	collider = FindComponentByClass<UStaticMeshComponent>();
+
+	collider->OnComponentBeginOverlap.AddUniqueDynamic(this, &ALever::OnOverlapBegin);
+	collider->OnComponentEndOverlap.AddUniqueDynamic(this, &ALever::OnOverlapEnd);
 }
 
 // Called every frame
@@ -26,12 +32,13 @@ void ALever::Tick(float DeltaTime)
 
 }
 
-const bool ALever::Interact_Implementation(const AActor * caller)
+const bool ALever::Interact_Implementation(AActor* caller)
 {
 	bool haveActivate = false;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Interact")));
 	for (auto& objectToActivate : objectsToActivate)
 	{
-		if (IActivable* activable = Cast<IActivable>(objectToActivate))
+		if (IActivable * activable = Cast<IActivable>(objectToActivate))
 		{
 			if (activationType == EActivationType::Activate)
 			{
@@ -57,3 +64,20 @@ const bool ALever::Interact_Implementation(const AActor * caller)
 	return haveActivate;
 }
 
+void ALever::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AGolemProjectCharacter* player = Cast<AGolemProjectCharacter>(OtherActor);
+	if (player != nullptr)
+	{
+		player->SetInteractable(this);
+	}
+}
+
+void ALever::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AGolemProjectCharacter* player = Cast<AGolemProjectCharacter>(OtherActor);
+	if (player != nullptr)
+	{
+		player->SetInteractable(nullptr);
+	}
+}

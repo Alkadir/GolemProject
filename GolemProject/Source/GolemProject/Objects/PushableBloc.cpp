@@ -26,7 +26,7 @@ void APushableBloc::BeginPlay()
 	boxCollider->OnComponentEndOverlap.AddUniqueDynamic(this, &APushableBloc::OnOverlapEnd);
 }
 
-const bool APushableBloc::Interact_Implementation(const AActor* caller)
+const bool APushableBloc::Interact_Implementation(AActor* caller)
 {
 	if (playerActor != nullptr)
 	{
