@@ -30,6 +30,9 @@ class AGolemProjectCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
 		class UGrappleComponent* mGrapple;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FistComp , meta = (AllowPrivateAccess = "true"))
+		class UFistComponent* FistComp;
+
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* CameraBoom;
@@ -43,6 +46,9 @@ class AGolemProjectCharacter : public ACharacter
 
 	UPROPERTY()
 		class UChildActorComponent* sightCamera;
+
+	UPROPERTY()
+	class UChildActorComponent* sightCameraL;
 
 	float initialGroundFriction;
 
@@ -112,6 +118,9 @@ protected:
 
 	void UseAssistedGrapple();
 
+	void ChangeToGrapple();
+
+	void ChangeToFist();
 
 public:
 	/** Returns CameraBoom subobject **/

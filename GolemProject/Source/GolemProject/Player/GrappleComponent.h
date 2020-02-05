@@ -73,6 +73,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GoToDestination(bool _isAssisted);
 
+	UPROPERTY(BlueprintReadOnly)
+	bool IsTargetingGrapple;
+
 	UFUNCTION()
 	void Cancel();
 
