@@ -59,7 +59,7 @@ void ADoor::Tick(float DeltaTime)
 	}
 }
 
-const bool ADoor::Activate_Implementation(const AActor* caller)
+const bool ADoor::Activate_Implementation(AActor* caller)
 {
 	if (isActivate)
 	{
@@ -69,7 +69,7 @@ const bool ADoor::Activate_Implementation(const AActor* caller)
 	return true;
 }
 
-const bool ADoor::Desactivate_Implementation(const AActor* caller)
+const bool ADoor::Desactivate_Implementation(AActor* caller)
 {
 	if (!isActivate)
 	{
@@ -79,7 +79,7 @@ const bool ADoor::Desactivate_Implementation(const AActor* caller)
 	return true;
 }
 
-const bool ADoor::Switch_Implementation(const AActor* caller)
+const bool ADoor::Switch_Implementation(AActor* caller)
 {
 	isActivate = !isActivate;
 	return true;

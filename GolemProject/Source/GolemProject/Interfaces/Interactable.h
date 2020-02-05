@@ -22,5 +22,5 @@ class GOLEMPROJECT_API IInteractable
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
-		const bool Interact(const AActor* caller);
+		const bool Interact(AActor* caller);
 };

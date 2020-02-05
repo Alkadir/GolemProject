@@ -105,6 +105,7 @@ void AMovingPlatform::Init()
 		if (alwaysActive)
 		{
 			platformType = EMovingPlatformType::PingPong;
+			isActivate = true;
 		}
 		else
 		{
@@ -123,7 +124,6 @@ void AMovingPlatform::Init()
 	velocity = FVector::ZeroVector;
 	SetActorLocation(worldCheckpoint[currentIndex]);
 	isPause = false;
-	//parents = new Dictionary<Collider, Transform>();
 }
 
 void AMovingPlatform::MoveLine(float dt)
@@ -180,13 +180,13 @@ void AMovingPlatform::SetNextIndex()
 				nextIndex = worldCheckpoint.Num() - 2;
 				direction = EMovingDirection::Backward;
 				dir = -1;
-				Desactivate(this);
+				isActivate = false;
 				break;
 			}
 		}
 		else if (nextIndex == 1 && platformType == EMovingPlatformType::OnceLoop)
 		{
-			Desactivate(this);
+			isActivate = false;
 		}
 	}
 	else
@@ -207,60 +207,74 @@ void AMovingPlatform::SetNextIndex()
 				break;
 			case EMovingPlatformType::OnceLoop:
 				nextIndex = worldCheckpoint.Num() - 1;
-				Desactivate(this);
+				isActivate = false;
 				break;
 			case EMovingPlatformType::Once:
 				nextIndex = 1;
 				direction = EMovingDirection::Forward;
 				dir = 1;
-				Desactivate(this);
+				isActivate = false;
 				break;
 			}
 		}
 	}
 }
 
-const bool AMovingPlatform::Activate_Implementation(const AActor* caller)
+const bool AMovingPlatform::Activate_Implementation(AActor* caller)
 {
+	if (isStair && direction != EMovingDirection::Forward)
+	{
+		direction = EMovingDirection::Forward;
+		isActivate = true;
+		SetNextIndex();
+		return true;
+	}
 	if (isActivate)
 	{
 		return false;
-	}
-	if (isStair)
-	{
-		direction = EMovingDirection::Forward;
 	}
 	isActivate = true;
 	return true;
 }
 
-const bool AMovingPlatform::Desactivate_Implementation(const AActor* caller)
+const bool AMovingPlatform::Desactivate_Implementation(AActor* caller)
 {
+	if (isStair && direction != EMovingDirection::Backward)
+	{
+		direction = EMovingDirection::Backward;
+		SetNextIndex();
+		isActivate = true;
+		return true;
+	}
 	if (!isActivate)
 	{
 		return false;
 	}
-	if (isStair)
+	else
 	{
-		direction = EMovingDirection::Backward;
+		isActivate = false;
 	}
-	isActivate = false;
 	return true;
 }
 
-const bool AMovingPlatform::Switch_Implementation(const AActor* caller)
+const bool AMovingPlatform::Switch_Implementation(AActor* caller)
 {
-	isActivate = !isActivate;
 	if (isStair)
 	{
-		if (isActivate)
-		{
-			direction = EMovingDirection::Forward;
-		}
-		else
+		if (direction == EMovingDirection::Forward)
 		{
 			direction = EMovingDirection::Backward;
 		}
+		else if(direction == EMovingDirection::Backward)
+		{
+			direction = EMovingDirection::Forward;
+		}
+		SetNextIndex();
+		isActivate = true;
+	}
+	else
+	{
+		isActivate = !isActivate;
 	}
 	return true;
 }
