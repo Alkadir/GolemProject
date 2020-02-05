@@ -29,7 +29,7 @@ void APressurePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 	{
 		if (!isPressed)
 		{
-			world->GetTimerManager().SetTimer(pressedTimerHandle, this, &APressurePlate::OnPressed, 1.0f);
+			world->GetTimerManager().SetTimer(pressedTimerHandle, this, &APressurePlate::OnPressed, delay);
 		}
 
 		world->GetTimerManager().ClearTimer(releasedTimerHandle);
@@ -45,7 +45,7 @@ void APressurePlate::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 	{
 		if (isPressed)
 		{
-			world->GetTimerManager().SetTimer(releasedTimerHandle, this, &APressurePlate::OnReleased, 1.0f);
+			world->GetTimerManager().SetTimer(releasedTimerHandle, this, &APressurePlate::OnReleased, delay);
 		}
 
 		world->GetTimerManager().ClearTimer(pressedTimerHandle);

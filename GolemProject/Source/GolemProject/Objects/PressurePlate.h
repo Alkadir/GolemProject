@@ -26,8 +26,11 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Collision")
 		FVector boxOffset = FVector::ZeroVector;
 
-	UPROPERTY(BlueprintReadOnly)
-	bool isPressed = false;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float delay = 0.25f;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+		bool isPressed = false;
 
 public:
 	APressurePlate();
