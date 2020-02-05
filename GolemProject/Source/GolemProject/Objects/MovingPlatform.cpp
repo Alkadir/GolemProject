@@ -316,3 +316,8 @@ const bool AMovingPlatform::Switch_Implementation(AActor* caller)
 	}
 	return true;
 }
+
+void AMovingPlatform::SetSpawner_Implementation(AActor* _spawner)
+{
+	spawner = _spawner;
+}
