@@ -7,12 +7,12 @@
 #include "DashComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class GOLEMPROJECT_API UDashComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UDashComponent();
 
@@ -42,6 +42,8 @@ protected:
 
 	bool m_canDash;
 
+	bool isDashing;
+
 	bool HasDashInAir;
 
 	FTimerHandle m_loopTimer;
@@ -52,14 +54,18 @@ protected:
 
 	void CanRedashDash();
 
-public:	
+public:
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE bool IsDashing() { return isDashing; }
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void Dash(FVector _direction);
+		void Dash(FVector _direction);
 
 	UFUNCTION(BlueprintCallable)
 		void ResetDashInAir();
-		
+
 };

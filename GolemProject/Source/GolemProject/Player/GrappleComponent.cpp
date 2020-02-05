@@ -16,6 +16,7 @@
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
 #include "SwingPhysics.h"
+//#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
@@ -126,16 +127,12 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
-				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : mCamera->GetForwardVector() * accuracy;
+				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
 				FVector direction = (offset - currentProjectile->GetActorLocation());
-				
-				FHitResult hit;
-				if (world->LineTraceSingleByChannel(hit, mCamera->GetComponentLocation(), offset,ECollisionChannel::ECC_Visibility))
-				{
-					direction = hit.Location - currentProjectile->GetActorLocation();
-				}
-
 				direction /= direction.Size();
+
+				//DrawDebugLine(world, mCamera->GetComponentLocation(), offset, FColor::Red, true);
+
 				currentProjectile->Instigator = mCharacter->GetInstigator();
 				currentProjectile->SetOwner(mCharacter);
 				currentProjectile->LaunchProjectile(direction, this);
@@ -239,7 +236,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				}
 				else
 				{
-					if (!swingPhysics) 
+					if (!swingPhysics)
 					{
 						ACharacter* c = Cast<ACharacter>(mCharacter);
 						swingPhysics = new SwingPhysics(c, ClosestGrapplingHook);

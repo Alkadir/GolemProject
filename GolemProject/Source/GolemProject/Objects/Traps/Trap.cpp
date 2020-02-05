@@ -11,7 +11,7 @@ ATrap::ATrap()
 
 }
 
-const bool ATrap::Activate_Implementation(const AActor* caller)
+const bool ATrap::Activate_Implementation(AActor* caller)
 {
 	if (isActivate)
 	{
@@ -21,7 +21,7 @@ const bool ATrap::Activate_Implementation(const AActor* caller)
 	return true;
 }
 
-const bool ATrap::Desactivate_Implementation(const AActor* caller)
+const bool ATrap::Desactivate_Implementation(AActor* caller)
 {
 	if (!isActivate)
 	{
@@ -31,7 +31,7 @@ const bool ATrap::Desactivate_Implementation(const AActor* caller)
 	return true;
 }
 
-const bool ATrap::Switch_Implementation(const AActor* caller)
+const bool ATrap::Switch_Implementation(AActor* caller)
 {
 	isActivate = !isActivate;
 	return true;
