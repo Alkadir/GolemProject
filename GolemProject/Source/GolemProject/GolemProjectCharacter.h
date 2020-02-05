@@ -23,7 +23,6 @@ class AGolemProjectCharacter : public ACharacter
 
 	float m_valueRight;
 
-	IInteractable* toInteract = nullptr;
 
 	UPROPERTY()
 		class UUserWidget* currentSightWidget = nullptr;
@@ -68,6 +67,9 @@ public:
 
 protected:
 
+	UPROPERTY(BlueprintReadWrite)
+		AActor* actorToInteract;
+
 	virtual void BeginPlay() override;
 
 	//To do
@@ -110,8 +112,6 @@ protected:
 
 	void UseAssistedGrapple();
 
-	void Interact();
-
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -121,9 +121,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
 		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
-		
-	//Set interactable interface reference
-	FORCEINLINE void SetInteractable(IInteractable* pToInteract) { toInteract = pToInteract; }
+
 
 	void PushBloc();
 };

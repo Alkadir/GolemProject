@@ -89,7 +89,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGolemProjectCharacter::Dash);
 
-	PlayerInputComponent->BindAction("Interacte", IE_Pressed, this, &AGolemProjectCharacter::Interact);
+	//PlayerInputComponent->BindAction("Interacte", IE_Pressed, this, &AGolemProjectCharacter::Interact);
 }
 
 void AGolemProjectCharacter::BeginPlay()
@@ -143,21 +143,12 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 	}
 }
 
-void AGolemProjectCharacter::Interact()
-{
-	if (toInteract != nullptr)
-	{
-		toInteract->Interact_Implementation(this);
-	}
-}
-
 void AGolemProjectCharacter::PushBloc()
 {
 	isPushing = !isPushing;
 	GetCharacterMovement()->bOrientRotationToMovement = !isPushing;
 
 	float blocAngle = 0.0f;
-	AActor* actorToInteract = Cast<AActor>(toInteract);
 
 	if (isPushing && actorToInteract != nullptr)
 	{
