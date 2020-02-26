@@ -55,12 +55,26 @@ void APressurePlate::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 void APressurePlate::OnPressed()
 {
 	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Yellow, TEXT("Pressed!"));
+	
+	if (!isPressed)
+	{
+		FVector newPosition;
+	newPosition.Z = GetActorLocation().Z - 10.f;
+	SetActorLocation(newPosition);
+	}
+
 	isPressed = true;
 }
 
 void APressurePlate::OnReleased()
 {
 	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Yellow, TEXT("Released!"));
+	if (isPressed)
+	{
+		FVector newPosition;
+		newPosition.Z = GetActorLocation().Z + 10.f;
+		SetActorLocation(newPosition);
+	}
 	isPressed = false;
 }
 
