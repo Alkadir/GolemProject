@@ -12,7 +12,9 @@
 #include "Components/PrimitiveComponent.h"
 #include "Engine/World.h"
 #include "Player/GrappleComponent.h"
+#include "CableComponent.h"
 #include "Helpers/HelperLibrary.h"
+
 
 SwingPhysics::SwingPhysics()
 {
@@ -36,27 +38,28 @@ SwingPhysics::SwingPhysics(UGrappleComponent* _grappleHook)
 
 	if (world)
 	{
-		FVector constraintLocation = character->GetActorLocation() + dist * vec;
-		constraintActor = world->SpawnActor<APhysicsConstraintActor>(constraintLocation, FRotator::ZeroRotator);
-		HelperLibrary::Print(target->GetFName().ToString());
-		constraintComponent = constraintActor->GetConstraintComp();
-		constraintComponent->ConstraintActor1 = character->GetMesh()->GetAttachmentRootActor();
-		constraintComponent->ConstraintActor2 = target;
-	}
+		FActorSpawnParameters params;
+		params.Name = "ActorCable";
+		params.Instigator = character;
+		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	/*if (character)
-	{*/
+		/*AActor* cableActor = world->SpawnActor<AActor>(AActor::StaticClass(), character->GetTransform(), params);
 
-
-	/*if (characterMovement)
-		characterMovement->GravityScale = 0.0f;*/
-
-		/*if (target)
-		{
-			lastPosition = character->GetActorLocation();
-			length = FVector::Dist(character->GetActorLocation(), target->GetActorLocation());
-		}*/
+		if (cableActor)
+		{*/
+		//	HelperLibrary::Print(cableActor->GetName());
+			UCableComponent* cableComponentActor = NewObject<UCableComponent>(character->GetRootComponent(),UCableComponent::StaticClass(),TEXT("cableComp"));
+			
+			if (cableComponentActor)
+			{
+				HelperLibrary::Print(cableComponentActor->GetName());
+				character->AddInstanceComponent(cableComponentActor);
+				cableComponentActor->OnComponentCreated();
+				cableComponentActor->EndLocation = target->GetActorLocation();
+				cableComponentActor->RegisterComponent();
+			}	
 		//}
+	}
 }
 
 void SwingPhysics::Tick(float _deltaTime)

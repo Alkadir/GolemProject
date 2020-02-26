@@ -10,18 +10,11 @@
 class GOLEMPROJECT_API SwingPhysics
 {
 private:
-	class APhysicsConstraintActor* constraintActor;
-	class UPhysicsConstraintComponent* constraintComponent;
 	class AGolemProjectCharacter* character;
 	class UCharacterMovementComponent* characterMovement;
 	class AActor* target;
-
-	/*FVector lastPosition;
-	FVector newPosition;
-	FVector velocity;
-	float length;
-	float friction;*/
-
+	
+	class UCableComponent* cable;
 public:
 	SwingPhysics();
 	~SwingPhysics();
