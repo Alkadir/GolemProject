@@ -16,6 +16,7 @@
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
 #include "Player/FistProjectile.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
 UFistComponent::UFistComponent()
@@ -58,6 +59,16 @@ void UFistComponent::UpdateIKArm()
 	}
 }
 
+FVector UFistComponent::GetHandPosition()
+{
+	FVector pos = FVector::ZeroVector;
+	if (mSkeletalMesh)
+	{
+		pos = mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
+	}
+	return pos;
+}
+
 void UFistComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 {
 	if (!currentProjectile)
@@ -91,6 +102,11 @@ void UFistComponent::GoToDestination()
 	}
 }
 
+void UFistComponent::DisplayTrajectory()
+{
+
+}
+
 void UFistComponent::ResetFire()
 {
 	CanFire = true;
@@ -108,8 +124,21 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		if (IsTargetingFist && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
+			FHitResult hitResult;
+			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
+			DrawDebugLine(world, GetHandPosition(), end, FColor::Emerald, false, 0.0f, 0, 2.0f);
+			FVector dir = end - GetHandPosition();
+			
+			if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), end, ECollisionChannel::ECC_Visibility))
+			{
+				if (hitResult.GetComponent()->ComponentHasTag("Bounce"))
+				{
+					FVector direction;
+					direction = dir.MirrorByVector(hitResult.ImpactNormal);
+					DrawDebugLine(world, hitResult.ImpactPoint, direction * accuracy, FColor::Emerald, false, 0.0f, 0, 2.0f);
+				}
+			}
 		}
 	}
-	// ...
 }
 

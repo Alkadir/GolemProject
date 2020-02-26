@@ -32,6 +32,7 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AFistProjectile> fistProjectileClass;
 
@@ -47,6 +48,8 @@ protected:
 	UPROPERTY()
 	FVector IKposition;
 
+	bool DisplayEnable;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -56,6 +59,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GoToDestination();
+
+	UFUNCTION()
+	void DisplayTrajectory();
+
+	UFUNCTION()
+	FVector GetHandPosition();
 
 	FORCEINLINE const FVector& GetDirection() { return mDirection; };
 
