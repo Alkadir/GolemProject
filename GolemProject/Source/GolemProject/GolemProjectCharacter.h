@@ -23,13 +23,15 @@ class AGolemProjectCharacter : public ACharacter
 
 	float m_valueRight;
 
-	IInteractable* toInteract = nullptr;
 
 	UPROPERTY()
 		class UUserWidget* currentSightWidget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
 		class UGrappleComponent* mGrapple;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FistComp , meta = (AllowPrivateAccess = "true"))
+		class UFistComponent* FistComp;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -44,6 +46,9 @@ class AGolemProjectCharacter : public ACharacter
 
 	UPROPERTY()
 		class UChildActorComponent* sightCamera;
+
+	UPROPERTY()
+	class UChildActorComponent* sightCameraL;
 
 	float initialGroundFriction;
 
@@ -67,6 +72,9 @@ public:
 	void ResetFriction();
 
 protected:
+
+	UPROPERTY(BlueprintReadWrite)
+		AActor* actorToInteract;
 
 	virtual void BeginPlay() override;
 
@@ -110,8 +118,9 @@ protected:
 
 	void UseAssistedGrapple();
 
-	void Interact();
+	void ChangeToGrapple();
 
+	void ChangeToFist();
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -121,9 +130,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
 		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
-		
-	//Set interactable interface reference
-	FORCEINLINE void SetInteractable(IInteractable* pToInteract) { toInteract = pToInteract; }
+
 
 	void PushBloc();
 };

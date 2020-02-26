@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/Activable.h"
+#include "Interfaces/Spawnable.h"
 #include "MovingPlatform.generated.h"
 
 UENUM(BlueprintType)
@@ -32,7 +33,7 @@ enum class EMovingType : uint8
 };
 
 UCLASS()
-class GOLEMPROJECT_API AMovingPlatform : public AActor, public IActivable
+class GOLEMPROJECT_API AMovingPlatform : public AActor, public IActivable, public ISpawnable
 {
 	GENERATED_BODY()
 
@@ -87,6 +88,9 @@ protected:
 	void MoveCurve(float dt, int refIndex);
 	void SetNextIndex();
 
+	UPROPERTY(BlueprintReadWrite)
+		AActor* spawner = nullptr;
+
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Platform")
@@ -98,7 +102,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Platform")
 		const EMovingPlatformType GetPlatformType()const { return platformType; }
 
-		const bool IsActivate() const { return isActivate; }
+	const bool IsActivate() const { return isActivate; }
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -118,6 +122,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
 		bool Switch(AActor* caller);
 	virtual const bool Switch_Implementation(AActor* caller) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Spawnable")
+		void SetSpawner(AActor* _spawner);
+	virtual void SetSpawner_Implementation(AActor* _spawner) override;
 
 
 };

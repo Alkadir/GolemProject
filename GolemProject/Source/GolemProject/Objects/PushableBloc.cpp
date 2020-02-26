@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "GolemProjectCharacter.h"
 #include "Components/StaticMeshComponent.h"
+#include "GolemProjectCharacter.h"
 
 APushableBloc::APushableBloc()
 {
@@ -15,20 +16,18 @@ APushableBloc::APushableBloc()
 	boxCollider = CreateDefaultSubobject<UBoxComponent>(FName("Box collider"));
 	boxCollider->SetupAttachment(GetRootComponent());
 
-}
-
-void APushableBloc::BeginPlay()
-{
-	boxCollider->SetBoxExtent(FVector::OneVector * colliderSize);
-	//boxCollider->SetRelativeLocation(FVector(0.0f, 0.0f, colliderSize / 2.0f));
-
-	boxCollider->OnComponentBeginOverlap.AddUniqueDynamic(this, &APushableBloc::OnOverlapBegin);
-	boxCollider->OnComponentEndOverlap.AddUniqueDynamic(this, &APushableBloc::OnOverlapEnd);
+	boxCollider->SetBoxExtent(colliderSize);
+	boxCollider->SetRelativeLocation(boxOffset);
 }
 
 const bool APushableBloc::Interact_Implementation(AActor* caller)
 {
-	if (playerActor != nullptr)
+	playerActor = Cast<AGolemProjectCharacter>(caller);
+	if (playerActor == nullptr)
+	{
+		return false;
+	}
+	else
 	{
 		playerActor->PushBloc();
 
@@ -53,7 +52,7 @@ const bool APushableBloc::Interact_Implementation(AActor* caller)
 			{
 				mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Block);
 			}
-			
+
 			DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		}
 
@@ -63,30 +62,11 @@ const bool APushableBloc::Interact_Implementation(AActor* caller)
 	return false;
 }
 
-void APushableBloc::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+
+void APushableBloc::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	AGolemProjectCharacter* player = Cast<AGolemProjectCharacter>(OtherActor);
-	if (player != nullptr)
-	{
-		playerActor = player;
+	boxCollider->SetBoxExtent(colliderSize);
+	boxCollider->SetRelativeLocation(boxOffset);
 
-		if (!isUsed)
-		{
-			playerActor->SetInteractable(this);
-		}
-	}
-}
-
-void APushableBloc::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	AGolemProjectCharacter* player = Cast<AGolemProjectCharacter>(OtherActor);
-	if (player != nullptr)
-	{
-		if (!isUsed && playerActor != nullptr)
-		{
-			playerActor->SetInteractable(nullptr);
-		}
-
-		playerActor = nullptr;
-	}
+	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
