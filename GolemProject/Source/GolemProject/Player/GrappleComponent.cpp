@@ -267,10 +267,11 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				}
 				else
 				{
+					//Create the swing physics for the player
 					if (!swingPhysics)
 					{
 						ACharacter* c = Cast<ACharacter>(mCharacter);
-						swingPhysics = new SwingPhysics(c, ClosestGrapplingHook);
+						swingPhysics = new SwingPhysics(this);
 					}
 				}
 			}
@@ -283,6 +284,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			}
 		}
 
+		//if swing Physics exists we have to tick it
 		if (swingPhysics)
 			swingPhysics->Tick(DeltaTime);
 	}

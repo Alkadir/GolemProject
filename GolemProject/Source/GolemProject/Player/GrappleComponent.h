@@ -12,6 +12,7 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+private:
 	class UWorld* world;
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
@@ -25,6 +26,7 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 
 	FVector mDestination;
 	FVector mDirection;
+
 	int32 mIdBone;
 	bool bIsAssisted = false;
 	float accuracy = 100000.0f;
@@ -99,10 +101,16 @@ public:
 	FVector GetHandPosition();
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; }
+	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
+
+	FORCEINLINE class SwingPhysics* GetSwingPhysics() { return swingPhysics; };
 
 	UFUNCTION()
 	void UpdateIKArm();
+
+	UFUNCTION()
+	FORCEINLINE class AGolemProjectCharacter* GetCharacter() { return mCharacter; };
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
