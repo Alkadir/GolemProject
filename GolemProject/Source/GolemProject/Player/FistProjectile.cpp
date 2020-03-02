@@ -33,11 +33,14 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	{
 		if (OtherComponent->ComponentHasTag(BoucingTag))
 		{		
-			ProjectileComponent->bShouldBounce = true;
+			if (ProjectileComponent != nullptr)
+				ProjectileComponent->bShouldBounce = true;
+			BounceMovement(Hit.ImpactNormal);
 		}
 		else
 		{
-			ProjectileComponent->bShouldBounce = false;
+			if (ProjectileComponent != nullptr)
+				ProjectileComponent->bShouldBounce = false;
 		}
 
 		if (UWorld * world = GetWorld())
@@ -64,5 +67,15 @@ void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce)
 void AFistProjectile::DestroyFist()
 {
 	Destroy();
+}
+
+void AFistProjectile::BounceMovement(FVector _normal)
+{
+	if (ProjectileComponent != nullptr)
+	{
+		FVector direction = ProjectileComponent->Velocity.GetSafeNormal();
+		FVector newDirection = direction.MirrorByVector(_normal).GetSafeNormal();
+		ProjectileComponent->Velocity = newDirection * Speed;
+	}
 }
 

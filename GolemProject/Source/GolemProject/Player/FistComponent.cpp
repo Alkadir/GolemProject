@@ -121,22 +121,67 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 	if (mCharacter)
 	{
-		if (IsTargetingFist && mCharacter->GetSightCameraEnabled() && !currentProjectile)
+		if (IsTargetingFist && mCharacter->GetSightCameraEnabled() && CanFire)
 		{
 			UpdateIKArm();
-			FHitResult hitResult;
 			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
-			DrawDebugLine(world, GetHandPosition(), end, FColor::Emerald, false, 0.0f, 0, 2.0f);
-			FVector dir = end - GetHandPosition();
-			
-			if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), end, ECollisionChannel::ECC_Visibility))
+			FVector direction = end - GetHandPosition();
+			FVector location = GetHandPosition();
+			FVector scale;
+			FRotator rotation = direction.Rotation();
+			for (int i = 0; i < NumberBounce; ++i)
 			{
-				if (hitResult.GetComponent()->ComponentHasTag("Bounce"))
+				if (HelperAiming.Num() <= i)
 				{
-					FVector direction;
-					direction = dir.MirrorByVector(hitResult.ImpactNormal);
-					DrawDebugLine(world, hitResult.ImpactPoint, direction * accuracy, FColor::Emerald, false, 0.0f, 0, 2.0f);
+					HelperAiming.Add(world->SpawnActor<AActor>(HelperAimingClass));
 				}
+				if (HelperAiming[i] != nullptr)
+				{
+					HelperAiming[i]->SetActorLocation(location);
+					FHitResult hitResult;
+					HelperAiming[i]->SetActorRotation(rotation);
+					scale = HelperAiming[i]->GetActorScale3D();
+					FVector distance = direction * accuracy;
+					scale.Z = distance.Size();
+					HelperAiming[i]->SetActorScale3D(scale);
+					if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
+					{
+						distance = hitResult.ImpactPoint - location;
+						scale.Z = distance.Size() / 100.0f;
+						HelperAiming[i]->SetActorScale3D(scale);
+						if (hitResult.GetComponent()->ComponentHasTag("Bounce"))
+						{
+							direction = direction.MirrorByVector(hitResult.ImpactNormal);
+							end = direction * accuracy;
+							location = hitResult.ImpactPoint;
+							rotation = direction.Rotation();
+						}
+						else
+						{
+							if (HelperAiming.Num() != 0)
+							{
+								for (int j = i + 1; j < HelperAiming.Num(); ++j)
+								{
+									HelperAiming[j]->Destroy();
+									HelperAiming.RemoveAt(j);
+								}
+							}
+							i = NumberBounce;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if (HelperAiming.Num() != 0)
+			{
+				for (int i = 0; i < HelperAiming.Num(); ++i)
+				{
+					if (HelperAiming[i] != nullptr)
+						HelperAiming[i]->Destroy();
+				}
+				HelperAiming.Empty();
 			}
 		}
 	}

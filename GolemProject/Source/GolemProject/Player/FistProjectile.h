@@ -60,6 +60,8 @@ private:
 	class UProjectileMovementComponent* ProjectileComponent;
 	FVector Direction;
 
+	void BounceMovement(FVector _normal);
+
 	FTimerHandle TimerHandleDisappear;
 	FTimerHandle TimerHandleFXDisappear;
 };
