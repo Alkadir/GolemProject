@@ -121,7 +121,7 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 	if (mCharacter)
 	{
-		if (IsTargetingFist && mCharacter->GetSightCameraEnabled() && !currentProjectile)
+		if (IsTargetingFist && mCharacter->GetSightCameraEnabled() && CanFire)
 		{
 			UpdateIKArm();
 			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
@@ -129,21 +129,24 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			FVector location = GetHandPosition();
 			FVector scale;
 			FRotator rotation = direction.Rotation();
-			for (int i = 0; i < 3; ++i)
+			for (int i = 0; i < NumberBounce; ++i)
 			{
-				if (HelperAiming[i] == nullptr)
+				if (HelperAiming.Num() <= i)
 				{
-					HelperAiming[i] = world->SpawnActor<AActor>(HelperAimingClass);
+					HelperAiming.Add(world->SpawnActor<AActor>(HelperAimingClass));
 				}
 				if (HelperAiming[i] != nullptr)
 				{
 					HelperAiming[i]->SetActorLocation(location);
 					FHitResult hitResult;
+					HelperAiming[i]->SetActorRotation(rotation);
+					scale = HelperAiming[i]->GetActorScale3D();
+					FVector distance = direction * accuracy;
+					scale.Z = distance.Size();
+					HelperAiming[i]->SetActorScale3D(scale);
 					if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
 					{
-						HelperAiming[i]->SetActorRotation(rotation);
-						scale = HelperAiming[i]->GetActorScale3D();
-						FVector distance = hitResult.ImpactPoint - location;
+						distance = hitResult.ImpactPoint - location;
 						scale.Z = distance.Size() / 100.0f;
 						HelperAiming[i]->SetActorScale3D(scale);
 						if (hitResult.GetComponent()->ComponentHasTag("Bounce"))
@@ -155,23 +158,32 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 						}
 						else
 						{
-							i = 3;
+							if (HelperAiming.Num() != 0)
+							{
+								for (int j = i + 1; j < HelperAiming.Num(); ++j)
+								{
+									HelperAiming[j]->Destroy();
+									HelperAiming.RemoveAt(j);
+								}
+							}
+							i = NumberBounce;
 						}
 					}
 				}
 			}
 		}
-		/*else
+		else
 		{
-			for (int i = 0; i < 3; ++i)
+			if (HelperAiming.Num() != 0)
 			{
-				if (HelperAiming[i] != nullptr)
+				for (int i = 0; i < HelperAiming.Num(); ++i)
 				{
-					HelperAiming[i]->Destroy();
-					HelperAiming[i] = nullptr;
+					if (HelperAiming[i] != nullptr)
+						HelperAiming[i]->Destroy();
 				}
+				HelperAiming.Empty();
 			}
-		}*/
+		}
 	}
 }
 

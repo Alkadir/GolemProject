@@ -17,7 +17,7 @@ class GOLEMPROJECT_API UFistComponent : public UActorComponent
 	class USkeletalMeshComponent* mSkeletalMesh;
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
-	class AActor* HelperAiming[3];
+	TArray<class AActor*> HelperAiming;
 	FVector mDirection;
 	float accuracy = 100000.0f;
 	int32 mIdBone;
@@ -53,6 +53,9 @@ protected:
 	FVector IKposition;
 
 	bool DisplayEnable;
+
+	UPROPERTY(EditAnywhere)
+	int32 NumberBounce;
 
 public:	
 	// Called every frame
