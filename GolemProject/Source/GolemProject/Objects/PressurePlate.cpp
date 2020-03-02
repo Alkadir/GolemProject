@@ -7,7 +7,7 @@
 #include "Engine/EngineTypes.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
-
+#include "Math/UnrealMathVectorCommon.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
 
@@ -55,12 +55,27 @@ void APressurePlate::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 void APressurePlate::OnPressed()
 {
 	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Yellow, TEXT("Pressed!"));
+
+	if (!isPressed)
+	{
+		FVector newPosition;
+
+		newPosition.Z = GetActorLocation().Z - 4.f;
+		SetActorLocation(newPosition);
+	}
+
 	isPressed = true;
 }
 
 void APressurePlate::OnReleased()
 {
 	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Yellow, TEXT("Released!"));
+	if (isPressed)
+	{
+		FVector newPosition;
+		newPosition.Z = GetActorLocation().Z + 4.f;
+		SetActorLocation(newPosition);
+	}
 	isPressed = false;
 }
 
