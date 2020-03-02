@@ -7,6 +7,7 @@
 #include "Components/SceneComponent.h"
 #include "GameFramework/Actor.h"
 #include "Helpers/HelperLibrary.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 // Sets default values
 AFistProjectile::AFistProjectile()
@@ -31,8 +32,21 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
 	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
 	{
-		if (OtherComponent->ComponentHasTag(BoucingTag))
-		{		
+		UPhysicalMaterial* physMatTest;
+		if (Hit.GetComponent()->GetMaterial(0) != nullptr)
+		{
+			physMatTest = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+			HelperLibrary::Print(Hit.GetComponent()->GetMaterial(0)->GetName());
+			if (physMatTest != nullptr)
+				HelperLibrary::Print(physMatTest->GetName());
+		}
+
+
+
+		UPhysicalMaterial* physMat = Hit.PhysMaterial.Get();
+		if (physMat != nullptr && physMat->SurfaceType == SurfaceType2)
+		{
+		HelperLibrary::Print(FString::Printf(TEXT("%i"), physMat->SurfaceType.GetValue()));
 			if (ProjectileComponent != nullptr)
 				ProjectileComponent->bShouldBounce = true;
 			BounceMovement(Hit.ImpactNormal);

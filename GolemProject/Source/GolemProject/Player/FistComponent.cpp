@@ -16,6 +16,7 @@
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
 #include "Player/FistProjectile.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -146,11 +147,21 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 					HelperAiming[i]->SetActorScale3D(scale);
 					if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
 					{
+						UPhysicalMaterial* physMat = hitResult.PhysMaterial.Get();
+						/*UPhysicalMaterial* physMatTest;
+						if (hitResult.GetComponent()->GetMaterial(0) != nullptr)
+						{
+							physMatTest = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+							HelperLibrary::Print(hitResult.GetComponent()->GetMaterial(0)->GetName());
+							if (physMatTest != nullptr)
+								HelperLibrary::Print(physMatTest->GetName());
+						}*/
 						distance = hitResult.ImpactPoint - location;
 						scale.Z = distance.Size() / 100.0f;
 						HelperAiming[i]->SetActorScale3D(scale);
-						if (hitResult.GetComponent()->ComponentHasTag("Bounce"))
+						if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
 						{
+							HelperLibrary::Print("azeaze");
 							direction = direction.MirrorByVector(hitResult.ImpactNormal);
 							end = direction * accuracy;
 							location = hitResult.ImpactPoint;

@@ -6,6 +6,7 @@
 #include "Classes/Components/StaticMeshComponent.h"
 #include "Player/GrappleComponent.h"
 #include "Helpers/HelperLibrary.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 // Sets default values
 AProjectileHand::AProjectileHand()
 {
@@ -59,6 +60,12 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
 	{
 		bIsColliding = true;
+		UPhysicalMaterial* physMat = Hit.PhysMaterial.Get();
+		HelperLibrary::Print(FString::Printf(TEXT("%i"), physMat->SurfaceType.GetValue()));
+		if (physMat != nullptr && physMat->SurfaceType == SurfaceType1)
+		{
+			bIsGrapplingPossible = true;
+		}
 	}
 }
 
