@@ -12,6 +12,7 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+private:
 	class UWorld* world;
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
@@ -24,6 +25,7 @@ class GOLEMPROJECT_API UGrappleComponent : public UActorComponent
 
 	FVector mDestination;
 	FVector mDirection;
+
 	int32 mIdBone;
 	bool bIsAssisted = false;
 	float accuracy = 100000.0f;
@@ -96,6 +98,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
+
+	FORCEINLINE class SwingPhysics* GetSwingPhysics() { return swingPhysics; };
 
 	UFUNCTION()
 	void UpdateIKArm();

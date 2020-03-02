@@ -13,8 +13,27 @@ private:
 	class AGolemProjectCharacter* character;
 	class UCharacterMovementComponent* characterMovement;
 	class AActor* target;
-	
+	class UGrappleComponent* grapple;
 	class UCableComponent* cable;
+	class UWorld* world;
+
+	FVector velocity;
+	FVector lastLocation;
+	FVector newLocation;
+	FVector segment;
+
+	float friction;
+	float length;
+	float dist;
+	float diff;
+	float percent;
+	
+	//values to edit
+	float scaleGravity;
+	float forceMovement;
+	float speedRotation;
+
+	bool isAlreadyConnected;
 public:
 	SwingPhysics();
 	~SwingPhysics();
@@ -22,6 +41,6 @@ public:
 
 	FORCEINLINE void SetTarget(AActor*& _target) { target = _target; };
 	FORCEINLINE AActor*& GetTarget() { return target; };
-
+	void AddForceMovement(FVector _direction);
 	void Tick(float _deltaTime);
 };
