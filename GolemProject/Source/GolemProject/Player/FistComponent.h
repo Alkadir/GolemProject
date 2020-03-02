@@ -17,6 +17,7 @@ class GOLEMPROJECT_API UFistComponent : public UActorComponent
 	class USkeletalMeshComponent* mSkeletalMesh;
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
+	TArray<class AActor*> HelperAiming;
 	FVector mDirection;
 	float accuracy = 100000.0f;
 	int32 mIdBone;
@@ -32,8 +33,12 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AFistProjectile> fistProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = Help)
+	TSubclassOf<class AActor> HelperAimingClass;
 
 	UFUNCTION(BlueprintCallable)
 	void SetIKArm(FVector& _lookAt, bool& _isBlend);
@@ -47,6 +52,11 @@ protected:
 	UPROPERTY()
 	FVector IKposition;
 
+	bool DisplayEnable;
+
+	UPROPERTY(EditAnywhere)
+	int32 NumberBounce;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -56,6 +66,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GoToDestination();
+
+	UFUNCTION()
+	void DisplayTrajectory();
+
+	UFUNCTION()
+	FVector GetHandPosition();
 
 	FORCEINLINE const FVector& GetDirection() { return mDirection; };
 

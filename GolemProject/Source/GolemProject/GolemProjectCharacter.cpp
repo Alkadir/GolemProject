@@ -99,7 +99,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 void AGolemProjectCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
+	//currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
 	FistComp = FindComponentByClass<UFistComponent>();
@@ -268,14 +268,14 @@ void AGolemProjectCharacter::ChangeCamera()
 				else if (FistComp->IsTargetingFist)
 					pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 
-				if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
-					currentSightWidget->AddToViewport();
+			/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
+					currentSightWidget->AddToViewport();*/
 
 			}
 			else
 			{
-				if (currentSightWidget && currentSightWidget->IsInViewport())
-					currentSightWidget->RemoveFromViewport();
+				/*if (currentSightWidget && currentSightWidget->IsInViewport())
+					currentSightWidget->RemoveFromViewport();*/
 
 				isSightCameraEnabled = false;
 				GetCharacterMovement()->bOrientRotationToMovement = true;

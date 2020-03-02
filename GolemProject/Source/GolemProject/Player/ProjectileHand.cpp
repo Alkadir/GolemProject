@@ -29,7 +29,6 @@ void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleCompon
 {
 	direction = _direction;
 	grappleComponent = _grapple;
-
 }
 
 // Called every frame

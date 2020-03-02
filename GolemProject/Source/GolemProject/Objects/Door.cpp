@@ -4,7 +4,7 @@
 #include "Door.h"
 #include "Math/UnrealMathVectorCommon.h"
 #include "Classes/Components/SceneComponent.h"
-#include "Engine/Engine.h"
+#include "Helpers/HelperLibrary.h"
 #include "UObject/UObjectGlobals.h"
 
 // Sets default values
@@ -16,7 +16,10 @@ ADoor::ADoor(const FObjectInitializer& OI)
 	USceneComponent* Root = OI.CreateDefaultSubobject<USceneComponent>(this, TEXT("Root"));
 	SetRootComponent(Root);
 	destination = CreateDefaultSubobject<USceneComponent>(TEXT("DestinationDoor"));
-	destination->SetupAttachment(Root);
+	if (Root != nullptr && destination != nullptr)
+	{
+		destination->SetupAttachment(Root);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -24,13 +27,16 @@ void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
 	startPos = GetActorLocation();
-	destinationPos = destination->GetComponentLocation();
+	if (destination != nullptr)
+	{
+		destinationPos = destination->GetComponentLocation();
+	}
 }
 
 // Called every frame
 void ADoor::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime); 
+	Super::Tick(DeltaTime);
 
 	if (openBy == EOpenDoorBy::Movement)
 	{
@@ -53,7 +59,7 @@ void ADoor::Tick(float DeltaTime)
 		}
 		if (!SetActorLocation(FMath::Lerp(startPos, destinationPos, timerLerp)))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("cant move"));
+			HelperLibrary::Print(TEXT("cant move"), 5.f, FColor::Red);
 			timerLerp = lastTimer;
 		}
 	}

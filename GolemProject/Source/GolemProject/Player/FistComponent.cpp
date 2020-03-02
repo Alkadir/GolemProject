@@ -16,6 +16,7 @@
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
 #include "Player/FistProjectile.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
 UFistComponent::UFistComponent()
@@ -58,6 +59,16 @@ void UFistComponent::UpdateIKArm()
 	}
 }
 
+FVector UFistComponent::GetHandPosition()
+{
+	FVector pos = FVector::ZeroVector;
+	if (mSkeletalMesh)
+	{
+		pos = mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
+	}
+	return pos;
+}
+
 void UFistComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 {
 	if (!currentProjectile)
@@ -91,6 +102,11 @@ void UFistComponent::GoToDestination()
 	}
 }
 
+void UFistComponent::DisplayTrajectory()
+{
+
+}
+
 void UFistComponent::ResetFire()
 {
 	CanFire = true;
@@ -105,11 +121,69 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 	if (mCharacter)
 	{
-		if (IsTargetingFist && mCharacter->GetSightCameraEnabled() && !currentProjectile)
+		if (IsTargetingFist && mCharacter->GetSightCameraEnabled() && CanFire)
 		{
 			UpdateIKArm();
+			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
+			FVector direction = end - GetHandPosition();
+			FVector location = GetHandPosition();
+			FVector scale;
+			FRotator rotation = direction.Rotation();
+			for (int i = 0; i < NumberBounce; ++i)
+			{
+				if (HelperAiming.Num() <= i)
+				{
+					HelperAiming.Add(world->SpawnActor<AActor>(HelperAimingClass));
+				}
+				if (HelperAiming[i] != nullptr)
+				{
+					HelperAiming[i]->SetActorLocation(location);
+					FHitResult hitResult;
+					HelperAiming[i]->SetActorRotation(rotation);
+					scale = HelperAiming[i]->GetActorScale3D();
+					FVector distance = direction * accuracy;
+					scale.Z = distance.Size();
+					HelperAiming[i]->SetActorScale3D(scale);
+					if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
+					{
+						distance = hitResult.ImpactPoint - location;
+						scale.Z = distance.Size() / 100.0f;
+						HelperAiming[i]->SetActorScale3D(scale);
+						if (hitResult.GetComponent()->ComponentHasTag("Bounce"))
+						{
+							direction = direction.MirrorByVector(hitResult.ImpactNormal);
+							end = direction * accuracy;
+							location = hitResult.ImpactPoint;
+							rotation = direction.Rotation();
+						}
+						else
+						{
+							if (HelperAiming.Num() != 0)
+							{
+								for (int j = i + 1; j < HelperAiming.Num(); ++j)
+								{
+									HelperAiming[j]->Destroy();
+									HelperAiming.RemoveAt(j);
+								}
+							}
+							i = NumberBounce;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if (HelperAiming.Num() != 0)
+			{
+				for (int i = 0; i < HelperAiming.Num(); ++i)
+				{
+					if (HelperAiming[i] != nullptr)
+						HelperAiming[i]->Destroy();
+				}
+				HelperAiming.Empty();
+			}
 		}
 	}
-	// ...
 }
 

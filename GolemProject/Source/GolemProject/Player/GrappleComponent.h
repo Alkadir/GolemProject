@@ -22,6 +22,7 @@ private:
 	class AGolemProjectGameMode* GameMode;
 	class APlayerCameraManager* PlayerCameraManager;
 	class SwingPhysics* swingPhysics = nullptr;
+	class AActor* HelperAiming;
 
 	FVector mDestination;
 	FVector mDirection;
@@ -33,6 +34,9 @@ private:
 protected:
 	UPROPERTY(EditAnywhere, Category = "projectile", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AProjectileHand> handProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = Help)
+	TSubclassOf<class AActor> HelperAimingClass;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float maxDistance = 3000.0f;
