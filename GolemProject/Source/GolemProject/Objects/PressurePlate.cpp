@@ -3,7 +3,7 @@
 
 #include "PressurePlate.h"
 
-#include "Engine/Engine.h"
+#include "Helpers/HelperLibrary.h"
 #include "Engine/EngineTypes.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -22,7 +22,7 @@ APressurePlate::APressurePlate()
 
 void APressurePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Begin overlap"));
+	HelperLibrary::Print(TEXT("Begin overlap"), 2.0f, FColor::Red);
 
 	UWorld* world = GetWorld();
 	if (world)
@@ -38,7 +38,7 @@ void APressurePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 
 void APressurePlate::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("End overlap"));
+	HelperLibrary::Print(TEXT("End overlap"), 2.0f, FColor::Red);
 
 	UWorld* world = GetWorld();
 	if (world)
@@ -54,7 +54,7 @@ void APressurePlate::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 
 void APressurePlate::OnPressed()
 {
-	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Yellow, TEXT("Pressed!"));
+	HelperLibrary::Print(TEXT("Pressed!"), 2.0f, FColor::Yellow);
 
 	if (!isPressed)
 	{
@@ -69,7 +69,7 @@ void APressurePlate::OnPressed()
 
 void APressurePlate::OnReleased()
 {
-	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Yellow, TEXT("Released!"));
+	HelperLibrary::Print(TEXT("Released!"), 2.0f, FColor::Yellow);
 	if (isPressed)
 	{
 		FVector newPosition;
