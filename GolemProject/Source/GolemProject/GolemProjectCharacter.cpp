@@ -124,6 +124,14 @@ void AGolemProjectCharacter::Jump()
 	{
 		Super::Jump();
 	}
+
+	if (mGrapple)
+	{
+		if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->StopSwingPhysics();
+		}
+	}
 }
 
 void AGolemProjectCharacter::Dash()

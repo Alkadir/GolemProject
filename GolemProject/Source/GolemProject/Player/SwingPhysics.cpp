@@ -18,6 +18,8 @@ SwingPhysics::SwingPhysics()
 
 SwingPhysics::~SwingPhysics()
 {
+	if (characterMovement)
+		characterMovement->Activate();
 }
 
 SwingPhysics::SwingPhysics(UGrappleComponent* _grappleHook)
@@ -32,7 +34,7 @@ SwingPhysics::SwingPhysics(UGrappleComponent* _grappleHook)
 	scaleGravity = 4.0f;
 	friction = 0.9998f;
 	forceMovement = 5.0f;
-	speedRotation = 0.02f;
+	speedRotation = 0.01f;
 	length = FVector::Distance(target->GetActorLocation(), character->GetActorLocation());
 	velocity = characterMovement->Velocity * world->GetDeltaSeconds();
 	characterMovement->Deactivate();
@@ -40,6 +42,7 @@ SwingPhysics::SwingPhysics(UGrappleComponent* _grappleHook)
 
 void SwingPhysics::AddForceMovement(FVector _direction)
 {
+	direction = _direction;
 	velocity += _direction * forceMovement * world->GetDeltaSeconds();
 }
 
@@ -64,7 +67,8 @@ void SwingPhysics::Tick(float _deltaTime)
 
 		character->SetActorLocation(newLocation, true, nullptr, ETeleportType::None);
 		//smooth rotationnal movement 
-		FRotator rot = FMath::Lerp(character->GetActorRotation(), velocity.Rotation(), speedRotation);
+		direction.Z = velocity.Z * 0.5f;
+		FRotator rot = FMath::Lerp(character->GetActorRotation(), direction.Rotation(), speedRotation);
 		character->SetActorRotation(rot);
 		isAlreadyConnected = true;
 	}

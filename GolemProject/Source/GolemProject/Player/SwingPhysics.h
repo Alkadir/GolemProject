@@ -21,6 +21,7 @@ private:
 	FVector lastLocation;
 	FVector newLocation;
 	FVector segment;
+	FVector direction;
 
 	float friction;
 	float length;

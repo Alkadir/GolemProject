@@ -290,6 +290,17 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 }
 
+void UGrappleComponent::StopSwingPhysics()
+{
+	HelperLibrary::Print("stop swing");
+	if (swingPhysics)
+	{
+		bIsAssisted = false;
+		delete swingPhysics;
+		swingPhysics = nullptr;
+	}
+}
+
 void UGrappleComponent::PlayerIsNear()
 {
 	//Find destination stop player

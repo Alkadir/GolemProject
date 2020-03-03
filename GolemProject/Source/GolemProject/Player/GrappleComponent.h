@@ -114,5 +114,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-
+	//Implicit Delete SwingPhysics var 
+	void StopSwingPhysics();
 };
