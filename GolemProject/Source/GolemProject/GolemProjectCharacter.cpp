@@ -120,11 +120,55 @@ void AGolemProjectCharacter::BeginPlay()
 	FistComp->IsTargetingFist = false;
 }
 
+void AGolemProjectCharacter::Tick(float _deltaTime)
+{
+	Super::Tick(_deltaTime);
+
+	if (UWorld * world = GetWorld())
+	{
+		FHitResult hit;
+		float height = GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 1.0f;
+
+		if (world->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() - FVector::UpVector * height, ECollisionChannel::ECC_Visibility))
+		{
+			if (hit.bBlockingHit)
+			{
+				if (mGrapple)
+				{
+					if (mGrapple->GetSwingPhysics())
+					{
+						mGrapple->StopSwingPhysics();
+					}
+				}
+			}
+		}
+	}
+
+	if (mGrapple && !mGrapple->GetSwingPhysics())
+	{
+		FRotator rotFinal = FRotator::ZeroRotator;
+		rotFinal.Pitch = 0.0f;
+		rotFinal.Yaw = GetActorRotation().Yaw;
+		rotFinal.Roll = GetActorRotation().Roll;
+
+		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.05f);
+		SetActorRotation(rot);
+	}
+}
+
 void AGolemProjectCharacter::Jump()
 {
 	if (!PushingComponent->GetIsPushingObject())
 	{
 		Super::Jump();
+	}
+
+	if (mGrapple)
+	{
+		if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->StopSwingPhysics();
+		}
 	}
 }
 
@@ -266,6 +310,8 @@ void AGolemProjectCharacter::MoveForward(float Value)
 			{
 				mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetForwardVector() * m_valueForward);
 			}
+			else
+			{
 			if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()))
 			{
 				Direction = mGrapple->GetDirection();
@@ -274,6 +320,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 			{
 				Direction = FistComp->GetDirection();
 			}
+		}
 		}
 		else
 		{
@@ -303,15 +350,18 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		{
 			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetRightVector() * m_valueRight);
 		}
-
-		// add movement in that direction
-		if (isSightCameraEnabled && (mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()))
+		else
 		{
-			Direction = mGrapple->GetDirection();
+			// add movement in that direction
+			if (isSightCameraEnabled &&
+				(mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) &&
+				!isPushing && !GetCharacterMovement()->IsFalling())
+			{
+				Direction = mGrapple->GetDirection();
 
-			float X = Direction.X;
-			float Y = Direction.Y;
-			float Z = Direction.Z;
+				float X = Direction.X;
+				float Y = Direction.Y;
+				float Z = Direction.Z;
 
 			Direction.X = -Y;
 			Direction.Y = X;
@@ -320,14 +370,15 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		{
 			Direction = FistComp->GetDirection();
 
-			float X = Direction.X;
-			float Y = Direction.Y;
-			float Z = Direction.Z;
+				float X = Direction.X;
+				float Y = Direction.Y;
+				float Z = Direction.Z;
 
-			Direction.X = -Y;
-			Direction.Y = X;
+				Direction.X = -Y;
+				Direction.Y = X;
+			}
+			AddMovementInput(Direction, Value);
 		}
-		AddMovementInput(Direction, Value);
 	}
 }
 
