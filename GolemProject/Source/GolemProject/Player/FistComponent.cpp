@@ -16,6 +16,7 @@
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
 #include "Player/FistProjectile.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -121,22 +122,92 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 	if (mCharacter)
 	{
-		if (IsTargetingFist && mCharacter->GetSightCameraEnabled() && !currentProjectile)
+		if (IsTargetingFist && mCharacter->GetSightCameraEnabled())
 		{
 			UpdateIKArm();
-			FHitResult hitResult;
-			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
-			DrawDebugLine(world, GetHandPosition(), end, FColor::Emerald, false, 0.0f, 0, 2.0f);
-			FVector dir = end - GetHandPosition();
-			
-			if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), end, ECollisionChannel::ECC_Visibility))
+			if (CanFire)
 			{
-				if (hitResult.GetComponent()->ComponentHasTag("Bounce"))
+				FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
+				FVector direction = end - GetHandPosition();
+				FVector location = GetHandPosition();
+				FVector scale;
+				FRotator rotation = direction.Rotation();
+				for (int i = 0; i < NumberBounce; ++i)
 				{
-					FVector direction;
-					direction = dir.MirrorByVector(hitResult.ImpactNormal);
-					DrawDebugLine(world, hitResult.ImpactPoint, direction * accuracy, FColor::Emerald, false, 0.0f, 0, 2.0f);
+					//if helping is not spawn, spawn it
+					if (HelperAiming.Num() <= i)
+					{
+						HelperAiming.Add(world->SpawnActor<AActor>(HelperAimingClass));
+					}
+					if (HelperAiming[i] != nullptr)
+					{
+						HelperAiming[i]->SetActorLocation(location);
+						FHitResult hitResult;
+						HelperAiming[i]->SetActorRotation(rotation);
+						scale = HelperAiming[i]->GetActorScale3D();
+						FVector distance = direction * accuracy;
+						scale.Z = distance.Size();
+						HelperAiming[i]->SetActorScale3D(scale);
+						//raycast to see if there is any obstacle in front of player
+						if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
+						{
+							UPhysicalMaterial* physMat;
+							distance = hitResult.ImpactPoint - location;
+							scale.Z = distance.Size() / 100.0f;
+							HelperAiming[i]->SetActorScale3D(scale);
+							//scale the helping actor to avoid it to going through wall
+							if (hitResult.GetComponent()->GetMaterial(0) != nullptr)
+							{
+								physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+								//if it's a bouncing surface the calculate the direction of bounce 
+								if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType2)
+								{
+									direction = direction.MirrorByVector(hitResult.ImpactNormal);
+									end = direction * accuracy;
+									location = hitResult.ImpactPoint;
+									rotation = direction.Rotation();
+								}
+								else
+								{
+									//stop loop
+									if (HelperAiming.Num() != 0)
+									{
+										for (int j = i + 1; j < HelperAiming.Num(); ++j)
+										{
+											HelperAiming[j]->Destroy();
+											HelperAiming.RemoveAt(j);
+										}
+									}
+									i = NumberBounce;
+								}
+							}
+						}
+					}
 				}
+			}
+			else
+			{
+				if (HelperAiming.Num() != 0)
+				{
+					for (int i = 0; i < HelperAiming.Num(); ++i)
+					{
+						if (HelperAiming[i] != nullptr)
+							HelperAiming[i]->Destroy();
+					}
+					HelperAiming.Empty();
+				}
+			}
+		}
+		else
+		{
+			if (HelperAiming.Num() != 0)
+			{
+				for (int i = 0; i < HelperAiming.Num(); ++i)
+				{
+					if (HelperAiming[i] != nullptr)
+						HelperAiming[i]->Destroy();
+				}
+				HelperAiming.Empty();
 			}
 		}
 	}

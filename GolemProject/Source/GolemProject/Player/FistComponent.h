@@ -17,6 +17,7 @@ class GOLEMPROJECT_API UFistComponent : public UActorComponent
 	class USkeletalMeshComponent* mSkeletalMesh;
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
+	TArray<class AActor*> HelperAiming;
 	FVector mDirection;
 	float accuracy = 100000.0f;
 	int32 mIdBone;
@@ -36,6 +37,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AFistProjectile> fistProjectileClass;
 
+	UPROPERTY(EditAnywhere, Category = Help)
+	TSubclassOf<class AActor> HelperAimingClass;
+
 	UFUNCTION(BlueprintCallable)
 	void SetIKArm(FVector& _lookAt, bool& _isBlend);
 
@@ -49,6 +53,9 @@ protected:
 	FVector IKposition;
 
 	bool DisplayEnable;
+
+	UPROPERTY(EditAnywhere)
+	int32 NumberBounce;
 
 public:	
 	// Called every frame

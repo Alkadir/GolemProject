@@ -18,6 +18,8 @@ public:
 	ALever();
 
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditInstanceOnly)
 		TArray<AActor*> objectsToActivate;
 	UPROPERTY(EditInstanceOnly)

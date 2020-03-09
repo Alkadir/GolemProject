@@ -19,6 +19,7 @@
 #include "Player/HealthComponent.h"
 #include "Interfaces/Interactable.h"
 #include "Player/FistComponent.h"
+#include "Player/SwingPhysics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -98,7 +99,7 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 void AGolemProjectCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
+	//currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
 	FistComp = FindComponentByClass<UFistComponent>();
@@ -267,14 +268,14 @@ void AGolemProjectCharacter::ChangeCamera()
 				else if (FistComp->IsTargetingFist)
 					pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 
-				if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
-					currentSightWidget->AddToViewport();
+			/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
+					currentSightWidget->AddToViewport();*/
 
 			}
 			else
 			{
-				if (currentSightWidget && currentSightWidget->IsInViewport())
-					currentSightWidget->RemoveFromViewport();
+				/*if (currentSightWidget && currentSightWidget->IsInViewport())
+					currentSightWidget->RemoveFromViewport();*/
 
 				isSightCameraEnabled = false;
 				GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -296,6 +297,11 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 		// get forward vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetForwardVector() * m_valueForward);
+		}
 
 		if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()))
 		{
@@ -328,6 +334,12 @@ void AGolemProjectCharacter::MoveRight(float Value)
 
 		// get right vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetRightVector() * m_valueRight);
+		}
+
 		// add movement in that direction
 		if (isSightCameraEnabled && (mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) && !isPushing)
 		{

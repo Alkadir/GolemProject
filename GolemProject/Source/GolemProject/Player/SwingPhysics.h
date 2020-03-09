@@ -10,25 +10,37 @@
 class GOLEMPROJECT_API SwingPhysics
 {
 private:
-	class APhysicsConstraintActor* constraintActor;
-	class UPhysicsConstraintComponent* constraintComponent;
-	class ACharacter* character;
+	class AGolemProjectCharacter* character;
 	class UCharacterMovementComponent* characterMovement;
 	class AActor* target;
+	class UGrappleComponent* grapple;
+	class UCableComponent* cable;
+	class UWorld* world;
 
-	FVector lastPosition;
-	FVector newPosition;
 	FVector velocity;
-	float length;
-	float friction;
+	FVector lastLocation;
+	FVector newLocation;
+	FVector segment;
 
+	float friction;
+	float length;
+	float dist;
+	float diff;
+	float percent;
+	
+	//values to edit
+	float scaleGravity;
+	float forceMovement;
+	float speedRotation;
+
+	bool isAlreadyConnected;
 public:
 	SwingPhysics();
 	~SwingPhysics();
-	SwingPhysics(class ACharacter*& _character, class AActor*& _hook);
+	SwingPhysics(class UGrappleComponent* _grappleHook);
 
 	FORCEINLINE void SetTarget(AActor*& _target) { target = _target; };
 	FORCEINLINE AActor*& GetTarget() { return target; };
-
+	void AddForceMovement(FVector _direction);
 	void Tick(float _deltaTime);
 };

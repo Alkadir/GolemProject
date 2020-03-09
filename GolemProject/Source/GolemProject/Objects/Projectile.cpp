@@ -25,8 +25,11 @@ void AProjectile::LaunchProjectile_Implementation(AActor* _launcher, FVector vel
 {
 	launcher = _launcher;
 	damage = _damage;
-	projectileMovement->Velocity = velocity;
-	projectileMovement->ProjectileGravityScale = gravityScale;
+	if (projectileMovement)
+	{
+		projectileMovement->Velocity = velocity;
+		projectileMovement->ProjectileGravityScale = gravityScale;
+	}
 }
 
 // Called every frame

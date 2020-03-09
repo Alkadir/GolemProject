@@ -32,6 +32,18 @@ enum class EMovingType : uint8
 	Curve		UMETA(DisplayName = "Curve")
 };
 
+USTRUCT(BlueprintType)
+struct FPathInfo
+{
+	GENERATED_BODY();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		float speed = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		float waitTime = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		EMovingType movingType = EMovingType::Line;
+};
+
 UCLASS()
 class GOLEMPROJECT_API AMovingPlatform : public AActor, public IActivable, public ISpawnable
 {
@@ -55,11 +67,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		int startIndexCheckpoint = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
-		TArray<float> speeds;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
-		TArray<float> waitTimes;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
-		TArray<EMovingType> movingType;
+		TArray<FPathInfo> pathInfos;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool isStair = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
@@ -67,7 +75,6 @@ protected:
 
 	int currentIndex;
 	int nextIndex;
-	int dir;
 	float waitTime;
 	float timerLerp;
 	FVector velocity;

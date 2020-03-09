@@ -7,6 +7,7 @@
 #include "Components/SceneComponent.h"
 #include "GameFramework/Actor.h"
 #include "Helpers/HelperLibrary.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 // Sets default values
 AFistProjectile::AFistProjectile()
@@ -31,13 +32,21 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
 	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
 	{
-		if (OtherComponent->ComponentHasTag(BoucingTag))
-		{		
-			ProjectileComponent->bShouldBounce = true;
-		}
-		else
+		UPhysicalMaterial* physMat;
+		if (Hit.GetComponent()->GetMaterial(0) != nullptr)
 		{
-			ProjectileComponent->bShouldBounce = false;
+			physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+			if (physMat != nullptr && physMat->SurfaceType == SurfaceType2)
+			{
+				if (ProjectileComponent != nullptr)
+					ProjectileComponent->bShouldBounce = true;
+				BounceMovement(Hit.ImpactNormal);
+			}
+			else
+			{
+				if (ProjectileComponent != nullptr)
+					ProjectileComponent->bShouldBounce = false;
+			}
 		}
 
 		if (UWorld * world = GetWorld())
@@ -64,5 +73,15 @@ void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce)
 void AFistProjectile::DestroyFist()
 {
 	Destroy();
+}
+
+void AFistProjectile::BounceMovement(FVector _normal)
+{
+	if (ProjectileComponent != nullptr)
+	{
+		FVector direction = ProjectileComponent->Velocity.GetSafeNormal();
+		FVector newDirection = direction.MirrorByVector(_normal).GetSafeNormal();
+		ProjectileComponent->Velocity = newDirection * Speed;
+	}
 }
 
