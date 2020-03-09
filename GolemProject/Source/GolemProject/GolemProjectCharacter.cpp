@@ -19,6 +19,7 @@
 #include "Player/HealthComponent.h"
 #include "Interfaces/Interactable.h"
 #include "Player/FistComponent.h"
+#include "Player/SwingPhysics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -297,6 +298,11 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		// get forward vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
+		if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetForwardVector() * m_valueForward);
+		}
+
 		if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()))
 		{
 			Direction = mGrapple->GetDirection();
@@ -328,6 +334,12 @@ void AGolemProjectCharacter::MoveRight(float Value)
 
 		// get right vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetRightVector() * m_valueRight);
+		}
+
 		// add movement in that direction
 		if (isSightCameraEnabled && (mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) && !isPushing)
 		{

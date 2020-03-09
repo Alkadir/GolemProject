@@ -13,68 +13,50 @@ class AGolemProjectCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnyWhere, Category = "Debug")
-		bool showCursor = false;
+private:
+
+	UPROPERTY(EditAnyWhere, Category = "Debug")
+	bool showCursor = false;
 
 	UPROPERTY()
-		bool isSightCameraEnabled = false;
+	bool isSightCameraEnabled = false;
 
 	float m_valueForward;
 
 	float m_valueRight;
 
-
 	UPROPERTY()
-		class UUserWidget* currentSightWidget = nullptr;
+	class UUserWidget* currentSightWidget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
-		class UGrappleComponent* mGrapple;
+	class UGrappleComponent* mGrapple;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FistComp , meta = (AllowPrivateAccess = "true"))
-		class UFistComponent* FistComp;
+	class UFistComponent* FistComp;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* FollowCamera;
+	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-		class UHealthComponent* HealthComponent;
+	class UHealthComponent* HealthComponent;
 
 	UPROPERTY()
-		class UChildActorComponent* sightCamera;
+	class UChildActorComponent* sightCamera;
 
 	UPROPERTY()
 	class UChildActorComponent* sightCameraL;
 
 	float initialGroundFriction;
 
-public:
-	AGolemProjectCharacter();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
-		TSubclassOf<class UUserWidget>  sightHudClass;
-
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseTurnRate;
-
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseLookUpRate;
-
-	UFUNCTION(BlueprintCallable, Category = "Hud")
-		FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
-
-	void ResetFriction();
-
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
-		AActor* actorToInteract;
+	AActor* actorToInteract;
 
 	virtual void BeginPlay() override;
 
@@ -104,10 +86,10 @@ protected:
 	void ChangeCamera();
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		bool isPushing = false;
+	bool isPushing = false;
 
 	UPROPERTY(EditAnywhere)
-		UDashComponent* dashComponent;
+	UDashComponent* dashComponent;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -123,14 +105,30 @@ protected:
 	void ChangeToFist();
 
 public:
+	AGolemProjectCharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
+	TSubclassOf<class UUserWidget>  sightHudClass;
+
+	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	float BaseTurnRate;
+
+	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	float BaseLookUpRate;
+
+	UFUNCTION(BlueprintCallable, Category = "Hud")
+	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+
+	void ResetFriction();
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
-		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
-
+	FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
 
 	void PushBloc();
 };
