@@ -12,7 +12,7 @@ AMovingPlatform::AMovingPlatform(const FObjectInitializer& OI)
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	USceneComponent* Root = OI.CreateDefaultSubobject<USceneComponent>(this, TEXT("Root"));
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 	pathParent = CreateDefaultSubobject<USceneComponent>(TEXT("pathParen"));
 	path1 = CreateDefaultSubobject<USceneComponent>(TEXT("Path1"));
@@ -42,7 +42,7 @@ void AMovingPlatform::Init()
 	}
 	if (childrens.Num() == 0)
 	{
-		HelperLibrary::Print("WARNING There is no path", 15.f, FColor::Yellow);
+		HelperLibrary::Print("WARNING There is no path on " + GetName(), 15.f, FColor::Yellow);
 	}
 	for (auto& path : childrens)
 	{
@@ -51,7 +51,7 @@ void AMovingPlatform::Init()
 
 	if (pathInfos.Num() < worldCheckpoint.Num())
 	{
-		HelperLibrary::Print("ERROR pathInfos is not initialized for all path points", 15.f, FColor::Red);
+		HelperLibrary::Print("ERROR pathInfos is not initialized for all path points on " + GetName(), 15.f, FColor::Red);
 		return;
 	}
 	if (pathInfos.Num() > 0)
@@ -197,7 +197,7 @@ void AMovingPlatform::MoveCurve(float dt, int refIndex)
 		}
 		else
 		{
-			HelperLibrary::Print(FString::Printf(TEXT("WARNING path%d is not a spline"), refIndex), 15.f, FColor::Red);
+			HelperLibrary::Print(FString::Printf(TEXT("WARNING path%d is not a spline on "), refIndex) + GetName(), 15.f, FColor::Red);
 		}
 	}
 }

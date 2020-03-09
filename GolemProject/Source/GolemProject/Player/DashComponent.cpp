@@ -45,7 +45,7 @@ void UDashComponent::StopDash()
 				CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
 			}
 			m_character->ResetFriction();
-			isDashing = true;
+			isDashing = false;
 		}
 	}
 }
