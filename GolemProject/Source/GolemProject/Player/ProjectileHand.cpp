@@ -60,11 +60,22 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
 	{
 		bIsColliding = true;
-		UPhysicalMaterial* physMat = Hit.PhysMaterial.Get();
-		HelperLibrary::Print(FString::Printf(TEXT("%i"), physMat->SurfaceType.GetValue()));
-		if (physMat != nullptr && physMat->SurfaceType == SurfaceType1)
+		UPhysicalMaterial* physMat;
+		if (Hit.GetComponent()->GetMaterial(0) != nullptr)
 		{
-			bIsGrapplingPossible = true;
+			physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+			if (physMat != nullptr && physMat->SurfaceType == SurfaceType1)
+			{
+				bIsGrapplingPossible = true;
+			}
+			else
+			{
+				bIsComingBack = true;
+			}
+		}
+		else
+		{
+			bIsComingBack = true;
 		}
 	}
 }
