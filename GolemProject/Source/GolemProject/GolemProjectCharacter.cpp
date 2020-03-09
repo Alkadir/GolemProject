@@ -354,8 +354,7 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		{
 			// add movement in that direction
 			if (isSightCameraEnabled &&
-				(mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) &&
-				!isPushing && !GetCharacterMovement()->IsFalling())
+				(mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) && !GetCharacterMovement()->IsFalling())
 			{
 				Direction = mGrapple->GetDirection();
 
