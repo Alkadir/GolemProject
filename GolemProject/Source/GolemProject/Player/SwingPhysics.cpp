@@ -39,7 +39,9 @@ SwingPhysics::SwingPhysics(UGrappleComponent* _grappleHook)
 	friction = 0.9998f;
 	forceMovement = 5.0f;
 	speedRotation = 0.01f;
+
 	length = FVector::Distance(target->GetActorLocation(), character->GetActorLocation());
+
 	velocity = characterMovement->Velocity * world->GetDeltaSeconds();
 	characterMovement->Deactivate();
 }
