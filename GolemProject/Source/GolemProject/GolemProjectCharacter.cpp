@@ -312,15 +312,15 @@ void AGolemProjectCharacter::MoveForward(float Value)
 			}
 			else
 			{
-			if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()))
-			{
-				Direction = mGrapple->GetDirection();
+				if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()) && !GetCharacterMovement()->IsFalling())
+				{
+					Direction = mGrapple->GetDirection();
+				}
+				else if (FistComp->IsTargetingFist && isSightCameraEnabled)
+				{
+					Direction = FistComp->GetDirection();
+				}
 			}
-			else if (FistComp->IsTargetingFist && isSightCameraEnabled)
-			{
-				Direction = FistComp->GetDirection();
-			}
-		}
 		}
 		else
 		{
@@ -362,12 +362,12 @@ void AGolemProjectCharacter::MoveRight(float Value)
 				float Y = Direction.Y;
 				float Z = Direction.Z;
 
-			Direction.X = -Y;
-			Direction.Y = X;
-		}
-		else if (isSightCameraEnabled && FistComp->IsTargetingFist)
-		{
-			Direction = FistComp->GetDirection();
+				Direction.X = -Y;
+				Direction.Y = X;
+			}
+			else if (isSightCameraEnabled && FistComp->IsTargetingFist)
+			{
+				Direction = FistComp->GetDirection();
 
 				float X = Direction.X;
 				float Y = Direction.Y;
