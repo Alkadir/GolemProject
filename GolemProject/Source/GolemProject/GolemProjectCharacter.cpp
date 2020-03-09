@@ -118,11 +118,55 @@ void AGolemProjectCharacter::BeginPlay()
 	FistComp->IsTargetingFist = false;
 }
 
+void AGolemProjectCharacter::Tick(float _deltaTime)
+{
+	Super::Tick(_deltaTime);
+
+	if (UWorld * world = GetWorld())
+	{
+		FHitResult hit;
+		float height = GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 1.0f;
+
+		if (world->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() - FVector::UpVector * height, ECollisionChannel::ECC_Visibility))
+		{
+			if (hit.bBlockingHit)
+			{
+				if (mGrapple)
+				{
+					if (mGrapple->GetSwingPhysics())
+					{
+						mGrapple->StopSwingPhysics();
+					}
+				}
+			}
+		}
+	}
+
+	if (mGrapple && !mGrapple->GetSwingPhysics())
+	{
+		FRotator rotFinal = FRotator::ZeroRotator;
+		rotFinal.Pitch = 0.0f;
+		rotFinal.Yaw = GetActorRotation().Yaw;
+		rotFinal.Roll = GetActorRotation().Roll;
+
+		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.05f);
+		SetActorRotation(rot);
+	}
+}
+
 void AGolemProjectCharacter::Jump()
 {
 	if (!isPushing)
 	{
 		Super::Jump();
+	}
+
+	if (mGrapple)
+	{
+		if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->StopSwingPhysics();
+		}
 	}
 }
 
@@ -268,8 +312,8 @@ void AGolemProjectCharacter::ChangeCamera()
 				else if (FistComp->IsTargetingFist)
 					pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 
-			/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
-					currentSightWidget->AddToViewport();*/
+				/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
+						currentSightWidget->AddToViewport();*/
 
 			}
 			else
@@ -302,23 +346,27 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		{
 			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetForwardVector() * m_valueForward);
 		}
-
-		if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()))
-		{
-			Direction = mGrapple->GetDirection();
-		}
-		else if (FistComp->IsTargetingFist && isSightCameraEnabled)
-		{
-			Direction = FistComp->GetDirection();
-		}
-
-		if (isPushing)
-		{
-			AddMovementInput(GetActorForwardVector(), Value);
-		}
 		else
 		{
-			AddMovementInput(Direction, Value);
+			if (mGrapple->IsTargetingGrapple &&
+				(isSightCameraEnabled || mGrapple->GetProjectile()) &&
+				!GetCharacterMovement()->IsFalling())
+			{
+				Direction = mGrapple->GetDirection();
+			}
+			else if (FistComp->IsTargetingFist && isSightCameraEnabled)
+			{
+				Direction = FistComp->GetDirection();
+			}
+
+			if (isPushing)
+			{
+				AddMovementInput(GetActorForwardVector(), Value);
+			}
+			else
+			{
+				AddMovementInput(Direction, Value);
+			}
 		}
 	}
 }
@@ -339,31 +387,35 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		{
 			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetRightVector() * m_valueRight);
 		}
-
-		// add movement in that direction
-		if (isSightCameraEnabled && (mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) && !isPushing)
+		else
 		{
-			Direction = mGrapple->GetDirection();
+			// add movement in that direction
+			if (isSightCameraEnabled && 
+				(mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) &&
+				!isPushing && !GetCharacterMovement()->IsFalling())
+			{
+				Direction = mGrapple->GetDirection();
 
-			float X = Direction.X;
-			float Y = Direction.Y;
-			float Z = Direction.Z;
+				float X = Direction.X;
+				float Y = Direction.Y;
+				float Z = Direction.Z;
 
-			Direction.X = -Y;
-			Direction.Y = X;
+				Direction.X = -Y;
+				Direction.Y = X;
+			}
+			else if (isSightCameraEnabled && FistComp->IsTargetingFist && !isPushing)
+			{
+				Direction = FistComp->GetDirection();
+
+				float X = Direction.X;
+				float Y = Direction.Y;
+				float Z = Direction.Z;
+
+				Direction.X = -Y;
+				Direction.Y = X;
+			}
+			AddMovementInput(Direction, Value);
 		}
-		else if (isSightCameraEnabled && FistComp->IsTargetingFist && !isPushing)
-		{
-			Direction = FistComp->GetDirection();
-
-			float X = Direction.X;
-			float Y = Direction.Y;
-			float Z = Direction.Z;
-
-			Direction.X = -Y;
-			Direction.Y = X;
-		}
-		AddMovementInput(Direction, Value);
 	}
 }
 
