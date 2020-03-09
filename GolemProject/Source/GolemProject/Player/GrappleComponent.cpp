@@ -16,6 +16,7 @@
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
 #include "SwingPhysics.h"
+#include "DashComponent.h"
 //#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -186,7 +187,6 @@ void UGrappleComponent::UpdateIKArm()
 
 		//I don't know how anim works in cpp
 		//UAnimInstance* animBp = mSkeletalMesh->GetAnimInstance();
-
 	}
 }
 
@@ -270,10 +270,13 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				else
 				{
 					//Create the swing physics for the player
-					if (!swingPhysics)
+					if (!swingPhysics && ClosestGrapplingHook)
 					{
 						ACharacter* c = Cast<ACharacter>(mCharacter);
 						swingPhysics = new SwingPhysics(this);
+						UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>();
+						if (dashComp)
+							dashComp->ResetDashInAir();
 					}
 				}
 			}
