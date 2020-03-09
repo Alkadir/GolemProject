@@ -59,6 +59,7 @@ protected:
 	AActor* actorToInteract;
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float _deltaTime) override;
 
 	//To do
 	//virtual void Tick(float _deltaTime) override;

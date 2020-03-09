@@ -180,6 +180,8 @@ void UGrappleComponent::UpdateIKArm()
 		mDirection = offset - mCharacter->GetActorLocation();
 		IKposition = offset;
 		mDirection.Z = 0.0f;
+
+		//Rotate character when he is aiming something
 		mCharacter->SetActorRotation(mDirection.Rotation());
 
 		//I don't know how anim works in cpp
@@ -298,6 +300,7 @@ void UGrappleComponent::StopSwingPhysics()
 		bIsAssisted = false;
 		delete swingPhysics;
 		swingPhysics = nullptr;
+		currentProjectile->SetComingBack(true);
 	}
 }
 
