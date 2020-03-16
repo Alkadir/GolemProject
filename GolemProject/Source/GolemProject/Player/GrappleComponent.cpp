@@ -15,7 +15,7 @@
 #include "Classes/Components/StaticMeshComponent.h"
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
-#include "SwingPhysics.h"
+#include "SwingPhysic.h"
 #include "DashComponent.h"
 #include "DrawDebugHelpers.h"
 //#include "DrawDebugHelpers.h"
@@ -270,10 +270,17 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				else
 				{
 					//Create the swing physics for the player
-					if (!swingPhysics && ClosestGrapplingHook)
+					if (!swingPhysic && ClosestGrapplingHook)
 					{
 						ACharacter* c = Cast<ACharacter>(mCharacter);
-						swingPhysics = new SwingPhysics(this);
+
+						swingPhysic = NewObject<USwingPhysic>();
+						swingPhysic->Initialize(this);
+						swingPhysic->SetScaleGravity(scaleGravity);
+						swingPhysic->SetFriction(friction);
+						swingPhysic->SetForceMovement(forceMovement);
+						swingPhysic->SetSpeedRotation(speedRotation);
+
 						UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>();
 						if (dashComp)
 							dashComp->ResetDashInAir();
@@ -290,19 +297,19 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		}
 
 		//if swing Physics exists we have to tick it
-		if (swingPhysics)
-			swingPhysics->Tick(DeltaTime);
+		if (swingPhysic)
+			swingPhysic->Tick(DeltaTime);
 	}
 }
 
 void UGrappleComponent::StopSwingPhysics()
 {
 	HelperLibrary::Print("stop swing");
-	if (swingPhysics)
+	if (swingPhysic)
 	{
 		bIsAssisted = false;
-		delete swingPhysics;
-		swingPhysics = nullptr;
+		swingPhysic->Destroy();
+		swingPhysic = nullptr;
 		currentProjectile->SetComingBack(true);
 	}
 }
