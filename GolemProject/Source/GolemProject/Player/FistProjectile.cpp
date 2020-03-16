@@ -36,26 +36,28 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		IInteractable* interactable = Cast<IInteractable>(OtherActor);
 		if (interactable)
 		{
-			interactable->Execute_Interact(OtherActor ,this);
+			interactable->Execute_Interact(OtherActor, this);
 		}
-		UPhysicalMaterial* physMat;
-		if (Hit.GetComponent()->GetMaterial(0) != nullptr)
+		else
 		{
-			physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
-			if (physMat != nullptr && physMat->SurfaceType == SurfaceType2)
+			UPhysicalMaterial* physMat;
+			if (Hit.GetComponent()->GetMaterial(0) != nullptr)
 			{
-				if (ProjectileComponent != nullptr)
-					ProjectileComponent->bShouldBounce = true;
-				BounceMovement(Hit.ImpactNormal);
-			}
-			else
-			{
-				if (ProjectileComponent != nullptr)
-					ProjectileComponent->bShouldBounce = false;
+				physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+				if (physMat != nullptr && physMat->SurfaceType == SurfaceType2)
+				{
+					if (ProjectileComponent != nullptr)
+						ProjectileComponent->bShouldBounce = true;
+					BounceMovement(Hit.ImpactNormal);
+				}
+				else
+				{
+					if (ProjectileComponent != nullptr)
+						ProjectileComponent->bShouldBounce = false;
+				}
 			}
 		}
-
-		if (UWorld * world = GetWorld())
+		if (UWorld* world = GetWorld())
 		{
 			world->GetTimerManager().SetTimer(TimerHandleFXDisappear, this, &AFistProjectile::Event_DestructionFistFX_BP, TimerDisappear - 1.0f, false);
 			world->GetTimerManager().SetTimer(TimerHandleDisappear, this, &AFistProjectile::DestroyFist, TimerDisappear, false);
