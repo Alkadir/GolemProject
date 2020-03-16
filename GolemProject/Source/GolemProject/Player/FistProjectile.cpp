@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "Helpers/HelperLibrary.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Interfaces/Interactable.h"
 
 // Sets default values
 AFistProjectile::AFistProjectile()
@@ -32,6 +33,11 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
 	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
 	{
+		IInteractable* interactable = Cast<IInteractable>(OtherActor);
+		if (interactable)
+		{
+			interactable->Execute_Interact(OtherActor ,this);
+		}
 		UPhysicalMaterial* physMat;
 		if (Hit.GetComponent()->GetMaterial(0) != nullptr)
 		{
