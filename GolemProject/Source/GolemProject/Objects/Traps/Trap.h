@@ -25,8 +25,6 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Trap")
 		int damage = 1;
 
-
-
 public:	
 
 

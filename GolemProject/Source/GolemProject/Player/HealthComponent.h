@@ -36,15 +36,6 @@ protected:
 	FVector LastPositionGrounded;
 	FVector PositionCheckPoint;
 
-	UFUNCTION(BlueprintCallable, Category = "Gameplay")
-	inline int GetLife() const
-	{
-		return Life;
-	};
-
-	UFUNCTION(BlueprintCallable, Category = "Gameplay")
-	void InflictDamage(int _damage);
-
 private:
 	void ResetInvulnerability();
 	void Respawn();
@@ -66,5 +57,14 @@ public:
 	};
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void SetPositionCheckPoint(FVector _positionCheckPoint);
+
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+		inline int GetLife() const
+	{
+		return Life;
+	};
+
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+		void InflictDamage(int _damage);
 		
 };

@@ -138,4 +138,6 @@ public:
 	void PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
 	void StopPushBloc();
+
+	void InflictDamage(int _damage);
 };
