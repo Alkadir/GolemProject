@@ -18,7 +18,8 @@ private:
 	FTimerHandle releasedTimerHandle;
 
 protected:
-	UBoxComponent* boxCollider = nullptr;
+	UPROPERTY(VisibleAnywhere)
+		UBoxComponent* boxCollider = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Collision")
 		FVector colliderSize = FVector::OneVector * 50.0f;
