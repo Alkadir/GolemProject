@@ -274,8 +274,8 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					{
 						ACharacter* c = Cast<ACharacter>(mCharacter);
 
-						swingPhysic = NewObject<USwingPhysic>();
-						swingPhysic->Initialize(this);
+						swingPhysic = new USwingPhysic(this);
+					
 						swingPhysic->SetScaleGravity(scaleGravity);
 						swingPhysic->SetFriction(friction);
 						swingPhysic->SetForceMovement(forceMovement);
@@ -308,7 +308,7 @@ void UGrappleComponent::StopSwingPhysics()
 	if (swingPhysic)
 	{
 		bIsAssisted = false;
-		swingPhysic->Destroy();
+		delete swingPhysic;
 		swingPhysic = nullptr;
 		currentProjectile->SetComingBack(true);
 	}
@@ -317,7 +317,6 @@ void UGrappleComponent::StopSwingPhysics()
 void UGrappleComponent::PlayerIsNear()
 {
 	//Find destination stop player
-
 	if (AController* ctrl = mCharacter->GetController())
 	{
 		if (mCharacter)
