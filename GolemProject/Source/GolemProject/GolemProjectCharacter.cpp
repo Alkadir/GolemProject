@@ -20,7 +20,7 @@
 #include "Player/PushingComponent.h"
 #include "Interfaces/Interactable.h"
 #include "Player/FistComponent.h"
-#include "Player/SwingPhysics.h"
+#include "Player/SwingPhysic.h"
 #include "Objects/PushableBloc.h"
 
 //////////////////////////////////////////////////////////////////////////
