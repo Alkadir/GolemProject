@@ -21,6 +21,7 @@
 #include "Interfaces/Interactable.h"
 #include "Player/FistComponent.h"
 #include "Player/SwingPhysic.h"
+#include "Objects/PushableBloc.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -115,6 +116,10 @@ void AGolemProjectCharacter::BeginPlay()
 	{
 		pc->bShowMouseCursor = showCursor;
 	}
+	if (PushingComponent)
+	{
+		PushingComponent->OnStartPushingObject.AddDynamic(this, &AGolemProjectCharacter::SetUpBlockOffsetPositon);
+	}
 
 	if (mGrapple)
 		mGrapple->IsTargetingGrapple = true;
@@ -156,6 +161,10 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 
 		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.05f);
 		SetActorRotation(rot);
+	}
+	if (PushingComponent->GetIsPushingObject(false) && actorToInteract != nullptr)
+	{
+		actorToInteract->SetActorLocation(GetActorLocation() + PushingComponent->GetBlockOffsetPosition());
 	}
 }
 
@@ -327,7 +336,14 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		}
 		else
 		{
-			Direction = PushingComponent->GetPushingDirection();
+			if (PushingComponent->GetIsPushingObject(false) && pushedObjectIsColliding && Value > 0)
+			{
+				Direction = FVector::ZeroVector;
+			}
+			else
+			{
+				Direction = PushingComponent->GetPushingDirection();
+			}
 		}
 		AddMovementInput(Direction, Value);
 	}
@@ -389,10 +405,25 @@ void AGolemProjectCharacter::ResetFriction()
 	GetCharacterMovement()->GroundFriction = initialGroundFriction;
 }
 
+
+void AGolemProjectCharacter::SetUpBlockOffsetPositon()
+{
+	if (actorToInteract != nullptr && PushingComponent != nullptr)
+	{
+		HelperLibrary::Print((actorToInteract->GetActorLocation() - GetActorLocation()).ToString());
+		PushingComponent->SetBlockOffsetPosition(actorToInteract->GetActorLocation() - GetActorLocation());
+	}
+}
+
 void AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation)
 {
+	if (isSightCameraEnabled)
+	{
+		ChangeCamera();
+	}
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	PushingComponent->PushBloc(pushingDirection, pushingPosition, pushingRotation);
+	PushingComponent->SetBlock(Cast<APushableBloc>(actorToInteract));
 }
 
 
@@ -400,6 +431,7 @@ void AGolemProjectCharacter::StopPushBloc()
 {
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	PushingComponent->StopPushBloc();
+	pushedObjectIsColliding = false;
 }
 
 void AGolemProjectCharacter::InflictDamage(int _damage)

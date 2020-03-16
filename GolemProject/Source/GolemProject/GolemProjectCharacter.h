@@ -61,6 +61,8 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 		AActor* actorToInteract;
+	UPROPERTY(BlueprintReadWrite)
+		bool pushedObjectIsColliding;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float _deltaTime) override;
@@ -108,6 +110,9 @@ protected:
 	void ChangeToGrapple();
 
 	void ChangeToFist();
+
+	UFUNCTION()
+		void SetUpBlockOffsetPositon();
 
 public:
 	AGolemProjectCharacter();

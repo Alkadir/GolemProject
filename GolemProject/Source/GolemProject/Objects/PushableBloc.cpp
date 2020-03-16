@@ -9,9 +9,10 @@
 #include "GolemProjectCharacter.h"
 #include "Helpers/HelperLibrary.h"
 
+
 APushableBloc::APushableBloc()
 {
-	USceneComponent* root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(root);
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 

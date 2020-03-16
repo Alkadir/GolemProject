@@ -14,13 +14,17 @@ class GOLEMPROJECT_API APushableBloc : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 
+
 protected:
+
+	UPROPERTY(VisibleAnywhere)
+		class USceneComponent* root;
 	UPROPERTY(VisibleAnywhere)
 		class UStaticMeshComponent* mesh;
 
 	AGolemProjectCharacter* playerActor = nullptr;
 	bool isUsed = false;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector sizeBlock = FVector::OneVector;
 	UPROPERTY(BlueprintReadWrite)
 		FVector pushingDirection = FVector::ZeroVector;
@@ -30,6 +34,9 @@ protected:
 		FRotator pushingRotation = FRotator::ZeroRotator;
 public:
 	APushableBloc();
+
+	UFUNCTION(BlueprintCallable)
+		FVector GetSizeBlock() { return sizeBlock; }
 
 	UFUNCTION(BlueprintCallable)
 		FVector GetPushingDirection() { return pushingDirection; }
