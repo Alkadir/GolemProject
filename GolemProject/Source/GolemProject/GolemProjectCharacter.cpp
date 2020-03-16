@@ -398,3 +398,9 @@ void AGolemProjectCharacter::StopPushBloc()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	PushingComponent->StopPushBloc();
 }
+
+void AGolemProjectCharacter::InflictDamage(int _damage)
+{
+	if (HealthComponent != nullptr)
+		HealthComponent->InflictDamage(_damage);
+}
