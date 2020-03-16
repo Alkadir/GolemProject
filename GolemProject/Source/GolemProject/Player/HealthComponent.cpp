@@ -28,6 +28,7 @@ void UHealthComponent::BeginPlay()
 		PlayerController = Cast<APlayerController>(Player->GetController());
 	}
 	CanTakeDamage = true;
+	Life = MaxLife;
 }
 
 
@@ -37,7 +38,6 @@ void UHealthComponent::InflictDamage(int _damage)
 	{
 		Life -= _damage;
 		CanTakeDamage = false;
-		HelperLibrary::Print(FString::FromInt(Life));
 		if (Life <= 0)
 		{
 			Life = 0;
@@ -49,11 +49,6 @@ void UHealthComponent::InflictDamage(int _damage)
 			{
 				Player->DisableInput(PlayerController);
 			}
-			/*if (UCharacterMovementComponent* cmc = Player->GetCharacterMovement())
-			{
-				cmc->Deactivate();
-
-			}*/
 		}
 		else
 		{

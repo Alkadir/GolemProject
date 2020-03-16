@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Helpers/HelperLibrary.h"
 #include "HealthComponent.generated.h"
 
 
@@ -58,10 +59,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void SetPositionCheckPoint(FVector _positionCheckPoint);
 
-	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		inline int GetLife() const
 	{
 		return Life;
+	};
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		inline int GetMaxLife() const
+	{
+		return MaxLife;
+	};
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		inline float GetPercentLife() const
+	{
+		return  (float)Life / (float)MaxLife;
 	};
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
