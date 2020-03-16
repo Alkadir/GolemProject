@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "Helpers/HelperLibrary.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Interfaces/Interactable.h"
 
 // Sets default values
 AFistProjectile::AFistProjectile()
@@ -32,24 +33,31 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
 	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
 	{
-		UPhysicalMaterial* physMat;
-		if (Hit.GetComponent()->GetMaterial(0) != nullptr)
+		IInteractable* interactable = Cast<IInteractable>(OtherActor);
+		if (interactable)
 		{
-			physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
-			if (physMat != nullptr && physMat->SurfaceType == SurfaceType2)
+			interactable->Execute_Interact(OtherActor, this);
+		}
+		else
+		{
+			UPhysicalMaterial* physMat;
+			if (Hit.GetComponent()->GetMaterial(0) != nullptr)
 			{
-				if (ProjectileComponent != nullptr)
-					ProjectileComponent->bShouldBounce = true;
-				BounceMovement(Hit.ImpactNormal);
-			}
-			else
-			{
-				if (ProjectileComponent != nullptr)
-					ProjectileComponent->bShouldBounce = false;
+				physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+				if (physMat != nullptr && physMat->SurfaceType == SurfaceType2)
+				{
+					if (ProjectileComponent != nullptr)
+						ProjectileComponent->bShouldBounce = true;
+					BounceMovement(Hit.ImpactNormal);
+				}
+				else
+				{
+					if (ProjectileComponent != nullptr)
+						ProjectileComponent->bShouldBounce = false;
+				}
 			}
 		}
-
-		if (UWorld * world = GetWorld())
+		if (UWorld* world = GetWorld())
 		{
 			world->GetTimerManager().SetTimer(TimerHandleFXDisappear, this, &AFistProjectile::Event_DestructionFistFX_BP, TimerDisappear - 1.0f, false);
 			world->GetTimerManager().SetTimer(TimerHandleDisappear, this, &AFistProjectile::DestroyFist, TimerDisappear, false);

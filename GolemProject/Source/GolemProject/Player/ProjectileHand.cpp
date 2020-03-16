@@ -7,6 +7,7 @@
 #include "Player/GrappleComponent.h"
 #include "Helpers/HelperLibrary.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+
 // Sets default values
 AProjectileHand::AProjectileHand()
 {
