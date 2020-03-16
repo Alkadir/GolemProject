@@ -21,6 +21,7 @@ private:
 	FVector lastLocation;
 	FVector newLocation;
 	FVector segment;
+	FVector direction;
 
 	float friction;
 	float length;
@@ -41,6 +42,8 @@ public:
 
 	FORCEINLINE void SetTarget(AActor*& _target) { target = _target; };
 	FORCEINLINE AActor*& GetTarget() { return target; };
+	FORCEINLINE FVector GetVelocity() { return velocity; };
+	FORCEINLINE FVector GetDirection() { return direction; };
 	void AddForceMovement(FVector _direction);
 	void Tick(float _deltaTime);
 };

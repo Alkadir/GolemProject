@@ -16,6 +16,7 @@
 #include "Interfaces/Targetable.h"
 #include "GolemProjectGameMode.h"
 #include "SwingPhysics.h"
+#include "DashComponent.h"
 //#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -180,11 +181,12 @@ void UGrappleComponent::UpdateIKArm()
 		mDirection = offset - mCharacter->GetActorLocation();
 		IKposition = offset;
 		mDirection.Z = 0.0f;
+
+		//Rotate character when he is aiming something
 		mCharacter->SetActorRotation(mDirection.Rotation());
 
 		//I don't know how anim works in cpp
 		//UAnimInstance* animBp = mSkeletalMesh->GetAnimInstance();
-
 	}
 }
 
@@ -268,10 +270,13 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				else
 				{
 					//Create the swing physics for the player
-					if (!swingPhysics)
+					if (!swingPhysics && ClosestGrapplingHook)
 					{
 						ACharacter* c = Cast<ACharacter>(mCharacter);
 						swingPhysics = new SwingPhysics(this);
+						UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>();
+						if (dashComp)
+							dashComp->ResetDashInAir();
 					}
 				}
 			}
@@ -287,6 +292,18 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		//if swing Physics exists we have to tick it
 		if (swingPhysics)
 			swingPhysics->Tick(DeltaTime);
+	}
+}
+
+void UGrappleComponent::StopSwingPhysics()
+{
+	HelperLibrary::Print("stop swing");
+	if (swingPhysics)
+	{
+		bIsAssisted = false;
+		delete swingPhysics;
+		swingPhysics = nullptr;
+		currentProjectile->SetComingBack(true);
 	}
 }
 

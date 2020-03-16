@@ -17,6 +17,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
 #include "Player/HealthComponent.h"
+#include "Player/PushingComponent.h"
 #include "Interfaces/Interactable.h"
 #include "Player/FistComponent.h"
 #include "Player/SwingPhysics.h"
@@ -104,6 +105,7 @@ void AGolemProjectCharacter::BeginPlay()
 	mGrapple = FindComponentByClass<UGrappleComponent>();
 	FistComp = FindComponentByClass<UFistComponent>();
 	HealthComponent = FindComponentByClass<UHealthComponent>();
+	PushingComponent = FindComponentByClass<UPushingComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	sightCameraL = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCameraL");
 	initialGroundFriction = GetCharacterMovement()->GroundFriction;
@@ -118,17 +120,61 @@ void AGolemProjectCharacter::BeginPlay()
 	FistComp->IsTargetingFist = false;
 }
 
+void AGolemProjectCharacter::Tick(float _deltaTime)
+{
+	Super::Tick(_deltaTime);
+
+	if (UWorld * world = GetWorld())
+	{
+		FHitResult hit;
+		float height = GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 1.0f;
+
+		if (world->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() - FVector::UpVector * height, ECollisionChannel::ECC_Visibility))
+		{
+			if (hit.bBlockingHit)
+			{
+				if (mGrapple)
+				{
+					if (mGrapple->GetSwingPhysics())
+					{
+						mGrapple->StopSwingPhysics();
+					}
+				}
+			}
+		}
+	}
+
+	if (mGrapple && !mGrapple->GetSwingPhysics())
+	{
+		FRotator rotFinal = FRotator::ZeroRotator;
+		rotFinal.Pitch = 0.0f;
+		rotFinal.Yaw = GetActorRotation().Yaw;
+		rotFinal.Roll = GetActorRotation().Roll;
+
+		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.05f);
+		SetActorRotation(rot);
+	}
+}
+
 void AGolemProjectCharacter::Jump()
 {
-	if (!isPushing)
+	if (!PushingComponent->GetIsPushingObject())
 	{
 		Super::Jump();
+	}
+
+	if (mGrapple)
+	{
+		if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->StopSwingPhysics();
+		}
 	}
 }
 
 void AGolemProjectCharacter::Dash()
 {
-	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr && !isPushing)
+	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr && !PushingComponent->GetIsPushingObject())
 	{
 		if (Controller != NULL)
 		{
@@ -176,50 +222,12 @@ void AGolemProjectCharacter::ChangeToFist()
 	}
 }
 
-void AGolemProjectCharacter::PushBloc()
-{
-	isPushing = !isPushing;
-	GetCharacterMovement()->bOrientRotationToMovement = !isPushing;
-
-	float blocAngle = 0.0f;
-
-	if (isPushing && actorToInteract != nullptr)
-	{
-		FVector blocDelta = actorToInteract->GetActorLocation() - GetActorLocation();
-
-		float angleDelta = FMath::Atan2(blocDelta.X, blocDelta.Y);
-		angleDelta = FMath::RadiansToDegrees(angleDelta) - 90.0f;
-
-		if (angleDelta > -45.0f && angleDelta <= 45.0f)
-		{
-			blocAngle = 0.0f;
-		}
-		else if (angleDelta > -135.0f && angleDelta <= -45.0f)
-		{
-			blocAngle = 90.0f;
-		}
-		else if (angleDelta > -225.0f && angleDelta <= -135.0f)
-		{
-			blocAngle = 180.0f;
-		}
-		else if ((angleDelta > -315.0f && angleDelta <= -225.0f) || (angleDelta > 45.0f && angleDelta <= 90.0f))
-		{
-			blocAngle = 270.0f;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not in range"));
-		}
-
-		UE_LOG(LogTemp, Warning, TEXT("%f"), blocAngle);
-
-		SetActorRotation(FRotator(0.0f, blocAngle, 0.0f));
-	}
-}
-
-
 void AGolemProjectCharacter::Fire()
 {
+	if (PushingComponent->GetIsPushingObject())
+	{
+		return;
+	}
 	if (mGrapple && mGrapple->IsTargetingGrapple)
 	{
 		mGrapple->Cancel();
@@ -236,25 +244,23 @@ void AGolemProjectCharacter::Fire()
 
 void AGolemProjectCharacter::TurnAtRate(float Rate)
 {
-	if (!isPushing)
-	{
-		// calculate delta for this frame from the rate information
-		AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
-	}
+	// calculate delta for this frame from the rate information
+	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AGolemProjectCharacter::LookUpAtRate(float Rate)
 {
-	if (!isPushing)
-	{
-		// calculate delta for this frame from the rate information
-		AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
-	}
+	// calculate delta for this frame from the rate information
+	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AGolemProjectCharacter::ChangeCamera()
 {
-	if (sightCamera && !isPushing)
+	if (PushingComponent->GetIsPushingObject())
+	{
+		return;
+	}
+	if (sightCamera)
 	{
 		APlayerController* pc = Cast<APlayerController>(GetController());
 		if (pc)
@@ -268,8 +274,8 @@ void AGolemProjectCharacter::ChangeCamera()
 				else if (FistComp->IsTargetingFist)
 					pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 
-			/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
-					currentSightWidget->AddToViewport();*/
+				/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
+						currentSightWidget->AddToViewport();*/
 
 			}
 			else
@@ -298,33 +304,38 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		// get forward vector
 		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		if (mGrapple->GetSwingPhysics())
+		if (!PushingComponent->GetIsPushingObject())
 		{
-			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetForwardVector() * m_valueForward);
-		}
-
-		if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()))
-		{
-			Direction = mGrapple->GetDirection();
-		}
-		else if (FistComp->IsTargetingFist && isSightCameraEnabled)
-		{
-			Direction = FistComp->GetDirection();
-		}
-
-		if (isPushing)
-		{
-			AddMovementInput(GetActorForwardVector(), Value);
+			if (mGrapple->GetSwingPhysics())
+			{
+				mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetForwardVector() * m_valueForward);
+			}
+			else
+			{
+				if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()) && !GetCharacterMovement()->IsFalling())
+				{
+					Direction = mGrapple->GetDirection();
+				}
+				else if (FistComp->IsTargetingFist && isSightCameraEnabled)
+				{
+					Direction = FistComp->GetDirection();
+				}
+			}
 		}
 		else
 		{
-			AddMovementInput(Direction, Value);
+			Direction = PushingComponent->GetPushingDirection();
 		}
+		AddMovementInput(Direction, Value);
 	}
 }
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
+	if (PushingComponent->GetIsPushingObject())
+	{
+		return;
+	}
 	m_valueRight = Value;
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
@@ -339,35 +350,51 @@ void AGolemProjectCharacter::MoveRight(float Value)
 		{
 			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetRightVector() * m_valueRight);
 		}
-
-		// add movement in that direction
-		if (isSightCameraEnabled && (mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) && !isPushing)
+		else
 		{
-			Direction = mGrapple->GetDirection();
+			// add movement in that direction
+			if (isSightCameraEnabled &&
+				(mGrapple->IsTargetingGrapple || mGrapple->GetProjectile()) && !GetCharacterMovement()->IsFalling())
+			{
+				Direction = mGrapple->GetDirection();
 
-			float X = Direction.X;
-			float Y = Direction.Y;
-			float Z = Direction.Z;
+				float X = Direction.X;
+				float Y = Direction.Y;
+				float Z = Direction.Z;
 
-			Direction.X = -Y;
-			Direction.Y = X;
+				Direction.X = -Y;
+				Direction.Y = X;
+			}
+			else if (isSightCameraEnabled && FistComp->IsTargetingFist)
+			{
+				Direction = FistComp->GetDirection();
+
+				float X = Direction.X;
+				float Y = Direction.Y;
+				float Z = Direction.Z;
+
+				Direction.X = -Y;
+				Direction.Y = X;
+			}
+			AddMovementInput(Direction, Value);
 		}
-		else if (isSightCameraEnabled && FistComp->IsTargetingFist && !isPushing)
-		{
-			Direction = FistComp->GetDirection();
-
-			float X = Direction.X;
-			float Y = Direction.Y;
-			float Z = Direction.Z;
-
-			Direction.X = -Y;
-			Direction.Y = X;
-		}
-		AddMovementInput(Direction, Value);
 	}
 }
 
 void AGolemProjectCharacter::ResetFriction()
 {
 	GetCharacterMovement()->GroundFriction = initialGroundFriction;
+}
+
+void AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation)
+{
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	PushingComponent->PushBloc(pushingDirection, pushingPosition, pushingRotation);
+}
+
+
+void AGolemProjectCharacter::StopPushBloc()
+{
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	PushingComponent->StopPushBloc();
 }
