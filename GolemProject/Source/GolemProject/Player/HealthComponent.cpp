@@ -37,6 +37,7 @@ void UHealthComponent::InflictDamage(int _damage)
 	{
 		Life -= _damage;
 		CanTakeDamage = false;
+		HelperLibrary::Print(FString::FromInt(Life));
 		if (Life <= 0)
 		{
 			Life = 0;
