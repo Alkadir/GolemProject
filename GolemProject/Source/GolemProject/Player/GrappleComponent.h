@@ -48,6 +48,9 @@ protected:
 	float offsetStop = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	float offsetBlockingObject = 200.0f;
+
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float stopScaleVelocity = 0.4f;
 
 	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))

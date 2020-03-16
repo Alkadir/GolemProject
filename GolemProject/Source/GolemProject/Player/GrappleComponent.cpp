@@ -17,6 +17,7 @@
 #include "GolemProjectGameMode.h"
 #include "SwingPhysics.h"
 #include "DashComponent.h"
+#include "DrawDebugHelpers.h"
 //#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -316,7 +317,6 @@ void UGrappleComponent::PlayerIsNear()
 		{
 
 			mCharacter->GetCharacterMovement()->Velocity *= stopScaleVelocity;
-			//mCharacter->GetCharacterMovement()->Velocity *= (currentProjectile->IsComingBack()) ? 1.0f : stopScaleVelocity;
 			mCharacter->ResetFriction();
 
 			mSkeletalMesh->UnHideBone(mIdBone);
@@ -331,21 +331,24 @@ void UGrappleComponent::PlayerIsNear()
 
 void UGrappleComponent::AttractCharacter()
 {
+	FVector tempDir;
 	mDirection /= mDirection.Size();
+	tempDir = mDirection;
 	mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
 	mCharacter->LaunchCharacter(mDirection * velocity, false, false);
-	mDirection.Z = 0.0f;
-	mCharacter->SetActorRotation(mDirection.Rotation());
+	tempDir.Z = 0.0f;
+	mCharacter->SetActorRotation(tempDir.Rotation());
 
 	if (world)
 	{
 		FHitResult hit;
-		float offset = 100.0f;
-		if (world->LineTraceSingleByChannel(hit, mCharacter->GetActorLocation(), mCharacter->GetActorLocation() + mDirection * offset, ECollisionChannel::ECC_Visibility))
+		if (world->LineTraceSingleByChannel(hit, mCharacter->GetActorLocation(), mCharacter->GetActorLocation() + mDirection * offsetBlockingObject, ECollisionChannel::ECC_Visibility))
 		{
+			if (mCharacter)
+				mCharacter->GetCharacterMovement()->Velocity *= stopScaleVelocity;
 
 			currentProjectile->SetComingBack(true);
-			currentProjectile->SetColliding(false);
+			//currentProjectile->SetColliding(false);
 		}
 	}
 }
