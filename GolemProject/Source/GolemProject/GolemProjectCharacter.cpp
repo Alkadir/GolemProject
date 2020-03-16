@@ -121,8 +121,11 @@ void AGolemProjectCharacter::BeginPlay()
 		PushingComponent->OnStartPushingObject.AddDynamic(this, &AGolemProjectCharacter::SetUpBlockOffsetPositon);
 	}
 
-	mGrapple->IsTargetingGrapple = true;
-	FistComp->IsTargetingFist = false;
+	if (mGrapple)
+		mGrapple->IsTargetingGrapple = true;
+
+	if (FistComp)
+		FistComp->IsTargetingFist = false;
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -278,9 +281,9 @@ void AGolemProjectCharacter::ChangeCamera()
 			{
 				isSightCameraEnabled = true;
 				GetCharacterMovement()->bOrientRotationToMovement = false;
-				if (mGrapple->IsTargetingGrapple)
+				if (mGrapple && mGrapple->IsTargetingGrapple)
 					pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
-				else if (FistComp->IsTargetingFist)
+				else if (FistComp && FistComp->IsTargetingFist)
 					pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 
 				/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
@@ -315,17 +318,17 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 		if (!PushingComponent->GetIsPushingObject())
 		{
-			if (mGrapple->GetSwingPhysics())
+			if (mGrapple && mGrapple->GetSwingPhysics())
 			{
 				mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetForwardVector() * m_valueForward);
 			}
 			else
 			{
-				if (mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()) && !GetCharacterMovement()->IsFalling())
+				if (mGrapple && mGrapple->IsTargetingGrapple && (isSightCameraEnabled || mGrapple->GetProjectile()) && !GetCharacterMovement()->IsFalling())
 				{
 					Direction = mGrapple->GetDirection();
 				}
-				else if (FistComp->IsTargetingFist && isSightCameraEnabled)
+				else if (FistComp && FistComp->IsTargetingFist && isSightCameraEnabled)
 				{
 					Direction = FistComp->GetDirection();
 				}
@@ -429,4 +432,10 @@ void AGolemProjectCharacter::StopPushBloc()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	PushingComponent->StopPushBloc();
 	pushedObjectIsColliding = false;
+}
+
+void AGolemProjectCharacter::InflictDamage(int _damage)
+{
+	if (HealthComponent != nullptr)
+		HealthComponent->InflictDamage(_damage);
 }

@@ -21,7 +21,8 @@ private:
 	class AActor* ClosestGrapplingHook;
 	class AGolemProjectGameMode* GameMode;
 	class APlayerCameraManager* PlayerCameraManager;
-	class SwingPhysics* swingPhysics = nullptr;
+	class USwingPhysic* swingPhysic = nullptr;
+
 	class AActor* HelperAiming;
 
 	FVector mDestination;
@@ -31,6 +32,19 @@ private:
 	bool bIsAssisted = false;
 	float accuracy = 100000.0f;
 
+	//values to edit
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float scaleGravity = 4.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float friction = 0.9998f;
+
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float forceMovement = 5.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float speedRotation = 0.01f;
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "projectile", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AProjectileHand> handProjectileClass;
@@ -46,6 +60,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float offsetStop = 200.0f;
+
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	float offsetBlockingObject = 200.0f;
+
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	float stopScaleVelocity = 0.4f;
 
 	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))
 	float maxDot = 1.0f;
@@ -103,7 +123,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
 
-	FORCEINLINE class SwingPhysics* GetSwingPhysics() { return swingPhysics; };
+	FORCEINLINE class USwingPhysic* GetSwingPhysics() { return swingPhysic; };
 
 	UFUNCTION()
 	void UpdateIKArm();
