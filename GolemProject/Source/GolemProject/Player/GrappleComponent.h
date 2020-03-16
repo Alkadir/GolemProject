@@ -30,7 +30,7 @@ private:
 	int32 mIdBone;
 	bool bIsAssisted = false;
 	float accuracy = 100000.0f;
-
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "projectile", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AProjectileHand> handProjectileClass;
@@ -46,6 +46,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float offsetStop = 200.0f;
+
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	float stopScaleVelocity = 0.4f;
 
 	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))
 	float maxDot = 1.0f;

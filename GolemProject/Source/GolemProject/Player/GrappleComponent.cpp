@@ -47,7 +47,7 @@ void UGrappleComponent::BeginPlay()
 	{
 		GameMode = Cast<AGolemProjectGameMode>(world->GetAuthGameMode());
 	}
-	if (APlayerController * ctrl = Cast<APlayerController>(mCharacter->GetController()))
+	if (APlayerController* ctrl = Cast<APlayerController>(mCharacter->GetController()))
 	{
 		PlayerCameraManager = ctrl->PlayerCameraManager;
 	}
@@ -61,7 +61,7 @@ void UGrappleComponent::CheckElementTargetable()
 	if (allActors.Num() <= 0) return;
 	TArray<AActor*> actorCloseEnough;
 
-	if (UCameraComponent * followingCam = mCharacter->GetFollowCamera())
+	if (UCameraComponent* followingCam = mCharacter->GetFollowCamera())
 	{
 		if (world)
 		{
@@ -70,7 +70,7 @@ void UGrappleComponent::CheckElementTargetable()
 				if (!actor->Implements<UTargetable>()) continue;
 				//get all the actors that are close to the player
 				if (FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) < maxDistance * maxDistance &&
-					FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) > minDistance * minDistance)
+					FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) > minDistance* minDistance)
 				{
 					actorCloseEnough.Add(actor);
 				}
@@ -83,7 +83,7 @@ void UGrappleComponent::CheckElementTargetable()
 				FromSoftware /= FromSoftware.Size();
 				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
 				//to change and finish
-				if (dot > minDot && dot < maxDot)
+				if (dot > minDot&& dot < maxDot)
 				{
 					FHitResult hitResult;
 					if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
@@ -92,7 +92,7 @@ void UGrappleComponent::CheckElementTargetable()
 						ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
 						if (target != nullptr)
 						{
-							if (ITargetable * Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+							if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
 							{
 								Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
 							}
@@ -105,7 +105,7 @@ void UGrappleComponent::CheckElementTargetable()
 			}
 			if (ClosestGrapplingHook != nullptr)
 			{
-				if (ITargetable * Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+				if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
 				{
 					Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
 				}
@@ -189,7 +189,6 @@ void UGrappleComponent::UpdateIKArm()
 		//UAnimInstance* animBp = mSkeletalMesh->GetAnimInstance();
 	}
 }
-
 
 // Called every frame
 void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -311,12 +310,13 @@ void UGrappleComponent::PlayerIsNear()
 {
 	//Find destination stop player
 
-	if (AController * ctrl = mCharacter->GetController())
+	if (AController* ctrl = mCharacter->GetController())
 	{
 		if (mCharacter)
 		{
 
-			mCharacter->GetCharacterMovement()->Velocity *= (currentProjectile->IsComingBack()) ? 1.0f : 0.15f;
+			mCharacter->GetCharacterMovement()->Velocity *= stopScaleVelocity;
+			//mCharacter->GetCharacterMovement()->Velocity *= (currentProjectile->IsComingBack()) ? 1.0f : stopScaleVelocity;
 			mCharacter->ResetFriction();
 
 			mSkeletalMesh->UnHideBone(mIdBone);
