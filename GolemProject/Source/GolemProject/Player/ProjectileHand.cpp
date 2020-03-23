@@ -49,7 +49,6 @@ void AProjectileHand::Tick(float DeltaTime)
 		{
 			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
 			dir /= dir.Size();
-			//HelperLibrary::Print((dir * velocity).ToString());
 			ProjectileComponent->Velocity = dir * velocity;
 		}
 	}
@@ -64,6 +63,14 @@ void AProjectileHand::Tick(float DeltaTime)
 
 void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
+	//change direction projectile, maybe add timer 
+	if (bIsComingBack && OtherActor != this)
+	{
+		FVector changeDir = OtherActor->GetActorLocation() - GetActorLocation();
+		changeDir /= changeDir.Size();
+		ProjectileComponent->Velocity = changeDir*velocity;
+	}
+
 	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
 	{
 		bIsColliding = true;
@@ -85,10 +92,7 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 				}
 			}
 		}
-		/*FVector location = GetActorLocation();
-		SetActorLocation(location - ProjectileComponent->Velocity*0.01f);*/
-		//ProjectileComponent->StopMovementImmediately();
-		//HelperLibrary::Print("hit");
+		
 		bIsComingBack = true;
 	}
 }
