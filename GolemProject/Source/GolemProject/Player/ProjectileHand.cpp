@@ -19,7 +19,12 @@ AProjectileHand::AProjectileHand()
 void AProjectileHand::BeginPlay()
 {
 	Super::BeginPlay();
+
 	meshComponent = FindComponentByClass<UStaticMeshComponent>();
+	ProjectileComponent = FindComponentByClass<UProjectileMovementComponent>();
+	ProjectileComponent->MaxSpeed = MaxSpeed;
+	ProjectileComponent->InitialSpeed = 0.0f;
+	ProjectileComponent->UpdatedComponent = meshComponent;
 
 	bIsColliding = false;
 	bIsComingBack = false;
@@ -30,6 +35,7 @@ void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleCompon
 {
 	direction = _direction;
 	grappleComponent = _grapple;
+	ProjectileComponent->Velocity = direction * velocity;
 }
 
 // Called every frame
@@ -43,20 +49,28 @@ void AProjectileHand::Tick(float DeltaTime)
 		{
 			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
 			dir /= dir.Size();
-			meshComponent->SetPhysicsLinearVelocity(dir * velocity);
+			ProjectileComponent->Velocity = dir * velocity;
 		}
 	}
 	else
 	{
 		if (!bIsColliding)
-			meshComponent->SetPhysicsLinearVelocity(direction * velocity);
+			ProjectileComponent->Velocity = direction * velocity;
 		else
-			meshComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+			ProjectileComponent->Velocity = FVector::ZeroVector;
 	}
 }
 
 void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
+	//change direction projectile, maybe add timer when the projectile is reallly blocked
+	if (bIsComingBack && OtherActor != this)
+	{
+		FVector changeDir = OtherActor->GetActorLocation() - GetActorLocation();
+		changeDir /= changeDir.Size();
+		ProjectileComponent->Velocity = changeDir*velocity;
+	}
+
 	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
 	{
 		bIsColliding = true;
@@ -78,6 +92,7 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 				}
 			}
 		}
+		
 		bIsComingBack = true;
 	}
 }
