@@ -26,7 +26,11 @@ protected:
 		class UProjectileMovementComponent* projectileMovement;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Projectile")
-	AActor* launcher;
+		AActor* launcher;
+	UFUNCTION()
+		void OverlapDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 public:
 
@@ -34,7 +38,6 @@ public:
 		void LaunchProjectile(AActor* _launcher, FVector velocity, int _damage, float gravityScale = 0.f);
 
 	virtual void LaunchProjectile_Implementation(AActor* _launcher, FVector velocity, int _damage, float gravityScale = 0.f);
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
 
 };

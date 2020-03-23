@@ -4,6 +4,9 @@
 #include "Projectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SceneComponent.h"
+#include "Helpers/HelperLibrary.h"
+#include "GolemProjectCharacter.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AProjectile::AProjectile(const FObjectInitializer& OI)
@@ -19,6 +22,11 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UStaticMeshComponent* staticMesh = FindComponentByClass< UStaticMeshComponent>();
+	if (staticMesh)
+	{
+		staticMesh->OnComponentBeginOverlap.AddUniqueDynamic(this, &AProjectile::OverlapDamage);
+	}
 }
 
 void AProjectile::LaunchProjectile_Implementation(AActor* _launcher, FVector velocity, int _damage, float gravityScale)
@@ -39,3 +47,13 @@ void AProjectile::Tick(float DeltaTime)
 
 }
 
+void AProjectile::OverlapDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OverlappedComponent != nullptr && OtherActor != nullptr && OtherComp != nullptr)
+	{
+		if (AGolemProjectCharacter* character = Cast<AGolemProjectCharacter>(OtherActor))
+		{
+			character->InflictDamage(damage);
+		}
+	}
+}

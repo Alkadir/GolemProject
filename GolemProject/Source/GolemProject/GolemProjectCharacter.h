@@ -64,7 +64,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 		AActor* actorToInteract;
 	UPROPERTY(BlueprintReadWrite)
-		bool pushedObjectIsColliding;
+		bool pushedObjectIsCollidingForward;
+	UPROPERTY(BlueprintReadWrite)
+		bool pushedObjectIsCollidingBackward;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float _deltaTime) override;
@@ -142,7 +144,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dash")
 		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
 
-	void PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
+	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
 	void StopPushBloc();
 

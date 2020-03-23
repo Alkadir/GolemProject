@@ -4,6 +4,7 @@
 #include "DartTrap.h"
 #include "Engine/World.h"
 #include "Objects/Projectile.h"
+#include "Helpers/HelperLibrary.h"
 
 void ADartTrap::BeginPlay()
 {
@@ -18,14 +19,29 @@ void ADartTrap::BeginPlay()
 void ADartTrap::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	timerCooldown -= DeltaTime;
 	if (!isActivate)
 	{
 		return;
 	}
+	timerCooldown -= DeltaTime;
 	if (timerCooldown <= 0.f)
 	{
 		timerCooldown = cooldown;
-		GetWorld()->SpawnActor<AProjectile>(projectilePrefab, GetActorLocation(), FRotator::ZeroRotator)->LaunchProjectile(this, GetActorForwardVector() * speedProjectile, damage);
+		if (UWorld* world = GetWorld())
+		{
+			if (projectilePrefab == nullptr)
+			{
+				HelperLibrary::Print("You forgot to set the projectile on " + GetName(), 5.f, FColor::Red);
+				return;
+			}
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AProjectile* projectile = world->SpawnActorDeferred<AProjectile>(projectilePrefab, GetTransform());
+			if (projectile)
+			{
+				projectile->LaunchProjectile(this, GetActorForwardVector() * speedProjectile, damage);
+				projectile->FinishSpawning(GetTransform());
+			}
+		}
 	}
 }
