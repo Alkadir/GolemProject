@@ -67,6 +67,7 @@ protected:
 		bool pushedObjectIsCollidingForward;
 	UPROPERTY(BlueprintReadWrite)
 		bool pushedObjectIsCollidingBackward;
+	float startPushingZ;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float _deltaTime) override;

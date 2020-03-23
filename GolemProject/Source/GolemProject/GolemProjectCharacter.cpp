@@ -182,7 +182,15 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 	}
 	if (PushingComponent && PushingComponent->GetIsPushingObject(false) && actorToInteract)
 	{
-		actorToInteract->SetActorLocation(GetActorLocation() + PushingComponent->GetBlockOffsetPosition());
+		if (fabs(startPushingZ - GetActorLocation().Z) > 2.f)
+		{
+			HelperLibrary::Print(FString::SanitizeFloat(fabs(startPushingZ - GetActorLocation().Z)));
+			StopPushBloc();
+		}
+		else
+		{
+			actorToInteract->SetActorLocation(GetActorLocation() + PushingComponent->GetBlockOffsetPosition());
+		}
 	}
 }
 
@@ -439,6 +447,7 @@ void AGolemProjectCharacter::SetUpBlockOffsetPositon()
 	if (actorToInteract != nullptr && PushingComponent != nullptr)
 	{
 		PushingComponent->SetBlockOffsetPosition(actorToInteract->GetActorLocation() - GetActorLocation());
+		startPushingZ = GetActorLocation().Z;
 	}
 }
 
