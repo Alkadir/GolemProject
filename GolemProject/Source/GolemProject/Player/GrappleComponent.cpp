@@ -142,6 +142,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				currentProjectile->LaunchProjectile(direction, this);
 				IsFiring = true;
 				bIsAssisted = _isAssisted;
+				currentProjectile->SetAssisted(_isAssisted);
 			}
 		}
 	}
@@ -150,7 +151,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 //cancel projectile
 void UGrappleComponent::Cancel()
 {
-	if (currentProjectile && !currentProjectile->IsColliding())
+	if (currentProjectile && !currentProjectile->IsCollidingGrappling() && !currentProjectile->IsCollidingSwinging())
 	{
 		currentProjectile->SetComingBack(true);
 	}
@@ -254,7 +255,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				return;
 			}
 		}
-		else if (currentProjectile->IsColliding())
+		else if (currentProjectile->IsCollidingGrappling())
 		{
 			if (mCharacter)
 			{
@@ -270,15 +271,19 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 						return;
 					}
 				}
-				else
+			}
+		}
+		else if (currentProjectile->IsCollidingSwinging())
+		{
+			if (mCharacter)
+			{
+				if (bIsAssisted)
 				{
 					//Create the swing physics for the player
 					if (!swingPhysic && ClosestGrapplingHook)
 					{
-						ACharacter* c = Cast<ACharacter>(mCharacter);
-
 						swingPhysic = new USwingPhysic(this);
-					
+
 						swingPhysic->SetScaleGravity(scaleGravity);
 						swingPhysic->SetFriction(friction);
 						swingPhysic->SetForceMovement(forceMovement);
