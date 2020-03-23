@@ -4,28 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "ProjectileHand.generated.h"
 
 UCLASS()
 class GOLEMPROJECT_API AProjectileHand : public AActor
 {
 	GENERATED_BODY()
-
+private:
 	FVector direction;
 	class UStaticMeshComponent* meshComponent;
 	class UGrappleComponent* grappleComponent;
-
+	
 	bool bIsColliding;
 	bool bIsComingBack;
 	bool bIsGrapplingPossible;
 
+	UPROPERTY(EditAnywhere)
+	float MaxSpeed;
+
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 3000.0f;
-public:
-	// Sets default values for this actor's properties
-	AProjectileHand();
 
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Fist, meta = (AllowPrivateAccess = "true"))
+	class UProjectileMovementComponent* ProjectileComponent;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,6 +35,8 @@ protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 public:
+	// Sets default values for this actor's properties
+	AProjectileHand();
 
 	FORCEINLINE	void SetColliding(const bool& _isColliding) { bIsGrapplingPossible = _isColliding; };
 	
