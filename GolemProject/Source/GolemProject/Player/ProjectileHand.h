@@ -18,6 +18,8 @@ class GOLEMPROJECT_API AProjectileHand : public AActor
 	bool bIsColliding;
 	bool bIsComingBack;
 	bool bIsGrapplingPossible;
+	bool bIsSwingingPossible;
+	bool bIsAssisted;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 3000.0f;
@@ -36,11 +38,15 @@ public:
 
 	FORCEINLINE	void SetColliding(const bool& _isColliding) { bIsGrapplingPossible = _isColliding; };
 	
-	FORCEINLINE const bool& IsColliding() { return bIsGrapplingPossible; };
+	FORCEINLINE const bool& IsCollidingGrappling() { return bIsGrapplingPossible; };
+
+	FORCEINLINE const bool& IsCollidingSwinging() { return bIsSwingingPossible; };
 
 	FORCEINLINE void SetComingBack(const bool& _isComingBack) {  bIsComingBack = _isComingBack; };
 
 	FORCEINLINE const bool& IsComingBack() { return bIsComingBack; };
+
+	FORCEINLINE void SetAssisted(const bool& _isAssisted) { bIsAssisted = _isAssisted; }
 
 	UFUNCTION()
 	void LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple);
