@@ -84,7 +84,7 @@ void UGrappleComponent::CheckElementTargetable()
 				FromSoftware /= FromSoftware.Size();
 				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
 				//to change and finish
-				if (dot > minDot&& dot < maxDot)
+				if (dot > minDot && dot < maxDot)
 				{
 					FHitResult hitResult;
 					if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
