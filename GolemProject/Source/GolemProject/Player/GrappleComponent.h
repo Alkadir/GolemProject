@@ -27,6 +27,7 @@ private:
 
 	FVector mDestination;
 	FVector mDirection;
+	FVector mLastLocation;
 
 	int32 mIdBone;
 	bool bIsAssisted = false;
@@ -44,6 +45,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float speedRotation = 0.01f;
+
+	float mDistance;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "projectile", meta = (AllowPrivateAccess = "true"))
