@@ -49,6 +49,7 @@ void AProjectileHand::Tick(float DeltaTime)
 		{
 			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
 			dir /= dir.Size();
+			//HelperLibrary::Print((dir * velocity).ToString());
 			ProjectileComponent->Velocity = dir * velocity;
 		}
 	}
@@ -84,6 +85,10 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 				}
 			}
 		}
+		/*FVector location = GetActorLocation();
+		SetActorLocation(location - ProjectileComponent->Velocity*0.01f);*/
+		//ProjectileComponent->StopMovementImmediately();
+		//HelperLibrary::Print("hit");
 		bIsComingBack = true;
 	}
 }
