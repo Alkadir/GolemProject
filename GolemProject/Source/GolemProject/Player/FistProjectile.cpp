@@ -57,11 +57,12 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 				}
 			}
 		}
-		if (UWorld* world = GetWorld())
-		{
-			world->GetTimerManager().SetTimer(TimerHandleFXDisappear, this, &AFistProjectile::Event_DestructionFistFX_BP, TimerDisappear - 1.0f, false);
-			world->GetTimerManager().SetTimer(TimerHandleDisappear, this, &AFistProjectile::DestroyFist, TimerDisappear, false);
-		}
+
+	}
+	if (UWorld* world = GetWorld())
+	{
+		world->GetTimerManager().SetTimer(TimerHandleFXDisappear, this, &AFistProjectile::Event_DestructionFistFX_BP, TimerDisappear - 1.0f, false);
+		world->GetTimerManager().SetTimer(TimerHandleDisappear, this, &AFistProjectile::DestroyFist, TimerDisappear, false);
 	}
 }
 
