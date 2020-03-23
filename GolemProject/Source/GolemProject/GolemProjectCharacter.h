@@ -49,6 +49,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
 		class UPushingComponent* PushingComponent;
 
+	class APlayerController* pc;
+
 	UPROPERTY()
 		class UChildActorComponent* sightCamera;
 
