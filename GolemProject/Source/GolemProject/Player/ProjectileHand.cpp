@@ -45,7 +45,7 @@ void AProjectileHand::Tick(float DeltaTime)
 
 	if (bIsComingBack)
 	{
-		if (grappleComponent)
+		if (grappleComponent && !grappleComponent->GetSwingPhysics())
 		{
 			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
 			dir /= dir.Size();
@@ -68,7 +68,7 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	{
 		FVector changeDir = OtherActor->GetActorLocation() - GetActorLocation();
 		changeDir /= changeDir.Size();
-		ProjectileComponent->Velocity = changeDir*velocity;
+		ProjectileComponent->Velocity = changeDir * velocity;
 	}
 
 	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
@@ -92,7 +92,7 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 				}
 			}
 		}
-		
+
 		bIsComingBack = true;
 	}
 }

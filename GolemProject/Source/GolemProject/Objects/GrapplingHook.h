@@ -12,10 +12,6 @@ class GOLEMPROJECT_API AGrapplingHook : public AActor, public ITargetable
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	AGrapplingHook();
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,8 +24,14 @@ protected:
 		void DestroyHUD();
 	virtual void DestroyHUD_Implementation() override;
 
+	UPROPERTY(EditAnywhere, Category = "swing physic", meta = (AllowPrivateAccess = "true"))
+	float maxRopeDistance = 450.0f;
+
 public:	
+	// Sets default values for this actor's properties
+	AGrapplingHook();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	FORCEINLINE  const float GetMaxRopeDistance() { return maxRopeDistance; };
 };
