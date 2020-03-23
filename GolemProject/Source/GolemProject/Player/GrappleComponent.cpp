@@ -133,6 +133,8 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				FVector direction = (offset - currentProjectile->GetActorLocation());
 				direction /= direction.Size();
 
+				mLastLocation = currentProjectile->GetMeshComponent()->GetComponentLocation();
+				mDistance = 0.0f;
 				//DrawDebugLine(world, mCamera->GetComponentLocation(), offset, FColor::Red, true);
 
 				currentProjectile->Instigator = mCharacter->GetInstigator();
@@ -203,7 +205,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
-			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
+			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * maxDistance;
 			FVector direction = end - GetHandPosition();
 			FVector location = GetHandPosition();
 			FVector scale;
@@ -218,8 +220,8 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				FHitResult hitResult;
 				HelperAiming->SetActorRotation(rotation);
 				scale = HelperAiming->GetActorScale3D();
-				FVector distance = direction * accuracy;
-				scale.Z = distance.Size();
+				FVector distance = direction.GetSafeNormal() * maxDistance;
+				scale.Z = distance.Size() / 100.0f;
 				HelperAiming->SetActorScale3D(scale);
 				if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
 				{
@@ -241,11 +243,12 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	if (currentProjectile)
 	{
 		mDirection = currentProjectile->GetMeshComponent()->GetComponentLocation() - mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
-		float dist = mDirection.Size();
-
+		mDistance += FVector::Dist(mLastLocation, currentProjectile->GetMeshComponent()->GetComponentLocation());
+		float distanceWithCharacter = mDirection.Size();
+		mLastLocation = currentProjectile->GetMeshComponent()->GetComponentLocation();
 		if (currentProjectile->IsComingBack())
 		{
-			if (dist < offsetStop)
+			if (distanceWithCharacter < offsetStop)
 			{
 				PlayerIsNear();
 				return;
@@ -257,7 +260,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			{
 				if (!bIsAssisted)
 				{
-					if (dist > offsetStop)
+					if (distanceWithCharacter > offsetStop)
 					{
 						AttractCharacter();
 					}
@@ -290,7 +293,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		}
 		else
 		{
-			if (dist > maxDistance)
+			if (mDistance > maxDistance)
 			{
 				currentProjectile->SetComingBack(true);
 			}
