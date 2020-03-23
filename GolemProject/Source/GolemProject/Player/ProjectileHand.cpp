@@ -64,7 +64,7 @@ void AProjectileHand::Tick(float DeltaTime)
 void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//change direction projectile, maybe add timer when the projectile is reallly blocked
-	if (bIsComingBack && OtherActor != this)
+	if (bIsComingBack && OtherActor && OtherActor != this)
 	{
 		FVector changeDir = OtherActor->GetActorLocation() - GetActorLocation();
 		changeDir /= changeDir.Size();
