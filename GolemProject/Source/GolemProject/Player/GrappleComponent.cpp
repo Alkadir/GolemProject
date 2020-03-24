@@ -84,7 +84,7 @@ void UGrappleComponent::CheckElementTargetable()
 				FromSoftware /= FromSoftware.Size();
 				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
 				//to change and finish
-				if (dot > minDot&& dot < maxDot)
+				if (dot > minDot && dot < maxDot)
 				{
 					FHitResult hitResult;
 					if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
@@ -288,6 +288,8 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 						swingPhysic->SetFriction(friction);
 						swingPhysic->SetForceMovement(forceMovement);
 						swingPhysic->SetSpeedRotation(speedRotation);
+						swingPhysic->SetMinLength(minLength);
+						swingPhysic->SetMaxLength(maxLength);
 
 						UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>();
 						if (dashComp)

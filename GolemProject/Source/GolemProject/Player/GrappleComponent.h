@@ -46,6 +46,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float speedRotation = 0.01f;
 
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float minLength = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float maxLength = 1000.0f;
+
 	float mDistance;
 	
 protected:
