@@ -27,7 +27,7 @@ protected:
 	UPROPERTY(EditInstanceOnly)
 		EActivationType activationType;
 
-	bool CanBeActivated;
+	bool IsActivated;
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void Event_Interaction();

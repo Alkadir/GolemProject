@@ -151,6 +151,8 @@ public:
 
 	void InflictDamage(int _damage);
 
+	void ActivateDeath(bool _activate);
+
 	UPROPERTY(BlueprintReadOnly)
 	bool IsInteractingOrAiming;
 };

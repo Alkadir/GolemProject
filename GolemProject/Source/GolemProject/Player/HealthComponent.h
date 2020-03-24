@@ -29,6 +29,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	float TimerRespawn = 3.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
+	int FallDamage;
+
 	bool CanTakeDamage;
 	FTimerHandle TimerHandlerInvul;
 	FTimerHandle TimerHandlerRespawn;
@@ -40,6 +43,10 @@ protected:
 private:
 	void ResetInvulnerability();
 	void Respawn();
+	void RespawnFromFalling();
+	void KillCharacterFromFalling();
+
+	bool IsFallingDown;
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

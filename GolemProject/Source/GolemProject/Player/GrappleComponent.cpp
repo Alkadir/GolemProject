@@ -84,7 +84,7 @@ void UGrappleComponent::CheckElementTargetable()
 				FromSoftware /= FromSoftware.Size();
 				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
 				//to change and finish
-				if (dot > minDot && dot < maxDot)
+				if (dot > minDot&& dot < maxDot)
 				{
 					FHitResult hitResult;
 					if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
@@ -124,11 +124,11 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 	{
 		if (world && mCamera)
 		{
-			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
+				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
 				FVector direction = (offset - currentProjectile->GetActorLocation());
 				direction /= direction.Size();
@@ -319,7 +319,7 @@ void UGrappleComponent::StopSwingPhysics()
 		bIsAssisted = false;
 		delete swingPhysic;
 		swingPhysic = nullptr;
-		
+
 		currentProjectile->SetComingBack(true);
 	}
 }

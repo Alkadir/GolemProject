@@ -338,7 +338,7 @@ void AGolemProjectCharacter::ChangeCamera()
 
 void AGolemProjectCharacter::MoveForward(float Value)
 {
-	if (PushingComponent && PushingComponent->GetIsStartingPushingObject())
+	if (PushingComponent && PushingComponent->GetIsStartingPushingObject() || mGrapple && mGrapple->GetFiring())
 	{
 		return;
 	}
@@ -389,7 +389,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
-	if (PushingComponent && PushingComponent->GetIsPushingObject())
+	if (PushingComponent && PushingComponent->GetIsPushingObject() || mGrapple && mGrapple->GetFiring())
 	{
 		return;
 	}
@@ -501,4 +501,19 @@ void AGolemProjectCharacter::InflictDamage(int _damage)
 {
 	if (HealthComponent != nullptr)
 		HealthComponent->InflictDamage(_damage);
+}
+
+void AGolemProjectCharacter::ActivateDeath(bool _activate)
+{
+	if (_activate)
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		//GetMesh()->SetSimulatePhysics(true);
+	}
+	else 
+	{
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		//GetMesh()->SetSimulatePhysics(false);
+	}
 }

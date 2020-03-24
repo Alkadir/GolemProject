@@ -105,6 +105,9 @@ public:
 	// Sets default values for this component's properties
 	UGrappleComponent();
 
+	UFUNCTION()
+	FORCEINLINE bool GetFiring() { return IsFiring; }
+
 	UFUNCTION(BlueprintCallable)
 	void GoToDestination(bool _isAssisted);
 
