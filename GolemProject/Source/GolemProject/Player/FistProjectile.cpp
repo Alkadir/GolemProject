@@ -21,6 +21,11 @@ AFistProjectile::AFistProjectile()
 void AFistProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	MeshComponent = FindComponentByClass <UStaticMeshComponent>();
+	if (MeshComponent)
+	{
+		MeshComponent->OnComponentHit.AddDynamic(this, &AFistProjectile::OnHit);
+	}
 	ProjectileComponent = FindComponentByClass<UProjectileMovementComponent>();
 	if (ProjectileComponent)
 	{
@@ -28,16 +33,11 @@ void AFistProjectile::BeginPlay()
 		ProjectileComponent->InitialSpeed = 0.0f;
 		ProjectileComponent->UpdatedComponent = MeshComponent;
 	}
-	MeshComponent = FindComponentByClass <UStaticMeshComponent>();
-	if (MeshComponent)
-	{
-		MeshComponent->OnComponentHit.AddDynamic(this, &AFistProjectile::OnHit);
-	}
 }
 
 void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
+	if (HitComponent && OtherActor && OtherComponent)
 	{
 		if (IInteractable* interactable = Cast<IInteractable>(OtherActor))
 		{
@@ -46,18 +46,18 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		else
 		{
 			UPhysicalMaterial* physMat;
-			if (Hit.GetComponent() != nullptr && Hit.GetComponent()->GetMaterial(0) != nullptr)
+			if (Hit.GetComponent() && Hit.GetComponent()->GetMaterial(0) != nullptr)
 			{
 				physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
-				if (physMat != nullptr && physMat->SurfaceType == SurfaceType2)
+				if (physMat && physMat->SurfaceType == SurfaceType2)
 				{
-					if (ProjectileComponent != nullptr)
+					if (ProjectileComponent)
 						ProjectileComponent->bShouldBounce = true;
 					BounceMovement(Hit.ImpactNormal);
 				}
 				else
 				{
-					if (ProjectileComponent != nullptr)
+					if (ProjectileComponent)
 						ProjectileComponent->bShouldBounce = false;
 				}
 			}
