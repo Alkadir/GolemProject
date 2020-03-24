@@ -182,7 +182,15 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 	}
 	if (PushingComponent && PushingComponent->GetIsPushingObject(false) && actorToInteract)
 	{
-		actorToInteract->SetActorLocation(GetActorLocation() + PushingComponent->GetBlockOffsetPosition());
+		if (fabs(startPushingZ - GetActorLocation().Z) > 2.f)
+		{
+			HelperLibrary::Print(FString::SanitizeFloat(fabs(startPushingZ - GetActorLocation().Z)));
+			StopPushBloc();
+		}
+		else
+		{
+			actorToInteract->SetActorLocation(GetActorLocation() + PushingComponent->GetBlockOffsetPosition());
+		}
 	}
 }
 
@@ -360,7 +368,8 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		}
 		else
 		{
-			if (PushingComponent == nullptr || (PushingComponent->GetIsPushingObject(false) && pushedObjectIsColliding && Value > 0))
+			if (PushingComponent == nullptr || (PushingComponent->GetIsPushingObject(false) &&
+				(pushedObjectIsCollidingForward && Value > 0 || pushedObjectIsCollidingBackward && Value < 0)))
 			{
 				Direction = FVector::ZeroVector;
 			}
@@ -438,11 +447,17 @@ void AGolemProjectCharacter::SetUpBlockOffsetPositon()
 	if (actorToInteract != nullptr && PushingComponent != nullptr)
 	{
 		PushingComponent->SetBlockOffsetPosition(actorToInteract->GetActorLocation() - GetActorLocation());
+		startPushingZ = GetActorLocation().Z;
 	}
 }
 
-void AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation)
+bool AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation)
 {
+	FVector tempPos = pushingPosition;
+	if (GetWorld() && !GetWorld()->FindTeleportSpot(this, tempPos, pushingRotation) || tempPos != pushingPosition)
+	{
+		return false;
+	}
 	if (isSightCameraEnabled)
 	{
 		ChangeCamera();
@@ -456,6 +471,7 @@ void AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingP
 		PushingComponent->PushBloc(pushingDirection, pushingPosition, pushingRotation);
 		PushingComponent->SetBlock(Cast<APushableBloc>(actorToInteract));
 	}
+	return true;
 }
 
 
@@ -469,7 +485,8 @@ void AGolemProjectCharacter::StopPushBloc()
 	{
 		PushingComponent->StopPushBloc();
 	}
-	pushedObjectIsColliding = false;
+	pushedObjectIsCollidingForward = false;
+	pushedObjectIsCollidingBackward = false;
 }
 
 void AGolemProjectCharacter::InflictDamage(int _damage)

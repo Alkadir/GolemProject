@@ -312,12 +312,12 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 void UGrappleComponent::StopSwingPhysics()
 {
-	HelperLibrary::Print("stop swing");
 	if (swingPhysic)
 	{
 		bIsAssisted = false;
 		delete swingPhysic;
 		swingPhysic = nullptr;
+		
 		currentProjectile->SetComingBack(true);
 	}
 }
@@ -362,7 +362,6 @@ void UGrappleComponent::AttractCharacter()
 				mCharacter->GetCharacterMovement()->Velocity *= stopScaleVelocity;
 
 			currentProjectile->SetComingBack(true);
-			//currentProjectile->SetColliding(false);
 		}
 	}
 }

@@ -8,20 +8,52 @@
 #include "Components/StaticMeshComponent.h"
 #include "GolemProjectCharacter.h"
 #include "Helpers/HelperLibrary.h"
+#include "GameFramework/WorldSettings.h"
 
 
 APushableBloc::APushableBloc()
 {
-	root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	SetRootComponent(root);
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	SetRootComponent(mesh);
 
-	if (mesh != nullptr && root != nullptr)
+	if (mesh != nullptr)
 	{
-		mesh->SetupAttachment(root);
 		mesh->SetSimulatePhysics(false);
 	}
 
+}
+
+void APushableBloc::Tick(float _deltaTime)
+{
+	Super::Tick(_deltaTime);
+	if (useGravity)
+	{
+		if (AWorldSettings* worldSeting = GetWorldSettings())
+		{
+			FVector newPosition = GetActorLocation() + FVector::UpVector * worldSeting->GetGravityZ() * _deltaTime * 0.5f;
+			FHitResult hit;
+			if (SetActorLocation(newPosition, true, &hit))
+			{
+				if (isUsed && playerActor)
+				{
+					SetActorLocation(newPosition + pushingDirection, true);
+					playerActor->StopPushBloc();
+					isUsed = false;
+				}
+			}
+			else if (!isUsed)
+			{
+				if (hit.GetActor() == playerActor)
+				{
+					SetActorLocation(newPosition);
+				}
+				else
+				{
+					useGravity = false;
+				}
+			}
+		}
+	}
 }
 
 const bool APushableBloc::Interact_Implementation(AActor* caller)
@@ -40,11 +72,19 @@ const bool APushableBloc::Interact_Implementation(AActor* caller)
 		isUsed = !isUsed;
 		if (isUsed)
 		{
-			playerActor->PushBloc(pushingDirection, pushingPosition, pushingRotation);
+			if (playerActor->PushBloc(pushingDirection, pushingPosition, pushingRotation))
+			{
+				useGravity = true;
+			}
+			else
+			{
+				isUsed = false;
+			}
 		}
 		else
 		{
 			playerActor->StopPushBloc();
+			playerActor = nullptr;
 		}
 		return true;
 	}
