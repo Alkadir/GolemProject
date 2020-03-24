@@ -32,7 +32,8 @@ void APushableBloc::Tick(float _deltaTime)
 		{
 			FVector newPosition = GetActorLocation() + FVector::UpVector * worldSeting->GetGravityZ() * _deltaTime * 0.5f;
 			FHitResult hit;
-			if (SetActorLocation(newPosition, true, &hit))
+			float lastZ = GetActorLocation().Z;
+			if (SetActorLocation(newPosition, true, &hit) && lastZ - GetActorLocation().Z > 1.f)
 			{
 				if (isUsed && playerActor)
 				{
