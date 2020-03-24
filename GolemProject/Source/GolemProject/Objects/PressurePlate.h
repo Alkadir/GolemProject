@@ -4,56 +4,66 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/Activable.h"
 #include "PressurePlate.generated.h"
 
-class UBoxComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPresurePlate);
 
 UCLASS()
 class GOLEMPROJECT_API APressurePlate : public AActor
 {
 	GENERATED_BODY()
 
-private:
-	FTimerHandle pressedTimerHandle;
-	FTimerHandle releasedTimerHandle;
 
 protected:
+
+	UPROPERTY(EditInstanceOnly)
+		TArray<AActor*> objectsToActivate;
+	UPROPERTY(EditInstanceOnly)
+		EActivationType activationTypeOnPress = EActivationType::Activate;
+	UPROPERTY(EditInstanceOnly)
+		EActivationType activationTypeOnRelease = EActivationType::Desactivate;
+
 	UPROPERTY(VisibleAnywhere)
-		UBoxComponent* boxCollider = nullptr;
+		class UBoxComponent* boxCollider = nullptr;
+	UPROPERTY(VisibleAnywhere)
+		class UStaticMeshComponent* mesh = nullptr;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Collision")
-		FVector colliderSize = FVector::OneVector * 50.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Collision")
-		FVector boxOffset = FVector::ZeroVector;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float delay = 0.25f;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		bool isPressed = false;
+	short countObjectOn = 0;
 
+	UPROPERTY(EditAnywhere)
+		float offsetWhenPresed = -10.f;
+	UPROPERTY(EditAnywhere)
+		float timeToLerp = 0.5f;
+
+	float timerLerp = 0.f;
+
+	FVector startPos;
+	FVector pressedPos;
+	bool isMoving = false;
 public:
 	APressurePlate();
 
-private:
-	UFUNCTION()
-		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+		FPresurePlate OnPressedPlate;
 
-	UFUNCTION()
-		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UFUNCTION()
-		void OnPressed();
-
-	UFUNCTION()
-		void OnReleased();
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+		FPresurePlate OnReleasedPlate;
 
 protected:
-	virtual void BeginPlay() override;
+	UFUNCTION()
+		void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+		void OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-public:
-#if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif //WITH_EDITOR
+	void ActivateObjects(EActivationType activationType);
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
 };

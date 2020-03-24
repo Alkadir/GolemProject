@@ -150,4 +150,7 @@ public:
 	void StopPushBloc();
 
 	void InflictDamage(int _damage);
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsInteractingOrAiming;
 };

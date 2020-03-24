@@ -20,12 +20,19 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	class UStaticMeshComponent* MeshComponent;
+
 	UPROPERTY(EditInstanceOnly)
 		TArray<AActor*> objectsToActivate;
 	UPROPERTY(EditInstanceOnly)
 		EActivationType activationType;
 
+	bool CanBeActivated;
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void Event_Interaction();
+
+	void ResetActivation();
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")

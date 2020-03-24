@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -144,6 +145,8 @@ void AGolemProjectCharacter::BeginPlay()
 
 	if (FistComp)
 		FistComp->IsTargetingFist = false;
+
+	IsInteractingOrAiming = false;
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -313,6 +316,7 @@ void AGolemProjectCharacter::ChangeCamera()
 			else if (FistComp && FistComp->IsTargetingFist && sightCameraL)
 				pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 
+			IsInteractingOrAiming = true;
 			/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
 					currentSightWidget->AddToViewport();*/
 
@@ -321,7 +325,7 @@ void AGolemProjectCharacter::ChangeCamera()
 		{
 			/*if (currentSightWidget && currentSightWidget->IsInViewport())
 				currentSightWidget->RemoveFromViewport();*/
-
+			IsInteractingOrAiming = false;
 			isSightCameraEnabled = false;
 			if (GetCharacterMovement())
 			{
@@ -378,6 +382,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 				Direction = PushingComponent->GetPushingDirection();
 			}
 		}
+		Direction = Direction.GetSafeNormal();
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -428,6 +433,7 @@ void AGolemProjectCharacter::MoveRight(float Value)
 				Direction.X = -Y;
 				Direction.Y = X;
 			}
+			Direction = Direction.GetSafeNormal();
 			AddMovementInput(Direction, Value);
 		}
 	}
@@ -471,6 +477,7 @@ bool AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingP
 		PushingComponent->PushBloc(pushingDirection, pushingPosition, pushingRotation);
 		PushingComponent->SetBlock(Cast<APushableBloc>(actorToInteract));
 	}
+	IsInteractingOrAiming = true;
 	return true;
 }
 
@@ -487,6 +494,7 @@ void AGolemProjectCharacter::StopPushBloc()
 	}
 	pushedObjectIsCollidingForward = false;
 	pushedObjectIsCollidingBackward = false;
+	IsInteractingOrAiming = false;
 }
 
 void AGolemProjectCharacter::InflictDamage(int _damage)
