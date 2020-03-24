@@ -11,7 +11,8 @@ enum class EActivationType : uint8
 {
 	Activate		UMETA(DisplayName = "Activate"),
 	Desactivate 	UMETA(DisplayName = "Desactivate"),
-	Switch			UMETA(DisplayName = "Switch")
+	Switch			UMETA(DisplayName = "Switch"),
+	None			UMETA(DisplayName = "None")
 };
 
 // This class does not need to be modified.

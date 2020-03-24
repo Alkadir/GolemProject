@@ -21,9 +21,9 @@ protected:
 	UPROPERTY(EditInstanceOnly)
 		TArray<AActor*> objectsToActivate;
 	UPROPERTY(EditInstanceOnly)
-		EActivationType activationTypeOnPress;
+		EActivationType activationTypeOnPress = EActivationType::Activate;
 	UPROPERTY(EditInstanceOnly)
-		EActivationType activationTypeOnRelease;
+		EActivationType activationTypeOnRelease = EActivationType::Desactivate;
 
 	UPROPERTY(VisibleAnywhere)
 		class UBoxComponent* boxCollider = nullptr;
