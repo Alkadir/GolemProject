@@ -31,6 +31,7 @@ void AFistProjectile::BeginPlay()
 
 void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
+	ProjectileComponent->bShouldBounce = false;
 	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
 	{
 		IInteractable* interactable = Cast<IInteractable>(OtherActor);
