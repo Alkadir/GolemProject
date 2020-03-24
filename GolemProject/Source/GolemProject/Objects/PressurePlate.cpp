@@ -10,87 +10,162 @@
 #include "Math/UnrealMathVectorCommon.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 APressurePlate::APressurePlate()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 	USceneComponent* root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(root);
 
 	boxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Box"));
-	boxCollider->SetupAttachment(root);
-}
-
-void APressurePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	HelperLibrary::Print(TEXT("Begin overlap"), 2.0f, FColor::Red);
-
-	UWorld* world = GetWorld();
-	if (world)
+	if (boxCollider)
 	{
-		if (!isPressed)
-		{
-			world->GetTimerManager().SetTimer(pressedTimerHandle, this, &APressurePlate::OnPressed, delay);
-		}
-
-		world->GetTimerManager().ClearTimer(releasedTimerHandle);
-	}
-}
-
-void APressurePlate::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	HelperLibrary::Print(TEXT("End overlap"), 2.0f, FColor::Red);
-
-	UWorld* world = GetWorld();
-	if (world)
-	{
-		if (isPressed)
-		{
-			world->GetTimerManager().SetTimer(releasedTimerHandle, this, &APressurePlate::OnReleased, delay);
-		}
-
-		world->GetTimerManager().ClearTimer(pressedTimerHandle);
-	}
-}
-
-void APressurePlate::OnPressed()
-{
-	HelperLibrary::Print(TEXT("Pressed!"), 2.0f, FColor::Yellow);
-
-	if (!isPressed)
-	{
-		FVector newPosition;
-
-		newPosition.Z = GetActorLocation().Z - 4.f;
-		SetActorLocation(newPosition);
+		boxCollider->SetupAttachment(root);
 	}
 
-	isPressed = true;
-}
-
-void APressurePlate::OnReleased()
-{
-	HelperLibrary::Print(TEXT("Released!"), 2.0f, FColor::Yellow);
-	if (isPressed)
+	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	if (mesh)
 	{
-		FVector newPosition;
-		newPosition.Z = GetActorLocation().Z + 4.f;
-		SetActorLocation(newPosition);
+		mesh->SetupAttachment(root);
 	}
-	isPressed = false;
 }
 
 void APressurePlate::BeginPlay()
 {
-	boxCollider->OnComponentBeginOverlap.AddUniqueDynamic(this, &APressurePlate::OnOverlapBegin);
-	boxCollider->OnComponentEndOverlap.AddUniqueDynamic(this, &APressurePlate::OnOverlapEnd);
+	Super::BeginPlay();
+	if (boxCollider)
+	{
+		boxCollider->OnComponentBeginOverlap.AddUniqueDynamic(this, &APressurePlate::OnBeginOverlap);
+		boxCollider->OnComponentEndOverlap.AddUniqueDynamic(this, &APressurePlate::OnEndOverlap);
+	}
+	if (mesh)
+	{
+		startPos = mesh->GetComponentLocation();
+		pressedPos = startPos;
+		pressedPos.Z += offsetWhenPresed;
+	}
+
 }
 
-#if WITH_EDITOR
-void APressurePlate::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void APressurePlate::Tick(float DeltaTime)
 {
-	boxCollider->SetBoxExtent(colliderSize);
-	boxCollider->SetRelativeLocation(boxOffset);
+	Super::Tick(DeltaTime);
+	if (isMoving)
+	{
+		if (isPressed)
+		{
+			timerLerp += DeltaTime / timeToLerp;
+			if (timerLerp > 1.f)
+			{
+				timerLerp = 1.f;
+				isMoving = false;
+			}
+		}
+		else
+		{
+			timerLerp -= DeltaTime / timeToLerp;
+			if (timerLerp < 0.f)
+			{
+				timerLerp = 0.f;
+				isMoving = false;
+			}
+		}
+		mesh->SetWorldLocation(FMath::Lerp(startPos, pressedPos, timerLerp));
+	}
 
-	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
-#endif
+
+void APressurePlate::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+	countObjectOn++;
+	if (countObjectOn == 1)
+	{
+		HelperLibrary::Print(TEXT("Press"), 2.0f, FColor::Blue);
+		isPressed = true;
+		isMoving = true;
+		ActivateObjects(activationTypeOnPress);
+		OnPressedPlate.Broadcast();
+	}
+}
+
+void APressurePlate::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
+	countObjectOn--;
+	if (countObjectOn == 0)
+	{
+		HelperLibrary::Print(TEXT("Releasse"), 2.0f, FColor::Blue);
+		isPressed = false;
+		isMoving = true;
+		ActivateObjects(activationTypeOnRelease);
+		OnReleasedPlate.Broadcast();
+	}
+}
+
+void APressurePlate::ActivateObjects(EActivationType activationType)
+{
+	for (auto& objectToActivate : objectsToActivate)
+	{
+		if (objectToActivate != nullptr)
+		{
+			if (IActivable* activable = Cast<IActivable>(objectToActivate))
+			{
+				if (activationType == EActivationType::Activate)
+				{
+					activable->Execute_Activate(objectToActivate, this);
+				}
+				else if (activationType == EActivationType::Desactivate)
+				{
+					activable->Execute_Desactivate(objectToActivate, this);
+				}
+				else if (activationType == EActivationType::Switch)
+				{
+					activable->Execute_Switch(objectToActivate, this);
+				}
+			}
+			else
+			{
+				HelperLibrary::Print(FString::Printf(TEXT("%s don\'t implement Activable interface"), *(objectToActivate->GetName())), 5.f, FColor::Yellow);
+			}
+
+		}
+	}
+}
+
+//bool SetIsPressedValue(bool value)
+//{
+//	if (value != isPressed)
+//	{
+//	
+//	}
+//	return value;
+//}
+//void APressurePlate::OnPressed()
+//{
+//	HelperLibrary::Print(TEXT("Pressed!"), 2.0f, FColor::Yellow);
+//
+//	if (!isPressed)
+//	{
+//		FVector newPosition;
+//
+//		newPosition.Z = GetActorLocation().Z - 4.f;
+//		SetActorLocation(newPosition);
+//	}
+//
+//	isPressed = true;
+//}
+//
+//void APressurePlate::OnReleased()
+//{
+//	HelperLibrary::Print(TEXT("Released!"), 2.0f, FColor::Yellow);
+//	if (isPressed)
+//	{
+//		FVector newPosition;
+//		newPosition.Z = GetActorLocation().Z + 4.f;
+//		SetActorLocation(newPosition);
+//	}
+//	isPressed = false;
+//}
