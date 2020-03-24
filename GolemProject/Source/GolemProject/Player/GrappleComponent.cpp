@@ -288,6 +288,8 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 						swingPhysic->SetFriction(friction);
 						swingPhysic->SetForceMovement(forceMovement);
 						swingPhysic->SetSpeedRotation(speedRotation);
+						swingPhysic->SetMinLength(minLength);
+						swingPhysic->SetMaxLength(maxLength);
 
 						UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>();
 						if (dashComp)
