@@ -58,8 +58,6 @@ const bool ALever::Interact_Implementation(AActor* caller)
 						{
 							FVector4 color(0.0f, 1.0f, 0.0f, 1.0f);
 							MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
-							FTimerHandle timerHandle;
-							world->GetTimerManager().SetTimer(timerHandle, this, &ALever::ResetActivation, 1.5f);
 						}
 						Event_Interaction();
 						haveActivate = true;
@@ -70,10 +68,8 @@ const bool ALever::Interact_Implementation(AActor* caller)
 						activable->Execute_Desactivate(objectToActivate, this);
 						if (UWorld* world = GetWorld())
 						{
-							FVector4 color(0.0f, 1.0f, 0.0f, 1.0f);
+							FVector4 color(1.0f, 0.0f, 0.0f, 1.0f);
 							MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
-							FTimerHandle timerHandle;
-							world->GetTimerManager().SetTimer(timerHandle, this, &ALever::ResetActivation, 1.5f);
 						}
 						Event_Interaction();
 						haveActivate = true;
@@ -82,13 +78,13 @@ const bool ALever::Interact_Implementation(AActor* caller)
 					else if (activationType == EActivationType::Switch)
 					{
 						activable->Execute_Switch(objectToActivate, this);
-						if (UWorld* world = GetWorld())
+						/*if (UWorld* world = GetWorld())
 						{
 							FVector4 color(0.0f, 1.0f, 0.0f, 1.0f);
 							MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
 							FTimerHandle timerHandle;
 							world->GetTimerManager().SetTimer(timerHandle, this, &ALever::ResetActivation, 1.5f);
-						}
+						}*/
 						Event_Interaction();
 						haveActivate = true;
 						CanBeActivated = false;
