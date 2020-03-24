@@ -17,12 +17,13 @@ class GOLEMPROJECT_API APushableBloc : public AActor, public IInteractable
 
 protected:
 
-	UPROPERTY(VisibleAnywhere)
-		class USceneComponent* root;
+	virtual void Tick(float deltaTime) override;
+
 	UPROPERTY(VisibleAnywhere)
 		class UStaticMeshComponent* mesh;
 
 	AGolemProjectCharacter* playerActor = nullptr;
+	bool useGravity = true;
 	bool isUsed = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector sizeBlock = FVector::OneVector;
@@ -45,9 +46,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		FRotator GetPushingRotation() { return pushingRotation; }
 
-private:
 
-public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
 		const bool Interact(AActor* caller);
 	virtual const bool Interact_Implementation(AActor* caller) override;
