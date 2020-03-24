@@ -232,6 +232,7 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 {
 	if (mGrapple != nullptr)
 	{
+		ChangeToGrapple();
 		mGrapple->GoToDestination(true);
 	}
 }
