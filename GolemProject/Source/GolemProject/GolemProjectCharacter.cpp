@@ -212,7 +212,7 @@ void AGolemProjectCharacter::Jump()
 
 void AGolemProjectCharacter::Dash()
 {
-	if (mGrapple != nullptr && !mGrapple->GetIsFiring() && dashComponent != nullptr && !PushingComponent->GetIsPushingObject())
+	if (mGrapple && !mGrapple->GetIsFiring() && dashComponent && !PushingComponent->GetIsPushingObject())
 	{
 		if (Controller != NULL)
 		{
@@ -230,7 +230,7 @@ void AGolemProjectCharacter::Dash()
 
 void AGolemProjectCharacter::UseAssistedGrapple()
 {
-	if (mGrapple != nullptr)
+	if (mGrapple)
 	{
 		mGrapple->GoToDestination(true);
 	}
@@ -241,7 +241,7 @@ void AGolemProjectCharacter::ChangeToGrapple()
 	if (FistComp == nullptr || mGrapple == nullptr || mGrapple->IsTargetingGrapple) return;
 	mGrapple->IsTargetingGrapple = true;
 	FistComp->IsTargetingFist = false;
-	if (isSightCameraEnabled && pc)
+	if (isSightCameraEnabled && pc && sightCamera)
 	{
 		pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
 	}
@@ -249,10 +249,10 @@ void AGolemProjectCharacter::ChangeToGrapple()
 
 void AGolemProjectCharacter::ChangeToFist()
 {
-	if (FistComp && FistComp->IsTargetingFist) return;
+	if (FistComp == nullptr || mGrapple == nullptr || FistComp && FistComp->IsTargetingFist) return;
 	FistComp->IsTargetingFist = true;
 	mGrapple->IsTargetingGrapple = false;
-	if (isSightCameraEnabled && pc)
+	if (isSightCameraEnabled && pc && sightCameraL)
 	{
 		pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 	}
@@ -450,7 +450,7 @@ void AGolemProjectCharacter::ResetFriction()
 
 void AGolemProjectCharacter::SetUpBlockOffsetPositon()
 {
-	if (actorToInteract != nullptr && PushingComponent != nullptr)
+	if (actorToInteract && PushingComponent)
 	{
 		PushingComponent->SetBlockOffsetPosition(actorToInteract->GetActorLocation() - GetActorLocation());
 		startPushingZ = GetActorLocation().Z;
