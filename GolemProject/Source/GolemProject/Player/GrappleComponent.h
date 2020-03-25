@@ -65,7 +65,7 @@ protected:
 	float maxDistance = 3000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float velocity = 200.0f;
+	float velocity = 5000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
 	float offsetStop = 200.0f;

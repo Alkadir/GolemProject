@@ -377,7 +377,7 @@ void UGrappleComponent::AttractCharacter()
 	if (mCharacter && mCharacter->GetCharacterMovement())
 	{
 		mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
-		mCharacter->LaunchCharacter(mDirection * velocity, false, false);
+		mCharacter->LaunchCharacter(mDirection * velocity, true, true);
 		tempDir.Z = 0.0f;
 		mCharacter->SetActorRotation(tempDir.Rotation());
 
