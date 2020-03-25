@@ -17,10 +17,16 @@ class AGolemProjectCharacter : public ACharacter
 private:
 
 	UPROPERTY(EditAnyWhere, Category = "Debug")
-		bool showCursor = false;
+	bool showCursor = false;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
+	bool isGrappleSkillEnabled = false;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
+	bool isFistSkillEnabled = false;
 
 	UPROPERTY()
-		bool isSightCameraEnabled = false;
+	bool isSightCameraEnabled = false;
 
 	float m_valueForward;
 
@@ -108,7 +114,7 @@ protected:
 	void ChangeCameraReleased();
 
 	UPROPERTY(EditAnywhere)
-		UDashComponent* dashComponent;
+	UDashComponent* dashComponent;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -132,18 +138,22 @@ public:
 	AGolemProjectCharacter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
-		TSubclassOf<class UUserWidget>  sightHudClass;
+	TSubclassOf<class UUserWidget>  sightHudClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseTurnRate;
+	float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseLookUpRate;
+	float BaseLookUpRate;
 
 	UFUNCTION(BlueprintCallable, Category = "Hud")
-		FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+
+	FORCEINLINE bool& IsGrappleSkillEnabled() { return isGrappleSkillEnabled; };
+
+	FORCEINLINE bool& IsFistSkillEnabled() { return isFistSkillEnabled; };
 
 	void ResetFriction();
 	/** Returns CameraBoom subobject **/
