@@ -25,7 +25,10 @@ void UHealthComponent::BeginPlay()
 	if (AActor* owner = GetOwner())
 	{
 		Player = Cast<AGolemProjectCharacter>(owner);
-		PlayerController = Cast<APlayerController>(Player->GetController());
+		if (Player)
+		{
+			PlayerController = Cast<APlayerController>(Player->GetController());
+		}
 	}
 	CanTakeDamage = true;
 	Life = MaxLife;
@@ -83,10 +86,10 @@ void UHealthComponent::Respawn()
 	{
 		Player->EnableInput(PlayerController);
 		Player->ActivateDeath(false);
+		IsFallingDown = false;
+		Player->SetActorLocation(PositionCheckPoint);
+		bIsDead = false;
 	}
-	IsFallingDown = false;
-	Player->SetActorLocation(PositionCheckPoint);
-	bIsDead = false;
 }
 
 void UHealthComponent::RespawnFromFalling()
@@ -94,10 +97,11 @@ void UHealthComponent::RespawnFromFalling()
 	CanTakeDamage = true;
 	if (PlayerController != nullptr && Player != nullptr)
 	{
+		Player->SetActorLocation(LastPositionGrounded);
 		Player->EnableInput(PlayerController);
+		IsFallingDown = false;
+		Player->SetActorLocation(LastPositionGrounded);
 	}
-	IsFallingDown = false;
-	Player->SetActorLocation(LastPositionGrounded);
 }
 
 void UHealthComponent::KillCharacterFromFalling()
@@ -136,4 +140,3 @@ void UHealthComponent::SetPositionCheckPoint(FVector _positionCheckPoint)
 {
 	PositionCheckPoint = _positionCheckPoint;
 }
-

@@ -20,13 +20,13 @@ APressurePlate::APressurePlate()
 	SetRootComponent(root);
 
 	boxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Box"));
-	if (boxCollider)
+	if (boxCollider && root)
 	{
 		boxCollider->SetupAttachment(root);
 	}
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	if (mesh)
+	if (mesh && root)
 	{
 		mesh->SetupAttachment(root);
 	}
@@ -72,7 +72,10 @@ void APressurePlate::Tick(float DeltaTime)
 				isMoving = false;
 			}
 		}
-		mesh->SetWorldLocation(FMath::Lerp(startPos, pressedPos, timerLerp));
+		if (mesh)
+		{
+			mesh->SetWorldLocation(FMath::Lerp(startPos, pressedPos, timerLerp));
+		}
 	}
 
 }
@@ -134,38 +137,3 @@ void APressurePlate::ActivateObjects(EActivationType activationType)
 		}
 	}
 }
-
-//bool SetIsPressedValue(bool value)
-//{
-//	if (value != isPressed)
-//	{
-//	
-//	}
-//	return value;
-//}
-//void APressurePlate::OnPressed()
-//{
-//	HelperLibrary::Print(TEXT("Pressed!"), 2.0f, FColor::Yellow);
-//
-//	if (!isPressed)
-//	{
-//		FVector newPosition;
-//
-//		newPosition.Z = GetActorLocation().Z - 4.f;
-//		SetActorLocation(newPosition);
-//	}
-//
-//	isPressed = true;
-//}
-//
-//void APressurePlate::OnReleased()
-//{
-//	HelperLibrary::Print(TEXT("Released!"), 2.0f, FColor::Yellow);
-//	if (isPressed)
-//	{
-//		FVector newPosition;
-//		newPosition.Z = GetActorLocation().Z + 4.f;
-//		SetActorLocation(newPosition);
-//	}
-//	isPressed = false;
-//}

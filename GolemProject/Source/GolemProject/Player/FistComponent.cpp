@@ -46,7 +46,7 @@ void UFistComponent::BeginPlay()
 
 void UFistComponent::UpdateIKArm()
 {
-	if (world && mCamera)
+	if (world && mCamera && mCharacter)
 	{
 		FVector offset = mCamera->GetForwardVector() * accuracy;
 		mDirection = offset - mCharacter->GetActorLocation();
@@ -74,14 +74,17 @@ void UFistComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 {
 	if (!currentProjectile)
 		_lookAt = IKposition;
-	_isBlend = (mCharacter->GetSightCameraEnabled());
+	if (mCharacter)
+	{
+		_isBlend = (mCharacter->GetSightCameraEnabled());
+	}
 }
 
 void UFistComponent::GoToDestination()
 {
 	if (!currentProjectile && CanFire)
 	{
-		if (world && mCamera)
+		if (world && mCamera && mSkeletalMesh)
 		{
 			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 
@@ -111,8 +114,11 @@ void UFistComponent::DisplayTrajectory()
 void UFistComponent::ResetFire()
 {
 	CanFire = true;
-	mSkeletalMesh->UnHideBone(mIdBone);
-	mSkeletalMesh->bRequiredBonesUpToDate = false;
+	if (mSkeletalMesh)
+	{
+		mSkeletalMesh->UnHideBone(mIdBone);
+		mSkeletalMesh->bRequiredBonesUpToDate = false;
+	}
 }
 
 // Called every frame
@@ -125,7 +131,7 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		if (IsTargetingFist && mCharacter->GetSightCameraEnabled())
 		{
 			UpdateIKArm();
-			if (CanFire)
+			if (CanFire && mCamera && world)
 			{
 				FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
 				FVector direction = end - GetHandPosition();
@@ -156,7 +162,7 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 							scale.Z = distance.Size() / 100.0f;
 							HelperAiming[i]->SetActorScale3D(scale);
 							//scale the helping actor to avoid it to going through wall
-							if (hitResult.GetComponent()->GetMaterial(0) != nullptr)
+							if (hitResult.GetComponent() != nullptr && hitResult.GetComponent()->GetMaterial(0) != nullptr)
 							{
 								physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
 								//if it's a bouncing surface the calculate the direction of bounce 

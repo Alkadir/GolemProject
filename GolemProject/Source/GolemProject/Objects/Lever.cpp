@@ -19,7 +19,7 @@ void ALever::BeginPlay()
 	Super::BeginPlay();
 	if (objectsToActivate.Num() == 0)
 	{
-		HelperLibrary::Print(FString::Printf(TEXT("WARNING %s don\'t have objects to interact"), *(GetName())), 5.f, FColor::Yellow);
+		HelperLibrary::Print(FString::Printf(TEXT("WARNING %s don\'t have objects to activate"), *(GetName())), 5.f, FColor::Yellow);
 	}
 	for (auto& objectToActivate : objectsToActivate)
 	{
@@ -40,8 +40,12 @@ void ALever::BeginPlay()
 
 /*void ALever::ResetActivation()
 {
-	FVector4 color(1.0f, 1.0f, 1.0f, 1.0f);
-	MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
+	if (MeshComponent)
+	{
+		FVector4 color(1.0f, 1.0f, 1.0f, 1.0f);
+		MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
+	}
+	CanBeActivated = true;
 }
 */
 const bool ALever::Interact_Implementation(AActor* caller)
@@ -88,8 +92,11 @@ const bool ALever::Interact_Implementation(AActor* caller)
 					{
 						if (IsActivated)
 						{
-							FVector4 color(0.0f, 1.0f, 0.0f, 1.0f);
-							MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
+							if (MeshComponent)
+							{
+								FVector4 color(0.0f, 1.0f, 0.0f, 1.0f);
+								MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
+							}
 						}
 						else
 						{

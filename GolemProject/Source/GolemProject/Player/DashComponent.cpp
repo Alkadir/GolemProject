@@ -31,22 +31,19 @@ void UDashComponent::BeginPlay()
 
 void UDashComponent::StopDash()
 {
-	if (m_character != nullptr)
+	if (m_character != nullptr && CharacterMovementCmpt != nullptr)
 	{
-		if (CharacterMovementCmpt != nullptr)
+		CharacterMovementCmpt->StopMovementImmediately();
+		if (CurrentVelocity.IsZero())
 		{
-			CharacterMovementCmpt->StopMovementImmediately();
-			if (CurrentVelocity.IsZero())
-			{
-				CharacterMovementCmpt->AddImpulse(CurrentDirection * ForceAfterDash, true);
-			}
-			else
-			{
-				CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
-			}
-			m_character->ResetFriction();
-			isDashing = false;
+			CharacterMovementCmpt->AddImpulse(CurrentDirection * ForceAfterDash, true);
 		}
+		else
+		{
+			CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
+		}
+		m_character->ResetFriction();
+		isDashing = false;
 	}
 }
 
@@ -63,9 +60,9 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDashComponent::Dash(FVector _direction)
 {
-	if (CharacterMovementCmpt != nullptr)
+	if (CharacterMovementCmpt != nullptr && m_character != nullptr)
 	{
-		if (m_canDash && m_character != nullptr && !HasDashInAir)
+		if (m_canDash && !HasDashInAir)
 		{
 			if (CharacterMovementCmpt->IsFalling())	HasDashInAir = true;
 			CharacterMovementCmpt->GroundFriction = 0.0f;

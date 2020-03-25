@@ -21,21 +21,30 @@ void AProjectileHand::BeginPlay()
 	Super::BeginPlay();
 
 	meshComponent = FindComponentByClass<UStaticMeshComponent>();
+	if (meshComponent)
+	{
+		meshComponent->OnComponentHit.AddDynamic(this, &AProjectileHand::OnHit);
+	}
 	ProjectileComponent = FindComponentByClass<UProjectileMovementComponent>();
-	ProjectileComponent->MaxSpeed = MaxSpeed;
-	ProjectileComponent->InitialSpeed = 0.0f;
-	ProjectileComponent->UpdatedComponent = meshComponent;
+	if (ProjectileComponent)
+	{
+		ProjectileComponent->MaxSpeed = MaxSpeed;
+		ProjectileComponent->InitialSpeed = 0.0f;
+		ProjectileComponent->UpdatedComponent = meshComponent;
+	}
 
 	bIsColliding = false;
 	bIsComingBack = false;
-	meshComponent->OnComponentHit.AddDynamic(this, &AProjectileHand::OnHit);
 }
 
 void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple)
 {
 	direction = _direction;
 	grappleComponent = _grapple;
-	ProjectileComponent->Velocity = direction * velocity;
+	if (ProjectileComponent)
+	{
+		ProjectileComponent->Velocity = direction * velocity;
+	}
 }
 
 // Called every frame
@@ -45,14 +54,14 @@ void AProjectileHand::Tick(float DeltaTime)
 
 	if (bIsComingBack)
 	{
-		if (grappleComponent && !grappleComponent->GetSwingPhysics())
+		if (grappleComponent && !grappleComponent->GetSwingPhysics() && meshComponent && ProjectileComponent)
 		{
 			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
-			dir /= dir.Size();
+			dir.Normalize();
 			ProjectileComponent->Velocity = dir * velocity;
 		}
 	}
-	else
+	else if (ProjectileComponent)
 	{
 		if (!bIsColliding)
 			ProjectileComponent->Velocity = direction * velocity;
@@ -64,18 +73,18 @@ void AProjectileHand::Tick(float DeltaTime)
 void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//change direction projectile, maybe add timer when the projectile is reallly blocked
-	if (bIsComingBack && OtherActor && OtherActor != this)
+	if (bIsComingBack && OtherActor && OtherActor != this && ProjectileComponent)
 	{
 		FVector changeDir = OtherActor->GetActorLocation() - GetActorLocation();
-		changeDir /= changeDir.Size();
+		changeDir.Normalize();
 		ProjectileComponent->Velocity = changeDir * velocity;
 	}
 
-	if (!bIsComingBack && HitComponent != nullptr && OtherActor != this)
+	if (!bIsComingBack && HitComponent && OtherActor != this)
 	{
 		bIsColliding = true;
 		UPhysicalMaterial* physMat;
-		if (Hit.GetComponent()->GetMaterial(0) != nullptr)
+		if (Hit.GetComponent() && Hit.GetComponent()->GetMaterial(0))
 		{
 			physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
 			if (physMat != nullptr)
