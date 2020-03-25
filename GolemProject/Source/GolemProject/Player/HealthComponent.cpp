@@ -88,6 +88,7 @@ void UHealthComponent::Respawn()
 		Player->ActivateDeath(false);
 		IsFallingDown = false;
 		Player->SetActorLocation(PositionCheckPoint);
+		Player->ResetMeshOnRightPlace();
 		bIsDead = false;
 	}
 }

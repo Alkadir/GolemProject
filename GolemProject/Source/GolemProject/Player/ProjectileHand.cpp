@@ -37,6 +37,16 @@ void AProjectileHand::BeginPlay()
 	bIsComingBack = false;
 }
 
+void AProjectileHand::SetComingBack(const bool& _isComingBack)
+{
+	bIsColliding = false;
+	if (meshComponent != nullptr)
+	{
+		meshComponent->SetCollisionProfileName(TEXT("NoCollision"));
+	}
+	bIsComingBack = _isComingBack;
+}
+
 void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple)
 {
 	direction = _direction;
@@ -73,12 +83,12 @@ void AProjectileHand::Tick(float DeltaTime)
 void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//change direction projectile, maybe add timer when the projectile is reallly blocked
-	if (bIsComingBack && OtherActor && OtherActor != this && ProjectileComponent)
+	/*if (bIsComingBack && OtherActor && OtherActor != this && ProjectileComponent)
 	{
 		FVector changeDir = OtherActor->GetActorLocation() - GetActorLocation();
 		changeDir.Normalize();
 		ProjectileComponent->Velocity = changeDir * velocity;
-	}
+	}*/
 
 	if (!bIsComingBack && HitComponent && OtherActor != this)
 	{
@@ -103,6 +113,10 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		}
 
 		bIsComingBack = true;
+		if (meshComponent != nullptr)
+		{
+			meshComponent->SetCollisionProfileName(TEXT("NoCollision"));
+		}
 	}
 }
 

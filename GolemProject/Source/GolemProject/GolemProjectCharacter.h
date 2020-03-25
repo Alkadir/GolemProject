@@ -59,6 +59,8 @@ private:
 
 	float initialGroundFriction;
 
+	bool HasPressedAiming;
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
@@ -95,10 +97,9 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-	void ChangeCamera();
+	void ChangeCameraPressed();
 
-
-
+	void ChangeCameraReleased();
 
 	UPROPERTY(EditAnywhere)
 		UDashComponent* dashComponent;
@@ -154,6 +155,8 @@ public:
 	void InflictDamage(int _damage);
 
 	void ActivateDeath(bool _activate);
+
+	void ResetMeshOnRightPlace();
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsInteractingOrAiming;
