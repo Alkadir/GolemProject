@@ -27,7 +27,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	float TimerInvulnerability = 0.5f;
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
-	float TimerRespawn = 3.0f;
+	float TimerRespawn = 1.5f;
+
+	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
+	int FallDamage = 2;
 
 	bool CanTakeDamage;
 	FTimerHandle TimerHandlerInvul;
@@ -40,6 +43,10 @@ protected:
 private:
 	void ResetInvulnerability();
 	void Respawn();
+	void RespawnFromFalling();
+	void KillCharacterFromFalling();
+	bool IsFallingDown;
+	bool bIsDead;
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -80,4 +87,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 		void InflictDamage(int _damage);
 		
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		inline bool IsDead() { return bIsDead; }
 };

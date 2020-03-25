@@ -138,11 +138,11 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 	{
 		if (world && mCamera)
 		{
-			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
+				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
 				FVector direction = (offset - currentProjectile->GetActorLocation());
 				direction.Normalize();
