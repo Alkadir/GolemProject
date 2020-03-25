@@ -147,6 +147,8 @@ void AGolemProjectCharacter::BeginPlay()
 		FistComp->IsTargetingFist = false;
 
 	IsInteractingOrAiming = false;
+
+
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -230,7 +232,7 @@ void AGolemProjectCharacter::Dash()
 
 void AGolemProjectCharacter::UseAssistedGrapple()
 {
-	if (mGrapple)
+	if (isGrappleSkillEnabled && mGrapple)
 	{
 		ChangeToGrapple();
 		mGrapple->GoToDestination(true);
@@ -239,7 +241,7 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 
 void AGolemProjectCharacter::ChangeToGrapple()
 {
-	if (FistComp == nullptr || mGrapple == nullptr || mGrapple->IsTargetingGrapple) return;
+	if (!isGrappleSkillEnabled || FistComp == nullptr || mGrapple == nullptr || mGrapple->IsTargetingGrapple) return;
 	mGrapple->IsTargetingGrapple = true;
 	FistComp->IsTargetingFist = false;
 	if (isSightCameraEnabled && pc && sightCamera)
@@ -250,7 +252,7 @@ void AGolemProjectCharacter::ChangeToGrapple()
 
 void AGolemProjectCharacter::ChangeToFist()
 {
-	if (FistComp == nullptr || mGrapple == nullptr || FistComp && FistComp->IsTargetingFist) return;
+	if (!isFistSkillEnabled || FistComp == nullptr || mGrapple == nullptr || FistComp && FistComp->IsTargetingFist) return;
 	FistComp->IsTargetingFist = true;
 	mGrapple->IsTargetingGrapple = false;
 	if (isSightCameraEnabled && pc && sightCameraL)
@@ -265,14 +267,14 @@ void AGolemProjectCharacter::Fire()
 	{
 		return;
 	}
-	if (mGrapple && mGrapple->IsTargetingGrapple)
+	if (isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple)
 	{
 		mGrapple->Cancel();
 
 		if (isSightCameraEnabled)
 			mGrapple->GoToDestination(false);
 	}
-	else if (FistComp && FistComp->IsTargetingFist)
+	else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist)
 	{
 		if (isSightCameraEnabled)
 			FistComp->GoToDestination();
@@ -307,25 +309,34 @@ void AGolemProjectCharacter::ChangeCamera()
 	{
 		if (!isSightCameraEnabled)
 		{
-			isSightCameraEnabled = true;
-			if (GetCharacterMovement())
+
+			if (isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple)
 			{
-				GetCharacterMovement()->bOrientRotationToMovement = false;
-			}
-			if (mGrapple && mGrapple->IsTargetingGrapple)
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
-			else if (FistComp && FistComp->IsTargetingFist && sightCameraL)
+				isSightCameraEnabled = true;
+				if (GetCharacterMovement())
+				{
+					GetCharacterMovement()->bOrientRotationToMovement = false;
+				}
+			}
+
+			else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist && sightCameraL)
+			{
 				pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
+				isSightCameraEnabled = true;
+				if (GetCharacterMovement())
+				{
+					GetCharacterMovement()->bOrientRotationToMovement = false;
+				}
+			}
+
 
 			IsInteractingOrAiming = true;
-			/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
-					currentSightWidget->AddToViewport();*/
 
 		}
 		else
 		{
-			/*if (currentSightWidget && currentSightWidget->IsInViewport())
-				currentSightWidget->RemoveFromViewport();*/
+
 			IsInteractingOrAiming = false;
 			isSightCameraEnabled = false;
 			if (GetCharacterMovement())
