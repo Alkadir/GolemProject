@@ -81,7 +81,7 @@ void UGrappleComponent::CheckElementTargetable()
 			{
 				if (actor == nullptr || !actor->Implements<UTargetable>()) continue;
 				//get all the actors that are close to the player
-				if (FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) < maxDistance * maxDistance &&
+				if (FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) < maxDistanceSwinging * maxDistanceSwinging &&
 					FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) > minDistance* minDistance)
 				{
 					actorCloseEnough.Add(actor);
@@ -228,7 +228,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
-			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * maxDistance;
+			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * maxDistanceGrappling;
 			FVector direction = end - GetHandPosition();
 			FVector location = GetHandPosition();
 			FVector scale;
@@ -243,7 +243,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				FHitResult hitResult;
 				HelperAiming->SetActorRotation(rotation);
 				scale = HelperAiming->GetActorScale3D();
-				FVector distance = direction.GetSafeNormal() * maxDistance;
+				FVector distance = direction.GetSafeNormal() * maxDistanceGrappling;
 				scale.Z = distance.Size() / 100.0f;
 				HelperAiming->SetActorScale3D(scale);
 				if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
@@ -318,7 +318,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		}
 		else
 		{
-			if (mDistance > maxDistance)
+			if (mDistance > maxDistanceGrappling)
 			{
 				currentProjectile->SetComingBack(true);
 			}
@@ -377,7 +377,7 @@ void UGrappleComponent::AttractCharacter()
 	if (mCharacter && mCharacter->GetCharacterMovement())
 	{
 		mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
-		mCharacter->LaunchCharacter(mDirection * velocity, false, false);
+		mCharacter->LaunchCharacter(mDirection * velocity, true, true);
 		tempDir.Z = 0.0f;
 		mCharacter->SetActorRotation(tempDir.Rotation());
 
