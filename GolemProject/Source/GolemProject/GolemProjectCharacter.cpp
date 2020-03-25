@@ -387,7 +387,7 @@ void AGolemProjectCharacter::ChangeCameraReleased()
 
 void AGolemProjectCharacter::MoveForward(float Value)
 {
-	if (PushingComponent && PushingComponent->GetIsStartingPushingObject() || mGrapple && mGrapple->GetFiring())
+	if (PushingComponent && PushingComponent->GetIsStartingPushingObject() || (mGrapple && mGrapple->GetFiring() && !mGrapple->GetSwingPhysics()))
 	{
 		return;
 	}
@@ -438,7 +438,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
-	if (PushingComponent && PushingComponent->GetIsPushingObject() || mGrapple && mGrapple->GetFiring())
+	if (PushingComponent && PushingComponent->GetIsPushingObject() || (mGrapple && mGrapple->GetFiring() && !mGrapple->GetSwingPhysics()))
 	{
 		return;
 	}
@@ -553,7 +553,7 @@ void AGolemProjectCharacter::InflictDamage(int _damage)
 }
 
 //WIP DO NOT TOUCH
-void AGolemProjectCharacter::ActivateDeath(bool _activate)
+/*void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
 	if (_activate)
 	{
@@ -576,4 +576,4 @@ void AGolemProjectCharacter::ResetMeshOnRightPlace()
 	GetMesh()->SetupAttachment(GetCapsuleComponent());
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
 	GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
-}
+}*/
