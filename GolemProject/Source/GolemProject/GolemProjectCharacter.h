@@ -124,7 +124,9 @@ protected:
 	void ChangeToFist();
 
 	UFUNCTION()
-		void SetUpBlockOffsetPositon();
+	void SetUpBlockOffsetPositon();
+
+	void CheckIfStillOnGround();
 
 public:
 	AGolemProjectCharacter();
