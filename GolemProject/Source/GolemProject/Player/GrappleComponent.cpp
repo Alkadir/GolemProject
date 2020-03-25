@@ -90,12 +90,7 @@ void UGrappleComponent::CheckElementTargetable()
 			HelperLibrary::SortActorsByDistanceTo(actorCloseEnough, mCharacter);
 			if (followingCam)
 			{
-				// > 0 object seen
-				FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation());
-				FromSoftware /= FromSoftware.Size();
-				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
-				//to change and finish
-				if (dot > minDot&& dot < maxDot)
+				for (AActor* actor : actorCloseEnough)
 				{
 					if (actor == nullptr) continue;
 					// > 0 object seen
