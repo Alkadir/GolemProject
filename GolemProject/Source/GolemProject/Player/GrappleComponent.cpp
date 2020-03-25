@@ -81,7 +81,7 @@ void UGrappleComponent::CheckElementTargetable()
 			{
 				if (actor == nullptr || !actor->Implements<UTargetable>()) continue;
 				//get all the actors that are close to the player
-				if (FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) < maxDistance * maxDistance &&
+				if (FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) < maxDistanceSwinging * maxDistanceSwinging &&
 					FVector::DistSquared(actor->GetActorLocation(), mCharacter->GetActorLocation()) > minDistance* minDistance)
 				{
 					actorCloseEnough.Add(actor);
@@ -98,7 +98,7 @@ void UGrappleComponent::CheckElementTargetable()
 					FromSoftware.Normalize();
 					float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
 					//to change and finish
-					if (dot > minDot && dot < maxDot)
+					if (dot > minDot&& dot < maxDot)
 					{
 						FHitResult hitResult;
 						if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
@@ -138,11 +138,11 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 	{
 		if (world && mCamera)
 		{
-			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
+				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
 				FVector direction = (offset - currentProjectile->GetActorLocation());
 				direction.Normalize();
@@ -228,7 +228,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
-			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * maxDistance;
+			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * maxDistanceGrappling;
 			FVector direction = end - GetHandPosition();
 			FVector location = GetHandPosition();
 			FVector scale;
@@ -243,7 +243,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				FHitResult hitResult;
 				HelperAiming->SetActorRotation(rotation);
 				scale = HelperAiming->GetActorScale3D();
-				FVector distance = direction.GetSafeNormal() * maxDistance;
+				FVector distance = direction.GetSafeNormal() * maxDistanceGrappling;
 				scale.Z = distance.Size() / 100.0f;
 				HelperAiming->SetActorScale3D(scale);
 				if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
@@ -310,6 +310,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetSpeedRotation(speedRotation);
 					swingPhysic->SetMinLength(minLength);
 					swingPhysic->SetMaxLength(maxLength);
+					swingPhysic->SetReleaseForce(releaseForce);
 
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
 						dashComp->ResetDashInAir();
@@ -318,7 +319,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		}
 		else
 		{
-			if (mDistance > maxDistance)
+			if (mDistance > maxDistanceGrappling)
 			{
 				currentProjectile->SetComingBack(true);
 			}
@@ -348,7 +349,7 @@ void UGrappleComponent::PlayerIsNear()
 	{
 		//Find destination stop player
 
-		if (mCharacter->GetCharacterMovement())
+		if (mCharacter->GetCharacterMovement() && currentProjectile->IsCollidingGrappling())
 		{
 			mCharacter->GetCharacterMovement()->Velocity *= stopScaleVelocity;
 		}

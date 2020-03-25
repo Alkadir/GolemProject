@@ -34,6 +34,9 @@ private:
 	float accuracy = 100000.0f;
 
 	//values to edit
+	UPROPERTY(EditAnywhere, Category = "Swing physics", meta = (AllowPrivateAccess = "true"))
+	float maxDistanceSwinging = 3000.0f;
+
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float scaleGravity = 4.0f;
 
@@ -44,13 +47,16 @@ private:
 	float forceMovement = 5.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float speedRotation = 0.01f;
+	float speedRotation = 0.02f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float minLength = 100.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float maxLength = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float releaseForce = 1.0f;
 
 	float mDistance;
 	
@@ -61,19 +67,19 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Help)
 	TSubclassOf<class AActor> HelperAimingClass;
 
-	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float maxDistance = 3000.0f;
+	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
+	float maxDistanceGrappling = 3000.0f;
 
-	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
 	float velocity = 5000.0f;
 
-	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
 	float offsetStop = 200.0f;
 
-	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
 	float offsetBlockingObject = 200.0f;
 
-	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
 	float stopScaleVelocity = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "AutoGrapple", meta = (AllowPrivateAccess = "true"))
@@ -104,6 +110,9 @@ public:
 	FVector IKposition;
 	// Sets default values for this component's properties
 	UGrappleComponent();
+
+	UFUNCTION()
+	FORCEINLINE bool GetFiring() { return IsFiring; }
 
 	UFUNCTION(BlueprintCallable)
 	void GoToDestination(bool _isAssisted);
