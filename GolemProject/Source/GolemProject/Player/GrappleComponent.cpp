@@ -98,7 +98,7 @@ void UGrappleComponent::CheckElementTargetable()
 					FromSoftware.Normalize();
 					float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
 					//to change and finish
-					if (dot > minDot && dot < maxDot)
+					if (dot > minDot&& dot < maxDot)
 					{
 						FHitResult hitResult;
 						if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
@@ -138,11 +138,11 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 	{
 		if (world && mCamera)
 		{
-			mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
+				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
 				FVector direction = (offset - currentProjectile->GetActorLocation());
 				direction.Normalize();
@@ -310,6 +310,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetSpeedRotation(speedRotation);
 					swingPhysic->SetMinLength(minLength);
 					swingPhysic->SetMaxLength(maxLength);
+					swingPhysic->SetReleaseForce(releaseForce);
 
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
 						dashComp->ResetDashInAir();
@@ -348,7 +349,7 @@ void UGrappleComponent::PlayerIsNear()
 	{
 		//Find destination stop player
 
-		if (mCharacter->GetCharacterMovement())
+		if (mCharacter->GetCharacterMovement() && currentProjectile->IsCollidingGrappling())
 		{
 			mCharacter->GetCharacterMovement()->Velocity *= stopScaleVelocity;
 		}

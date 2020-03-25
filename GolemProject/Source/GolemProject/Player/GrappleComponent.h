@@ -55,6 +55,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float maxLength = 1000.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float releaseForce = 1.0f;
+
 	float mDistance;
 	
 protected:
@@ -107,6 +110,9 @@ public:
 	FVector IKposition;
 	// Sets default values for this component's properties
 	UGrappleComponent();
+
+	UFUNCTION()
+	FORCEINLINE bool GetFiring() { return IsFiring; }
 
 	UFUNCTION(BlueprintCallable)
 	void GoToDestination(bool _isAssisted);

@@ -7,9 +7,9 @@
 AActor* HelperLibrary::ActorToCalculateDistanceWith = nullptr;
 void HelperLibrary::Print(const FString& _message, const float& _time, const FColor _color)
 {
-#if WITH_EDITOR
+//#if WITH_EDITOR
 	GEngine->AddOnScreenDebugMessage(-1, _time, _color, _message);
-#endif
+//#endif
 }
 
 void HelperLibrary::SortActorsByDistanceTo(TArray<AActor*>& _inOutActorArray, AActor* _character)

@@ -142,8 +142,10 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
 	UFUNCTION(BlueprintCallable, Category = "Dash")
-		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
+	FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
 
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
@@ -151,6 +153,11 @@ public:
 
 	void InflictDamage(int _damage);
 
+	void ActivateDeath(bool _activate);
+
 	UPROPERTY(BlueprintReadOnly)
 	bool IsInteractingOrAiming;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Event_Death();
 };
