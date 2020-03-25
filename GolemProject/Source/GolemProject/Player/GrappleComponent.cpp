@@ -331,7 +331,6 @@ void UGrappleComponent::PlayerIsNear()
 	{
 		if (mCharacter)
 		{
-
 			mCharacter->GetCharacterMovement()->Velocity *= stopScaleVelocity;
 			mCharacter->ResetFriction();
 
@@ -348,10 +347,11 @@ void UGrappleComponent::PlayerIsNear()
 void UGrappleComponent::AttractCharacter()
 {
 	FVector tempDir;
-	mDirection /= mDirection.Size();
+	mDirection.Normalize();
 	tempDir = mDirection;
+
 	mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
-	mCharacter->LaunchCharacter(mDirection * velocity, false, false);
+	mCharacter->LaunchCharacter(mDirection * velocity, true, true);
 	tempDir.Z = 0.0f;
 	mCharacter->SetActorRotation(tempDir.Rotation());
 
