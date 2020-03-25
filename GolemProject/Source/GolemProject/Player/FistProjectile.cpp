@@ -37,7 +37,8 @@ void AFistProjectile::BeginPlay()
 
 void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HitComponent && OtherActor && OtherComponent)
+	ProjectileComponent->bShouldBounce = false;
+	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
 	{
 		if (IInteractable* interactable = Cast<IInteractable>(OtherActor))
 		{
@@ -101,4 +102,3 @@ void AFistProjectile::BounceMovement(FVector _normal)
 		ProjectileComponent->Velocity = newDirection * Speed;
 	}
 }
-

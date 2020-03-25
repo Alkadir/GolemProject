@@ -29,10 +29,16 @@ void ALever::BeginPlay()
 		}
 	}
 	MeshComponent = FindComponentByClass<UStaticMeshComponent>();
-	CanBeActivated = true;
+	IsActivated = false;
+	UWorld* world = GetWorld();
+	if (world != nullptr)
+	{
+		FVector4 color(1.0f, 0.0f, 0.0f, 1.0f);
+		MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
+	}
 }
 
-void ALever::ResetActivation()
+/*void ALever::ResetActivation()
 {
 	if (MeshComponent)
 	{
@@ -41,23 +47,50 @@ void ALever::ResetActivation()
 	}
 	CanBeActivated = true;
 }
-
+*/
 const bool ALever::Interact_Implementation(AActor* caller)
 {
 	bool haveActivate = false;
 	HelperLibrary::Print(FString::Printf(TEXT("Interact with %s"), *(GetName())), 5.f, FColor::Green);
-	if (CanBeActivated)
+
+	for (auto& objectToActivate : objectsToActivate)
 	{
-		for (auto& objectToActivate : objectsToActivate)
+		if (objectToActivate != nullptr)
 		{
-			if (objectToActivate != nullptr)
+			if (IActivable* activable = Cast<IActivable>(objectToActivate))
 			{
-				if (IActivable* activable = Cast<IActivable>(objectToActivate))
+				UWorld* world = GetWorld();
+				if (activationType == EActivationType::Activate)
 				{
-					if (activationType == EActivationType::Activate)
+					activable->Execute_Activate(objectToActivate, this);
+					IsActivated = true;
+					if (world != nullptr)
 					{
-						activable->Execute_Activate(objectToActivate, this);
-						if (UWorld* world = GetWorld())
+						FVector4 color(0.0f, 1.0f, 0.0f, 1.0f);
+						MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
+					}
+					Event_Interaction();
+					haveActivate = true;
+				}
+				else if (activationType == EActivationType::Desactivate)
+				{
+					activable->Execute_Desactivate(objectToActivate, this);
+					IsActivated = false;
+					if (world != nullptr)
+					{
+						FVector4 color(1.0f, 0.0f, 0.0f, 1.0f);
+						MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
+					}
+					Event_Interaction();
+					haveActivate = true;
+				}
+				else if (activationType == EActivationType::Switch)
+				{
+					activable->Execute_Switch(objectToActivate, this);
+					IsActivated = !IsActivated;
+					if (world != nullptr)
+					{
+						if (IsActivated)
 						{
 							if (MeshComponent)
 							{
@@ -65,41 +98,20 @@ const bool ALever::Interact_Implementation(AActor* caller)
 								MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
 							}
 						}
-						Event_Interaction();
-						haveActivate = true;
-						CanBeActivated = false;
-					}
-					else if (activationType == EActivationType::Desactivate)
-					{
-						activable->Execute_Desactivate(objectToActivate, this);
-						if (UWorld* world = GetWorld())
+						else
 						{
 							FVector4 color(1.0f, 0.0f, 0.0f, 1.0f);
 							MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
 						}
-						Event_Interaction();
-						haveActivate = true;
-						CanBeActivated = false;
+
 					}
-					else if (activationType == EActivationType::Switch)
-					{
-						activable->Execute_Switch(objectToActivate, this);
-						/*if (UWorld* world = GetWorld())
-						{
-							FVector4 color(0.0f, 1.0f, 0.0f, 1.0f);
-							MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
-							FTimerHandle timerHandle;
-							world->GetTimerManager().SetTimer(timerHandle, this, &ALever::ResetActivation, 1.5f);
-						}*/
-						Event_Interaction();
-						haveActivate = true;
-						CanBeActivated = false;
-					}
+					haveActivate = true;
+					Event_Interaction();
 				}
-				else
-				{
-					HelperLibrary::Print(FString::Printf(TEXT("%s don\'t implement Activable interface"), *(objectToActivate->GetName())), 5.f, FColor::Yellow);
-				}
+			}
+			else
+			{
+				HelperLibrary::Print(FString::Printf(TEXT("%s don\'t implement Activable interface"), *(objectToActivate->GetName())), 5.f, FColor::Yellow);
 			}
 		}
 	}
