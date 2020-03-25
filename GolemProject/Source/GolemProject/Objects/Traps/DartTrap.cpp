@@ -36,8 +36,7 @@ void ADartTrap::Tick(float DeltaTime)
 			}
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AProjectile* projectile = world->SpawnActorDeferred<AProjectile>(projectilePrefab, GetTransform());
-			if (projectile)
+			if (AProjectile* projectile = world->SpawnActorDeferred<AProjectile>(projectilePrefab, GetTransform()))
 			{
 				projectile->LaunchProjectile(this, GetActorForwardVector() * speedProjectile, damage);
 				projectile->FinishSpawning(GetTransform());

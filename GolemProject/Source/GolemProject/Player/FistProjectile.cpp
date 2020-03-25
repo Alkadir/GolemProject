@@ -21,38 +21,43 @@ AFistProjectile::AFistProjectile()
 void AFistProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	ProjectileComponent = FindComponentByClass<UProjectileMovementComponent>();
 	MeshComponent = FindComponentByClass <UStaticMeshComponent>();
-	ProjectileComponent->MaxSpeed = Speed;
-	ProjectileComponent->InitialSpeed = 0.0f;
-	ProjectileComponent->UpdatedComponent = MeshComponent;
-	MeshComponent->OnComponentHit.AddDynamic(this, &AFistProjectile::OnHit);
+	if (MeshComponent)
+	{
+		MeshComponent->OnComponentHit.AddDynamic(this, &AFistProjectile::OnHit);
+	}
+	ProjectileComponent = FindComponentByClass<UProjectileMovementComponent>();
+	if (ProjectileComponent)
+	{
+		ProjectileComponent->MaxSpeed = Speed;
+		ProjectileComponent->InitialSpeed = 0.0f;
+		ProjectileComponent->UpdatedComponent = MeshComponent;
+	}
 }
 
 void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HitComponent != nullptr && OtherActor != nullptr && OtherComponent != nullptr)
+	if (HitComponent && OtherActor && OtherComponent)
 	{
-		IInteractable* interactable = Cast<IInteractable>(OtherActor);
-		if (interactable)
+		if (IInteractable* interactable = Cast<IInteractable>(OtherActor))
 		{
 			interactable->Execute_Interact(OtherActor, this);
 		}
 		else
 		{
 			UPhysicalMaterial* physMat;
-			if (Hit.GetComponent()->GetMaterial(0) != nullptr)
+			if (Hit.GetComponent() && Hit.GetComponent()->GetMaterial(0) != nullptr)
 			{
 				physMat = Hit.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
-				if (physMat != nullptr && physMat->SurfaceType == SurfaceType2)
+				if (physMat && physMat->SurfaceType == SurfaceType2)
 				{
-					if (ProjectileComponent != nullptr)
+					if (ProjectileComponent)
 						ProjectileComponent->bShouldBounce = true;
 					BounceMovement(Hit.ImpactNormal);
 				}
 				else
 				{
-					if (ProjectileComponent != nullptr)
+					if (ProjectileComponent)
 						ProjectileComponent->bShouldBounce = false;
 				}
 			}
@@ -76,7 +81,10 @@ void AFistProjectile::Tick(float DeltaTime)
 void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce)
 {
 	Direction = _direction;
-	ProjectileComponent->Velocity = Direction * Speed;
+	if (ProjectileComponent)
+	{
+		ProjectileComponent->Velocity = Direction * Speed;
+	}
 }
 
 void AFistProjectile::DestroyFist()

@@ -46,7 +46,10 @@ void AMovingPlatform::Init()
 	}
 	for (auto& path : childrens)
 	{
-		worldCheckpoint.Add(path->GetComponentLocation());
+		if (path != nullptr)
+		{
+			worldCheckpoint.Add(path->GetComponentLocation());
+		}
 	}
 
 	if (pathInfos.Num() < worldCheckpoint.Num())

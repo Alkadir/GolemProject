@@ -22,8 +22,7 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UStaticMeshComponent* staticMesh = FindComponentByClass< UStaticMeshComponent>();
-	if (staticMesh)
+	if (UStaticMeshComponent* staticMesh = FindComponentByClass< UStaticMeshComponent>())
 	{
 		staticMesh->OnComponentBeginOverlap.AddUniqueDynamic(this, &AProjectile::OverlapDamage);
 	}
