@@ -46,7 +46,7 @@ public:
 
 	FORCEINLINE const bool& IsCollidingSwinging() { return bIsSwingingPossible; };
 
-	FORCEINLINE void SetComingBack(const bool& _isComingBack) { bIsColliding = false; bIsComingBack = _isComingBack; };
+	void SetComingBack(const bool& _isComingBack);
 
 	FORCEINLINE const bool& IsComingBack() { return bIsComingBack; };
 
