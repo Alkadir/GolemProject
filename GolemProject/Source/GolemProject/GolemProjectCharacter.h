@@ -155,6 +155,10 @@ public:
 
 	FORCEINLINE bool& IsFistSkillEnabled() { return isFistSkillEnabled; };
 
+	FORCEINLINE void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; };
+
+	FORCEINLINE void SetFistSkillEnabled(bool _enable) { isFistSkillEnabled = _enable; };
+
 	void ResetFriction();
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
