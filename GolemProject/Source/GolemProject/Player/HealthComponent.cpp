@@ -30,9 +30,12 @@ void UHealthComponent::BeginPlay()
 	CanTakeDamage = true;
 	Life = MaxLife;
 	if (Player != nullptr)
+	{
 		LastPositionGrounded = Player->GetActorLocation();
-
+		PositionCheckPoint = Player->GetActorLocation();
+	}
 	IsFallingDown = false;
+	bIsDead = false;
 }
 
 
@@ -44,6 +47,7 @@ void UHealthComponent::InflictDamage(int _damage)
 		CanTakeDamage = false;
 		if (Life <= 0)
 		{
+			bIsDead = true;
 			Life = 0;
 			if (UWorld* world = GetWorld())
 			{
@@ -51,7 +55,9 @@ void UHealthComponent::InflictDamage(int _damage)
 			}
 			if (PlayerController != nullptr && Player != nullptr)
 			{
+				Player->ActivateDeath(true);
 				Player->DisableInput(PlayerController);
+				Player->Event_Death();
 			}
 		}
 		else
@@ -75,11 +81,12 @@ void UHealthComponent::Respawn()
 	CanTakeDamage = true;
 	if (PlayerController != nullptr && Player != nullptr)
 	{
-		//Player->ActivateDeath(false);
 		Player->EnableInput(PlayerController);
+		Player->ActivateDeath(false);
 	}
 	IsFallingDown = false;
 	Player->SetActorLocation(PositionCheckPoint);
+	bIsDead = false;
 }
 
 void UHealthComponent::RespawnFromFalling()
@@ -87,7 +94,6 @@ void UHealthComponent::RespawnFromFalling()
 	CanTakeDamage = true;
 	if (PlayerController != nullptr && Player != nullptr)
 	{
-		//Player->ActivateDeath(false);
 		Player->EnableInput(PlayerController);
 	}
 	IsFallingDown = false;
@@ -97,11 +103,9 @@ void UHealthComponent::RespawnFromFalling()
 void UHealthComponent::KillCharacterFromFalling()
 {
 	IsFallingDown = true;
-	Life -= FallDamage;
-	if (Player)
-	{
-		Player->ActivateDeath(true);
-	}
+	InflictDamage(FallDamage);
+	if (bIsDead) return;
+
 	RespawnFromFalling();
 	/*if (UWorld* world = GetWorld())
 	{
