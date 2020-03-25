@@ -32,6 +32,13 @@ void UHealthComponent::BeginPlay()
 	}
 	CanTakeDamage = true;
 	Life = MaxLife;
+	if (Player != nullptr)
+	{
+		LastPositionGrounded = Player->GetActorLocation();
+		PositionCheckPoint = Player->GetActorLocation();
+	}
+	IsFallingDown = false;
+	bIsDead = false;
 }
 
 
@@ -43,6 +50,7 @@ void UHealthComponent::InflictDamage(int _damage)
 		CanTakeDamage = false;
 		if (Life <= 0)
 		{
+			bIsDead = true;
 			Life = 0;
 			if (UWorld* world = GetWorld())
 			{
@@ -50,7 +58,9 @@ void UHealthComponent::InflictDamage(int _damage)
 			}
 			if (PlayerController != nullptr && Player != nullptr)
 			{
+				Player->ActivateDeath(true);
 				Player->DisableInput(PlayerController);
+				Player->Event_Death();
 			}
 		}
 		else
@@ -72,14 +82,39 @@ void UHealthComponent::Respawn()
 {
 	Life = MaxLife;
 	CanTakeDamage = true;
-	if (Player)
+	if (PlayerController != nullptr && Player != nullptr)
+	{
+		Player->EnableInput(PlayerController);
+		Player->ActivateDeath(false);
+		IsFallingDown = false;
+		Player->SetActorLocation(PositionCheckPoint);
+		bIsDead = false;
+	}
+}
+
+void UHealthComponent::RespawnFromFalling()
+{
+	CanTakeDamage = true;
+	if (PlayerController != nullptr && Player != nullptr)
 	{
 		Player->SetActorLocation(LastPositionGrounded);
-		if (PlayerController != nullptr && Player != nullptr)
-		{
-			Player->EnableInput(PlayerController);
-		}
+		Player->EnableInput(PlayerController);
+		IsFallingDown = false;
+		Player->SetActorLocation(LastPositionGrounded);
 	}
+}
+
+void UHealthComponent::KillCharacterFromFalling()
+{
+	IsFallingDown = true;
+	InflictDamage(FallDamage);
+	if (bIsDead) return;
+
+	RespawnFromFalling();
+	/*if (UWorld* world = GetWorld())
+	{
+		world->GetTimerManager().SetTimer(TimerHandlerRespawn, this, &UHealthComponent::RespawnFromFalling, 1.f, false);
+	}*/
 }
 
 // Called every frame
@@ -87,7 +122,13 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (Player != nullptr && !IsFallingDown)
+	{
+		if (Player->GetActorLocation().Z <= -1000.0f)
+		{
+			KillCharacterFromFalling();
+		}
+	}
 }
 
 void UHealthComponent::SetLastPositionGrounded(FVector _lastPositionGrounded)
@@ -99,4 +140,3 @@ void UHealthComponent::SetPositionCheckPoint(FVector _positionCheckPoint)
 {
 	PositionCheckPoint = _positionCheckPoint;
 }
-
