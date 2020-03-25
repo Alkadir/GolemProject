@@ -507,19 +507,25 @@ void AGolemProjectCharacter::InflictDamage(int _damage)
 //WIP DO NOT TOUCH
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
-/*	if (_activate)
+	if (_activate)
 	{
 		GetCharacterMovement()->StopMovementImmediately();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		GetMesh()->SetSimulatePhysics(true);
 	}
-	else 
+	else
 	{
 		GetMesh()->SetSimulatePhysics(false);
 		GetMesh()->SetAllBodiesSimulatePhysics(false);
 		GetMesh()->ResetAllBodiesSimulatePhysics();
-		GetMesh()->SetupAttachment(GetCapsuleComponent());
+		GetMesh()->RecreatePhysicsState();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		GetMesh()->SetWorldLocationAndRotation(GetCapsuleComponent()->GetComponentLocation(), GetCapsuleComponent()->GetComponentRotation());
-	}*/
+	}
+}
+
+void AGolemProjectCharacter::ResetMeshOnRightPlace()
+{
+	GetMesh()->SetupAttachment(GetCapsuleComponent());
+	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
+	GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
 }
