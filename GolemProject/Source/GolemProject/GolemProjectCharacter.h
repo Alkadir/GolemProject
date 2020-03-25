@@ -69,6 +69,12 @@ protected:
 		bool pushedObjectIsCollidingBackward;
 	float startPushingZ;
 
+	UPROPERTY(BlueprintReadWrite)
+		FVector rightHandPosition;
+	UPROPERTY(BlueprintReadWrite)
+		FVector leftHandPosition;
+
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float _deltaTime) override;
 
@@ -146,6 +152,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
 	FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
+
+	UFUNCTION(BlueprintCallable, Category = "IK")
+		void SetRightHandPosition(FVector newPos) { rightHandPosition = newPos; }
+	UFUNCTION(BlueprintCallable, Category = "IK")
+		void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
 
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
