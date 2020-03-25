@@ -65,6 +65,8 @@ private:
 
 	float initialGroundFriction;
 
+	bool HasPressedAiming;
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
@@ -74,6 +76,12 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 		bool pushedObjectIsCollidingBackward;
 	float startPushingZ;
+
+	UPROPERTY(BlueprintReadWrite)
+		FVector rightHandPosition;
+	UPROPERTY(BlueprintReadWrite)
+		FVector leftHandPosition;
+
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float _deltaTime) override;
@@ -101,7 +109,9 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-	void ChangeCamera();
+	void ChangeCameraPressed();
+
+	void ChangeCameraReleased();
 
 	UPROPERTY(EditAnywhere)
 	UDashComponent* dashComponent;
@@ -121,6 +131,8 @@ protected:
 
 	UFUNCTION()
 	void SetUpBlockOffsetPositon();
+
+	void CheckIfStillOnGround();
 
 public:
 	AGolemProjectCharacter();
@@ -154,6 +166,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dash")
 	FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
 
+	UFUNCTION(BlueprintCallable, Category = "IK")
+		void SetRightHandPosition(FVector newPos) { rightHandPosition = newPos; }
+	UFUNCTION(BlueprintCallable, Category = "IK")
+		void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
+
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
 	void StopPushBloc();
@@ -161,6 +178,8 @@ public:
 	void InflictDamage(int _damage);
 
 	void ActivateDeath(bool _activate);
+
+	void ResetMeshOnRightPlace();
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsInteractingOrAiming;

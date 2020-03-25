@@ -33,6 +33,10 @@ protected:
 		FVector pushingPosition = FVector::ZeroVector;
 	UPROPERTY(BlueprintReadWrite)
 		FRotator pushingRotation = FRotator::ZeroRotator;
+	UPROPERTY(BlueprintReadWrite)
+		FVector pushingRightHandPosition = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadWrite)
+		FVector pushingLeftHandPosition = FVector::ZeroVector;
 public:
 	APushableBloc();
 

@@ -26,6 +26,11 @@ APushableBloc::APushableBloc()
 void APushableBloc::Tick(float _deltaTime)
 {
 	Super::Tick(_deltaTime);
+	if (isUsed)
+	{
+		playerActor->SetRightHandPosition(pushingRightHandPosition);
+		playerActor->SetLeftHandPosition(pushingLeftHandPosition);
+	}
 	if (useGravity)
 	{
 		if (AWorldSettings* worldSeting = GetWorldSettings())
