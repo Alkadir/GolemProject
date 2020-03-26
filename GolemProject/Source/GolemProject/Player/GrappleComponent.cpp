@@ -18,6 +18,7 @@
 #include "SwingPhysic.h"
 #include "DashComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
 //#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -297,24 +298,31 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		}
 		else if (currentProjectile->IsCollidingSwinging())
 		{
+			
 			if (mCharacter && bIsAssisted)
 			{
+				if(ClosestGrapplingHook)
+					HelperLibrary::Print("exist");
+				else
+					HelperLibrary::Print("don't exist");
+
 				//Create the swing physics for the player
 				if (!swingPhysic && ClosestGrapplingHook)
 				{
 					swingPhysic = new USwingPhysic(this);
-
+					
 					swingPhysic->SetScaleGravity(scaleGravity);
 					swingPhysic->SetFriction(friction);
 					swingPhysic->SetForceMovement(forceMovement);
 					swingPhysic->SetSpeedRotation(speedRotation);
-					swingPhysic->SetMinLength(minLength);
-					swingPhysic->SetMaxLength(maxLength);
+					swingPhysic->SetMinLength(minDistanceSwinging);
+					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
 
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
 						dashComp->ResetDashInAir();
 				}
+				else currentProjectile->SetComingBack(true);
 			}
 		}
 		else
@@ -379,6 +387,11 @@ void UGrappleComponent::AttractCharacter()
 	{
 		mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
 		mCharacter->LaunchCharacter(mDirection * velocity, true, true);
+
+		//change rotation player when the grapple isn't assisted
+		
+		//FRotator newRot = UKismetMathLibrary::MakeRotFromZ(tempDir);
+		//mCharacter->SetActorRotation(newRot);
 		tempDir.Z = 0.0f;
 		mCharacter->SetActorRotation(tempDir.Rotation());
 
