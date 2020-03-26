@@ -72,6 +72,9 @@ public:
 	void SetPositionCheckPoint(FVector _positionCheckPoint);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
+		void SetLife(int _Life);
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		inline int GetLife() const
 	{
 		return Life;
