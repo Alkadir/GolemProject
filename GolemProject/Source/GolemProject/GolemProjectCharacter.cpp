@@ -197,6 +197,8 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 		else
 		{
 			actorToInteract->SetActorLocation(GetActorLocation() + PushingComponent->GetBlockOffsetPosition());
+			rightHandPosition = GetActorLocation() + offsetRightHand;
+			leftHandPosition = GetActorLocation() + offsetLeftHand;	
 		}
 	}
 }
@@ -478,6 +480,8 @@ void AGolemProjectCharacter::SetUpBlockOffsetPositon()
 	{
 		PushingComponent->SetBlockOffsetPosition(actorToInteract->GetActorLocation() - GetActorLocation());
 		startPushingZ = GetActorLocation().Z;
+		offsetLeftHand = leftHandPosition - GetActorLocation();
+		offsetRightHand = rightHandPosition - GetActorLocation();
 	}
 }
 

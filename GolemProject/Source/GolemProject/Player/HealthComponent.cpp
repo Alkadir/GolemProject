@@ -140,3 +140,7 @@ void UHealthComponent::SetPositionCheckPoint(FVector _positionCheckPoint)
 {
 	PositionCheckPoint = _positionCheckPoint;
 }
+void UHealthComponent::SetLife(int _Life)
+{
+	Life = _Life;
+}
