@@ -55,6 +55,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
 		class UPushingComponent* PushingComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
+		class URaycastingComponent* RaycastingComponent;
+
 	class APlayerController* pc;
 
 	UPROPERTY()
@@ -168,6 +171,8 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
+	FORCEINLINE class URaycastingComponent* GetRaycastingComponent() const { return RaycastingComponent; }
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
 		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
