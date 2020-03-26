@@ -301,11 +301,6 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			
 			if (mCharacter && bIsAssisted)
 			{
-				if(ClosestGrapplingHook)
-					HelperLibrary::Print("exist");
-				else
-					HelperLibrary::Print("don't exist");
-
 				//Create the swing physics for the player
 				if (!swingPhysic && ClosestGrapplingHook)
 				{
