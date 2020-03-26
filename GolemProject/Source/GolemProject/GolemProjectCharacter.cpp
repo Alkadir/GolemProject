@@ -22,6 +22,7 @@
 #include "Interfaces/Interactable.h"
 #include "Player/FistComponent.h"
 #include "Player/SwingPhysic.h"
+#include "Player/RaycastingComponent.h"
 #include "Objects/PushableBloc.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -122,6 +123,7 @@ void AGolemProjectCharacter::BeginPlay()
 	PushingComponent = FindComponentByClass<UPushingComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	sightCameraL = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCameraL");
+	RaycastingComponent = FindComponentByClass<URaycastingComponent>();
 	if (GetCharacterMovement())
 	{
 		initialGroundFriction = GetCharacterMovement()->GroundFriction;
