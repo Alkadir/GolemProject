@@ -17,16 +17,16 @@ class AGolemProjectCharacter : public ACharacter
 private:
 
 	UPROPERTY(EditAnyWhere, Category = "Debug")
-	bool showCursor = false;
+		bool showCursor = false;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
-	bool isGrappleSkillEnabled = false;
+		bool isGrappleSkillEnabled = false;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
-	bool isFistSkillEnabled = false;
+		bool isFistSkillEnabled = false;
 
 	UPROPERTY()
-	bool isSightCameraEnabled = false;
+		bool isSightCameraEnabled = false;
 
 	float m_valueForward;
 
@@ -79,8 +79,10 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 		FVector rightHandPosition;
+	FVector offsetRightHand;
 	UPROPERTY(BlueprintReadWrite)
 		FVector leftHandPosition;
+	FVector offsetLeftHand;
 
 
 	virtual void BeginPlay() override;
@@ -114,7 +116,7 @@ protected:
 	void ChangeCameraReleased();
 
 	UPROPERTY(EditAnywhere)
-	UDashComponent* dashComponent;
+		UDashComponent* dashComponent;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -130,7 +132,7 @@ protected:
 	void ChangeToFist();
 
 	UFUNCTION()
-	void SetUpBlockOffsetPositon();
+		void SetUpBlockOffsetPositon();
 
 	void CheckIfStillOnGround();
 
@@ -138,18 +140,18 @@ public:
 	AGolemProjectCharacter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
-	TSubclassOf<class UUserWidget>  sightHudClass;
+		TSubclassOf<class UUserWidget>  sightHudClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseTurnRate;
+		float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseLookUpRate;
+		float BaseLookUpRate;
 
 	UFUNCTION(BlueprintCallable, Category = "Hud")
-	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+		FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
 
 	FORCEINLINE bool& IsGrappleSkillEnabled() { return isGrappleSkillEnabled; };
 
@@ -168,7 +170,7 @@ public:
 	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
-	FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
+		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
 
 	UFUNCTION(BlueprintCallable, Category = "IK")
 		void SetRightHandPosition(FVector newPos) { rightHandPosition = newPos; }
@@ -186,8 +188,8 @@ public:
 	void ResetMeshOnRightPlace();
 
 	UPROPERTY(BlueprintReadOnly)
-	bool IsInteractingOrAiming;
+		bool IsInteractingOrAiming;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void Event_Death();
+		void Event_Death();
 };

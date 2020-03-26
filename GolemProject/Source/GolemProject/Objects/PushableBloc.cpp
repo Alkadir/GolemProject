@@ -26,11 +26,6 @@ APushableBloc::APushableBloc()
 void APushableBloc::Tick(float _deltaTime)
 {
 	Super::Tick(_deltaTime);
-	if (isUsed)
-	{
-		playerActor->SetRightHandPosition(pushingRightHandPosition);
-		playerActor->SetLeftHandPosition(pushingLeftHandPosition);
-	}
 	if (useGravity)
 	{
 		if (AWorldSettings* worldSeting = GetWorldSettings())
@@ -80,6 +75,8 @@ const bool APushableBloc::Interact_Implementation(AActor* caller)
 		{
 			if (playerActor->PushBloc(pushingDirection, pushingPosition, pushingRotation))
 			{
+				playerActor->SetRightHandPosition(pushingRightHandPosition);
+				playerActor->SetLeftHandPosition(pushingLeftHandPosition);
 				useGravity = true;
 			}
 			else
