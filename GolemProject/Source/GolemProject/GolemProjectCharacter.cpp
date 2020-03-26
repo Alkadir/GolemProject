@@ -22,6 +22,7 @@
 #include "Interfaces/Interactable.h"
 #include "Player/FistComponent.h"
 #include "Player/SwingPhysic.h"
+#include "Player/RaycastingComponent.h"
 #include "Objects/PushableBloc.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -122,6 +123,7 @@ void AGolemProjectCharacter::BeginPlay()
 	PushingComponent = FindComponentByClass<UPushingComponent>();
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	sightCameraL = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCameraL");
+	RaycastingComponent = FindComponentByClass<URaycastingComponent>();
 	if (GetCharacterMovement())
 	{
 		initialGroundFriction = GetCharacterMovement()->GroundFriction;
@@ -196,7 +198,7 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 		{
 			actorToInteract->SetActorLocation(GetActorLocation() + PushingComponent->GetBlockOffsetPosition());
 			rightHandPosition = GetActorLocation() + offsetRightHand;
-			leftHandPosition = GetActorLocation() + offsetLeftHand;	
+			leftHandPosition = GetActorLocation() + offsetLeftHand;
 		}
 	}
 }
@@ -312,7 +314,7 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 		if (!isSightCameraEnabled)
 		{
 
-			if (isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple)
+			if ((isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple) || (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist))
 			{
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
 				isSightCameraEnabled = true;
@@ -320,20 +322,8 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 				{
 					GetCharacterMovement()->bOrientRotationToMovement = false;
 				}
+				IsInteractingOrAiming = true;
 			}
-
-			else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist && sightCameraL)
-			{
-				pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
-				isSightCameraEnabled = true;
-				if (GetCharacterMovement())
-				{
-					GetCharacterMovement()->bOrientRotationToMovement = false;
-				}
-			}
-
-
-			IsInteractingOrAiming = true;
 
 		}
 	}

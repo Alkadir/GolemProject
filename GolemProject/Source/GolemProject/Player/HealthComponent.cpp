@@ -100,7 +100,7 @@ void UHealthComponent::RespawnFromFalling()
 	{
 		Player->EnableInput(PlayerController);
 		IsFallingDown = false;
-		Player->SetActorLocation(LastPositionGrounded);
+		Player->SetActorLocation(PositionCheckPoint);
 	}
 }
 
