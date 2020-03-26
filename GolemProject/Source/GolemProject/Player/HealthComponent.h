@@ -41,12 +41,14 @@ protected:
 	FVector PositionCheckPoint;
 
 private:
+
 	void ResetInvulnerability();
 	void Respawn();
 	void RespawnFromFalling();
 	void KillCharacterFromFalling();
 	bool IsFallingDown;
 	bool bIsDead;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -56,15 +58,21 @@ public:
 	{
 		return LastPositionGrounded;
 	};
+
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void SetLastPositionGrounded(FVector _lastPositionGrounded);
+
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 		inline FVector GetPositionCheckPoint() const
 	{
 		return PositionCheckPoint;
 	};
+
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void SetPositionCheckPoint(FVector _positionCheckPoint);
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		void SetLife(int _Life);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		inline int GetLife() const

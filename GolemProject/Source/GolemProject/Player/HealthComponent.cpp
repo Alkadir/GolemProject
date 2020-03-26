@@ -88,6 +88,7 @@ void UHealthComponent::Respawn()
 		Player->ActivateDeath(false);
 		IsFallingDown = false;
 		Player->SetActorLocation(PositionCheckPoint);
+		Player->ResetMeshOnRightPlace();
 		bIsDead = false;
 	}
 }
@@ -97,7 +98,6 @@ void UHealthComponent::RespawnFromFalling()
 	CanTakeDamage = true;
 	if (PlayerController != nullptr && Player != nullptr)
 	{
-		Player->SetActorLocation(LastPositionGrounded);
 		Player->EnableInput(PlayerController);
 		IsFallingDown = false;
 		Player->SetActorLocation(LastPositionGrounded);
@@ -139,4 +139,8 @@ void UHealthComponent::SetLastPositionGrounded(FVector _lastPositionGrounded)
 void UHealthComponent::SetPositionCheckPoint(FVector _positionCheckPoint)
 {
 	PositionCheckPoint = _positionCheckPoint;
+}
+void UHealthComponent::SetLife(int _Life)
+{
+	Life = _Life;
 }

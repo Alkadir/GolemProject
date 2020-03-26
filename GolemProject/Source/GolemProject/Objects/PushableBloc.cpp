@@ -75,6 +75,8 @@ const bool APushableBloc::Interact_Implementation(AActor* caller)
 		{
 			if (playerActor->PushBloc(pushingDirection, pushingPosition, pushingRotation))
 			{
+				playerActor->SetRightHandPosition(pushingRightHandPosition);
+				playerActor->SetLeftHandPosition(pushingLeftHandPosition);
 				useGravity = true;
 			}
 			else

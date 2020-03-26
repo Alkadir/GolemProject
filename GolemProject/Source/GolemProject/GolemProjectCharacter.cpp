@@ -88,8 +88,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	//Input left Mouse Click
 	PlayerInputComponent->BindAction("Fire1", IE_Released, this, &AGolemProjectCharacter::Fire);
 
-	PlayerInputComponent->BindAction("Fire2", IE_Pressed, this, &AGolemProjectCharacter::ChangeCamera);
-	PlayerInputComponent->BindAction("Fire2", IE_Released, this, &AGolemProjectCharacter::ChangeCamera);
+	PlayerInputComponent->BindAction("Fire2", IE_Pressed, this, &AGolemProjectCharacter::ChangeCameraPressed);
+	PlayerInputComponent->BindAction("Fire2", IE_Released, this, &AGolemProjectCharacter::ChangeCameraReleased);
 	PlayerInputComponent->BindAction("ChangeToGrapple", IE_Pressed, this, &AGolemProjectCharacter::ChangeToGrapple);
 	PlayerInputComponent->BindAction("ChangeToFist", IE_Pressed, this, &AGolemProjectCharacter::ChangeToFist);
 
@@ -147,6 +147,8 @@ void AGolemProjectCharacter::BeginPlay()
 		FistComp->IsTargetingFist = false;
 
 	IsInteractingOrAiming = false;
+
+
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -193,6 +195,8 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 		else
 		{
 			actorToInteract->SetActorLocation(GetActorLocation() + PushingComponent->GetBlockOffsetPosition());
+			rightHandPosition = GetActorLocation() + offsetRightHand;
+			leftHandPosition = GetActorLocation() + offsetLeftHand;	
 		}
 	}
 }
@@ -230,7 +234,7 @@ void AGolemProjectCharacter::Dash()
 
 void AGolemProjectCharacter::UseAssistedGrapple()
 {
-	if (mGrapple)
+	if (isGrappleSkillEnabled && mGrapple)
 	{
 		ChangeToGrapple();
 		mGrapple->GoToDestination(true);
@@ -239,7 +243,7 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 
 void AGolemProjectCharacter::ChangeToGrapple()
 {
-	if (FistComp == nullptr || mGrapple == nullptr || mGrapple->IsTargetingGrapple) return;
+	if (!isGrappleSkillEnabled || FistComp == nullptr || mGrapple == nullptr || mGrapple->IsTargetingGrapple) return;
 	mGrapple->IsTargetingGrapple = true;
 	FistComp->IsTargetingFist = false;
 	if (isSightCameraEnabled && pc && sightCamera)
@@ -250,7 +254,7 @@ void AGolemProjectCharacter::ChangeToGrapple()
 
 void AGolemProjectCharacter::ChangeToFist()
 {
-	if (FistComp == nullptr || mGrapple == nullptr || FistComp && FistComp->IsTargetingFist) return;
+	if (!isFistSkillEnabled || FistComp == nullptr || mGrapple == nullptr || FistComp && FistComp->IsTargetingFist) return;
 	FistComp->IsTargetingFist = true;
 	mGrapple->IsTargetingGrapple = false;
 	if (isSightCameraEnabled && pc && sightCameraL)
@@ -265,14 +269,14 @@ void AGolemProjectCharacter::Fire()
 	{
 		return;
 	}
-	if (mGrapple && mGrapple->IsTargetingGrapple)
+	if (isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple)
 	{
 		mGrapple->Cancel();
 
 		if (isSightCameraEnabled)
 			mGrapple->GoToDestination(false);
 	}
-	else if (FistComp && FistComp->IsTargetingFist)
+	else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist)
 	{
 		if (isSightCameraEnabled)
 			FistComp->GoToDestination();
@@ -297,7 +301,7 @@ void AGolemProjectCharacter::LookUpAtRate(float Rate)
 	}
 }
 
-void AGolemProjectCharacter::ChangeCamera()
+void AGolemProjectCharacter::ChangeCameraPressed()
 {
 	if (PushingComponent && PushingComponent->GetIsPushingObject())
 	{
@@ -307,25 +311,44 @@ void AGolemProjectCharacter::ChangeCamera()
 	{
 		if (!isSightCameraEnabled)
 		{
-			isSightCameraEnabled = true;
-			if (GetCharacterMovement())
+
+			if (isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple)
 			{
-				GetCharacterMovement()->bOrientRotationToMovement = false;
-			}
-			if (mGrapple && mGrapple->IsTargetingGrapple)
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
-			else if (FistComp && FistComp->IsTargetingFist && sightCameraL)
+				isSightCameraEnabled = true;
+				if (GetCharacterMovement())
+				{
+					GetCharacterMovement()->bOrientRotationToMovement = false;
+				}
+			}
+
+			else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist && sightCameraL)
+			{
 				pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
+				isSightCameraEnabled = true;
+				if (GetCharacterMovement())
+				{
+					GetCharacterMovement()->bOrientRotationToMovement = false;
+				}
+			}
+
 
 			IsInteractingOrAiming = true;
-			/*	if (currentSightWidget && !currentSightWidget->IsInViewport() && !mGrapple->GetProjectile())
-					currentSightWidget->AddToViewport();*/
 
 		}
-		else
+	}
+}
+
+void AGolemProjectCharacter::ChangeCameraReleased()
+{
+	if (PushingComponent && PushingComponent->GetIsPushingObject())
+	{
+		return;
+	}
+	if (sightCamera && pc)
+	{
+		if (isSightCameraEnabled)
 		{
-			/*if (currentSightWidget && currentSightWidget->IsInViewport())
-				currentSightWidget->RemoveFromViewport();*/
 			IsInteractingOrAiming = false;
 			isSightCameraEnabled = false;
 			if (GetCharacterMovement())
@@ -339,7 +362,7 @@ void AGolemProjectCharacter::ChangeCamera()
 
 void AGolemProjectCharacter::MoveForward(float Value)
 {
-	if (PushingComponent && PushingComponent->GetIsStartingPushingObject() || mGrapple && mGrapple->GetFiring())
+	if (PushingComponent && PushingComponent->GetIsStartingPushingObject() || (mGrapple && mGrapple->GetFiring() && !mGrapple->GetSwingPhysics()))
 	{
 		return;
 	}
@@ -390,7 +413,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
-	if (PushingComponent && PushingComponent->GetIsPushingObject() || mGrapple && mGrapple->GetFiring())
+	if (PushingComponent && PushingComponent->GetIsPushingObject() || (mGrapple && mGrapple->GetFiring() && !mGrapple->GetSwingPhysics()))
 	{
 		return;
 	}
@@ -455,6 +478,8 @@ void AGolemProjectCharacter::SetUpBlockOffsetPositon()
 	{
 		PushingComponent->SetBlockOffsetPosition(actorToInteract->GetActorLocation() - GetActorLocation());
 		startPushingZ = GetActorLocation().Z;
+		offsetLeftHand = leftHandPosition - GetActorLocation();
+		offsetRightHand = rightHandPosition - GetActorLocation();
 	}
 }
 
@@ -467,7 +492,7 @@ bool AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingP
 	}
 	if (isSightCameraEnabled)
 	{
-		ChangeCamera();
+		ChangeCameraReleased();
 	}
 	if (GetCharacterMovement())
 	{
@@ -507,19 +532,25 @@ void AGolemProjectCharacter::InflictDamage(int _damage)
 //WIP DO NOT TOUCH
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
-/*	if (_activate)
+	/*if (_activate)
 	{
 		GetCharacterMovement()->StopMovementImmediately();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		GetMesh()->SetSimulatePhysics(true);
 	}
-	else 
+	else
 	{
 		GetMesh()->SetSimulatePhysics(false);
 		GetMesh()->SetAllBodiesSimulatePhysics(false);
 		GetMesh()->ResetAllBodiesSimulatePhysics();
-		GetMesh()->SetupAttachment(GetCapsuleComponent());
+		GetMesh()->RecreatePhysicsState();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		GetMesh()->SetWorldLocationAndRotation(GetCapsuleComponent()->GetComponentLocation(), GetCapsuleComponent()->GetComponentRotation());
 	}*/
+}
+
+void AGolemProjectCharacter::ResetMeshOnRightPlace()
+{
+	//GetMesh()->SetupAttachment(GetCapsuleComponent());
+	//GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
+	//GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
 }

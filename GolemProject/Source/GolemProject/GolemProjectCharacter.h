@@ -19,6 +19,12 @@ private:
 	UPROPERTY(EditAnyWhere, Category = "Debug")
 		bool showCursor = false;
 
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
+		bool isGrappleSkillEnabled = false;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
+		bool isFistSkillEnabled = false;
+
 	UPROPERTY()
 		bool isSightCameraEnabled = false;
 
@@ -59,6 +65,8 @@ private:
 
 	float initialGroundFriction;
 
+	bool HasPressedAiming;
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
@@ -68,6 +76,14 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 		bool pushedObjectIsCollidingBackward;
 	float startPushingZ;
+
+	UPROPERTY(BlueprintReadWrite)
+		FVector rightHandPosition;
+	FVector offsetRightHand;
+	UPROPERTY(BlueprintReadWrite)
+		FVector leftHandPosition;
+	FVector offsetLeftHand;
+
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float _deltaTime) override;
@@ -95,10 +111,9 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-	void ChangeCamera();
+	void ChangeCameraPressed();
 
-
-
+	void ChangeCameraReleased();
 
 	UPROPERTY(EditAnywhere)
 		UDashComponent* dashComponent;
@@ -119,6 +134,8 @@ protected:
 	UFUNCTION()
 		void SetUpBlockOffsetPositon();
 
+	void CheckIfStillOnGround();
+
 public:
 	AGolemProjectCharacter();
 
@@ -136,6 +153,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Hud")
 		FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
 
+	FORCEINLINE bool& IsGrappleSkillEnabled() { return isGrappleSkillEnabled; };
+
+	FORCEINLINE bool& IsFistSkillEnabled() { return isFistSkillEnabled; };
+
+	FORCEINLINE void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; };
+
+	FORCEINLINE void SetFistSkillEnabled(bool _enable) { isFistSkillEnabled = _enable; };
+
 	void ResetFriction();
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -145,7 +170,12 @@ public:
 	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
-	FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
+		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
+
+	UFUNCTION(BlueprintCallable, Category = "IK")
+		void SetRightHandPosition(FVector newPos) { rightHandPosition = newPos; }
+	UFUNCTION(BlueprintCallable, Category = "IK")
+		void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
 
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
@@ -155,9 +185,11 @@ public:
 
 	void ActivateDeath(bool _activate);
 
+	void ResetMeshOnRightPlace();
+
 	UPROPERTY(BlueprintReadOnly)
-	bool IsInteractingOrAiming;
+		bool IsInteractingOrAiming;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void Event_Death();
+		void Event_Death();
 };
