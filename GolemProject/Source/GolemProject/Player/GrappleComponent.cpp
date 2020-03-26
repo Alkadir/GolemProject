@@ -384,11 +384,12 @@ void UGrappleComponent::AttractCharacter()
 		mCharacter->LaunchCharacter(mDirection * velocity, true, true);
 
 		//change rotation player when the grapple isn't assisted
+
+		FVector tempRight = FVector::CrossProduct(tempDir,FVector::UpVector);
+		tempDir = FVector::CrossProduct(tempDir, tempRight);
 		
-		//FRotator newRot = UKismetMathLibrary::MakeRotFromZ(tempDir);
-		//mCharacter->SetActorRotation(newRot);
-		tempDir.Z = 0.0f;
-		mCharacter->SetActorRotation(tempDir.Rotation());
+		FRotator rotation = FMath::Lerp(mCharacter->GetActorRotation(), tempDir.Rotation(), 0.1f);
+		mCharacter->SetActorRotation(rotation);
 
 		if (world)
 		{
