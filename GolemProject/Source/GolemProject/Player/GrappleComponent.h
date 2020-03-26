@@ -34,6 +34,9 @@ private:
 	float accuracy = 100000.0f;
 
 	//values to edit
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float minDistanceSwinging = 100.0f;
+
 	UPROPERTY(EditAnywhere, Category = "Swing physics", meta = (AllowPrivateAccess = "true"))
 	float maxDistanceSwinging = 3000.0f;
 
@@ -48,12 +51,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float speedRotation = 0.02f;
-
-	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float minLength = 100.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float maxLength = 1000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float releaseForce = 1.0f;
