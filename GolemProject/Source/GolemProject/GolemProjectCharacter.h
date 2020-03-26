@@ -130,10 +130,6 @@ protected:
 
 	void UseAssistedGrapple();
 
-	void ChangeToGrapple();
-
-	void ChangeToFist();
-
 	UFUNCTION()
 		void SetUpBlockOffsetPositon();
 
@@ -185,6 +181,10 @@ public:
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
 	void StopPushBloc();
+
+	void ChangeToGrapple();
+
+	void ChangeToFist();
 
 	void InflictDamage(int _damage);
 
