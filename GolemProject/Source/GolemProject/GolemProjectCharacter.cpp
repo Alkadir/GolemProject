@@ -157,26 +157,6 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 {
 	Super::Tick(_deltaTime);
 
-	if (UWorld* world = GetWorld())
-	{
-		FHitResult hit;
-		if (GetCapsuleComponent())
-		{
-			float height = GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 1.0f;
-
-			if (world->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() - FVector::UpVector * height, ECollisionChannel::ECC_Visibility))
-			{
-				if (hit.bBlockingHit)
-				{
-					if (mGrapple && mGrapple->GetSwingPhysics())
-					{
-						mGrapple->StopSwingPhysics();
-					}
-				}
-			}
-		}
-	}
-
 	if (mGrapple && !mGrapple->GetSwingPhysics())
 	{
 		FRotator rotFinal = FRotator::ZeroRotator;
