@@ -22,7 +22,7 @@ private:
 	class AGolemProjectGameMode* GameMode;
 	class APlayerCameraManager* PlayerCameraManager;
 	class USwingPhysic* swingPhysic = nullptr;
-
+	class ARope* rope = nullptr;
 	class AActor* HelperAiming;
 
 	FVector mDestination;
@@ -54,6 +54,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float releaseForce = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swing Render", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ARope> ropeClass;
 
 	float mDistance;
 	
@@ -135,6 +138,12 @@ public:
 	UFUNCTION()
 	FVector GetHandPosition();
 
+	UFUNCTION()
+	FVector GetVirtualRightHandPosition();
+
+	UFUNCTION()
+	FVector GetVirtualLeftHandPosition();
+
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
 
@@ -151,4 +160,6 @@ public:
 
 	//Implicit Delete SwingPhysics var 
 	void StopSwingPhysics();
+
+	void CheckGround();
 };
