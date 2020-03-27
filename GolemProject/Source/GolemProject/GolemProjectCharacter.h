@@ -8,7 +8,6 @@
 #include "Interfaces/Interactable.h"
 #include "GolemProjectCharacter.generated.h"
 
-
 UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
@@ -187,6 +186,8 @@ public:
 	void ChangeToFist();
 
 	void InflictDamage(int _damage);
+
+	bool IsCharacterDead();
 
 	void ActivateDeath(bool _activate);
 

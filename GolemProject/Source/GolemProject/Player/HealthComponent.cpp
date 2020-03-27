@@ -50,6 +50,7 @@ void UHealthComponent::InflictDamage(int _damage)
 		CanTakeDamage = false;
 		if (Life <= 0)
 		{
+			OnCharacterDie.Broadcast();
 			bIsDead = true;
 			Life = 0;
 			if (UWorld* world = GetWorld())
@@ -85,9 +86,9 @@ void UHealthComponent::Respawn()
 	if (PlayerController != nullptr && Player != nullptr)
 	{
 		Player->EnableInput(PlayerController);
+		Player->SetActorLocation(PositionCheckPoint);
 		Player->ActivateDeath(false);
 		IsFallingDown = false;
-		Player->SetActorLocation(PositionCheckPoint);
 		Player->ResetMeshOnRightPlace();
 		bIsDead = false;
 	}
