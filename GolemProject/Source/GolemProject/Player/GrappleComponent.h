@@ -136,6 +136,7 @@ public:
 
 	FORCEINLINE const FVector& GetDirection() { return mDirection; };
 
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AProjectileHand* GetProjectile() { return currentProjectile; };
 
 	UFUNCTION()
