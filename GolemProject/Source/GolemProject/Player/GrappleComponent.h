@@ -50,7 +50,7 @@ private:
 	float forceMovement = 5.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float speedRotation = 0.02f;
+	float speedRotation = 0.06f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float releaseForce = 1.0f;
