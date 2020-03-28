@@ -294,7 +294,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 	if (currentProjectile && currentProjectile->GetMeshComponent() && mSkeletalMesh)
 	{
-		mDirection = currentProjectile->GetLocation() - mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
+		mDirection = currentProjectile->GetLocation() - GetVirtualRightHandPosition();
 		mDistance += FVector::Dist(mLastLocation, currentProjectile->GetLocation());
 		float distanceWithCharacter = mDirection.Size();
 		mLastLocation = currentProjectile->GetLocation();
@@ -381,8 +381,8 @@ void UGrappleComponent::CheckGround()
 	{
 		if (mCharacter && mCharacter->GetCapsuleComponent())
 		{
-			float height = mCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 1.0f;
-			FVector location = mCharacter->GetActorLocation() - FVector::UpVector * height;
+			float height = mCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - radiusOnGround * 0.5f;
+			FVector location = mCharacter->GetActorLocation() - mCharacter->GetActorUpVector() * height;
 
 			TArray<AActor*>OutActors;
 			TArray<AActor*>ActorsToIgnore;
@@ -390,8 +390,8 @@ void UGrappleComponent::CheckGround()
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 			ActorsToIgnore.Add(mCharacter);
-
-			if (UKismetSystemLibrary::SphereOverlapActors(world, location, 50.0f, ObjectTypes, NULL, ActorsToIgnore, OutActors))
+		
+			if (UKismetSystemLibrary::SphereOverlapActors(world, location, radiusOnGround, ObjectTypes, NULL, ActorsToIgnore, OutActors))
 			{
 				if (swingPhysic)
 					StopSwingPhysics();
