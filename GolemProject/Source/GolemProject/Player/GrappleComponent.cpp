@@ -339,8 +339,6 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					//Create the rope visual 
 					rope = world->SpawnActor<ARope>(ropeClass);
 					rope->SetGrappleComponent(this);
-					rope->Initialize();
-					//rope->SetTarget(GetClosestGrapplingHook());
 
 					//Reset dash when the player grappled something
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
@@ -395,10 +393,9 @@ void UGrappleComponent::CheckGround()
 
 			if (UKismetSystemLibrary::SphereOverlapActors(world, location, 50.0f, ObjectTypes, NULL, ActorsToIgnore, OutActors))
 			{
-				HelperLibrary::Print("hit");
 				if (swingPhysic)
 					StopSwingPhysics();
-				
+
 				if (currentProjectile)
 					currentProjectile->SetComingBack(true);
 			}
@@ -445,10 +442,18 @@ void UGrappleComponent::AttractCharacter()
 
 		//change rotation player when the grapple isn't assisted
 
-		FVector tempRight = FVector::CrossProduct(tempDir, FVector::UpVector);
+		FVector tempRight = FVector::CrossProduct(tempDir, (mCharacter->GetActorLocation().Z < currentProjectile->GetLocation().Z) ? FVector::UpVector : FVector::DownVector);
+		
+		if (mCharacter->GetActorLocation().Z > currentProjectile->GetLocation().Z)
+		{
+			tempDir.X *= -1;
+			tempDir.Y *= -1;
+		}
+
 		tempDir = FVector::CrossProduct(tempDir, tempRight);
 
-		FRotator rotation = FMath::Lerp(mCharacter->GetActorRotation(), tempDir.Rotation(), 0.1f);
+		FRotator finalRotation = tempDir.Rotation();
+		FRotator rotation = FMath::Lerp(mCharacter->GetActorRotation(), finalRotation, 0.1f);
 		mCharacter->SetActorRotation(rotation);
 
 		if (world)
