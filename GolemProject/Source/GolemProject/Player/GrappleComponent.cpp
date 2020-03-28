@@ -393,7 +393,7 @@ void UGrappleComponent::CheckGround()
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 			ActorsToIgnore.Add(mCharacter);
 
-			if (UKismetSystemLibrary::SphereOverlapActors(world, location, 25.0f, ObjectTypes, NULL, ActorsToIgnore, OutActors))
+			if (UKismetSystemLibrary::SphereOverlapActors(world, location, 50.0f, ObjectTypes, NULL, ActorsToIgnore, OutActors))
 			{
 				HelperLibrary::Print("hit");
 				if (swingPhysic)
