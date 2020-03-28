@@ -20,6 +20,7 @@
 #include "DrawDebugHelpers.h"
 #include "Player/Rope.h"
 #include "Components/CapsuleComponent.h"
+
 //#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -162,6 +163,10 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				IsFiring = true;
 				bIsAssisted = _isAssisted;
 				currentProjectile->SetAssisted(_isAssisted);
+
+				//Create the rope visual 
+				rope = world->SpawnActor<ARope>(ropeClass);
+				rope->SetGrappleComponent(this);
 			}
 		}
 	}
@@ -336,10 +341,6 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
 
-					//Create the rope visual 
-					rope = world->SpawnActor<ARope>(ropeClass);
-					rope->SetGrappleComponent(this);
-
 					//Reset dash when the player grappled something
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
 						dashComp->ResetDashInAir();
@@ -371,7 +372,6 @@ void UGrappleComponent::StopSwingPhysics()
 		swingPhysic = nullptr;
 
 		currentProjectile->SetComingBack(true);
-		rope->Destroy();
 	}
 }
 
@@ -421,10 +421,14 @@ void UGrappleComponent::PlayerIsNear()
 			mSkeletalMesh->bRequiredBonesUpToDate = false;
 		}
 
+		if (rope)
+			rope->Destroy();
+
 		if (currentProjectile)
 		{
 			currentProjectile->Destroy();
 		}
+		rope = nullptr;
 		currentProjectile = nullptr;
 		IsFiring = false;
 	}
@@ -441,18 +445,9 @@ void UGrappleComponent::AttractCharacter()
 		mCharacter->LaunchCharacter(mDirection * velocity, true, true);
 
 		//change rotation player when the grapple isn't assisted
-
-		FVector tempRight = FVector::CrossProduct(tempDir, (mCharacter->GetActorLocation().Z < currentProjectile->GetLocation().Z) ? FVector::UpVector : FVector::DownVector);
-		
-		if (mCharacter->GetActorLocation().Z > currentProjectile->GetLocation().Z)
-		{
-			tempDir.X *= -1;
-			tempDir.Y *= -1;
-		}
-
-		tempDir = FVector::CrossProduct(tempDir, tempRight);
-
 		FRotator finalRotation = tempDir.Rotation();
+		finalRotation.Add(-90.0f, 0.0f, 0.0f);
+
 		FRotator rotation = FMath::Lerp(mCharacter->GetActorRotation(), finalRotation, 0.1f);
 		mCharacter->SetActorRotation(rotation);
 

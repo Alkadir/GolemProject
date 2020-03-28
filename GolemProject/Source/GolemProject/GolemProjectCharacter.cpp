@@ -160,13 +160,12 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 	if (mGrapple && !mGrapple->GetSwingPhysics())
 	{
 		FRotator rotFinal = FRotator::ZeroRotator;
-		rotFinal.Pitch = 0.0f;
 		rotFinal.Yaw = GetActorRotation().Yaw;
-		rotFinal.Roll = GetActorRotation().Roll;
 
-		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.05f);
+		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.09f);
 		SetActorRotation(rot);
 	}
+
 	if (PushingComponent && PushingComponent->GetIsPushingObject(false) && actorToInteract)
 	{
 		if (fabs(startPushingZ - GetActorLocation().Z) > 2.f)
