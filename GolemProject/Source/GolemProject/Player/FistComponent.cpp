@@ -34,6 +34,8 @@ UFistComponent::UFistComponent()
 void UFistComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	SetTickGroup(ETickingGroup::TG_PrePhysics);
+
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
 	mSkeletalMesh = mCharacter->GetMesh();
