@@ -20,6 +20,7 @@
 #include "DrawDebugHelpers.h"
 #include "Player/Rope.h"
 #include "Components/CapsuleComponent.h"
+
 //#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -28,7 +29,6 @@ UGrappleComponent::UGrappleComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 	// ...
 }
 
@@ -37,6 +37,7 @@ UGrappleComponent::UGrappleComponent()
 void UGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	SetTickGroup(ETickingGroup::TG_PrePhysics);
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
 	if (mCharacter)
@@ -162,6 +163,10 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				IsFiring = true;
 				bIsAssisted = _isAssisted;
 				currentProjectile->SetAssisted(_isAssisted);
+
+				//Create the rope visual 
+				rope = world->SpawnActor<ARope>(ropeClass);
+				rope->SetGrappleComponent(this);
 			}
 		}
 	}
@@ -289,7 +294,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 	if (currentProjectile && currentProjectile->GetMeshComponent() && mSkeletalMesh)
 	{
-		mDirection = currentProjectile->GetLocation() - mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
+		mDirection = currentProjectile->GetLocation() - GetVirtualRightHandPosition();
 		mDistance += FVector::Dist(mLastLocation, currentProjectile->GetLocation());
 		float distanceWithCharacter = mDirection.Size();
 		mLastLocation = currentProjectile->GetLocation();
@@ -336,12 +341,6 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
 
-					//Create the rope visual 
-					rope = world->SpawnActor<ARope>(ropeClass);
-					rope->SetGrappleComponent(this);
-					rope->Initialize();
-					//rope->SetTarget(GetClosestGrapplingHook());
-
 					//Reset dash when the player grappled something
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
 						dashComp->ResetDashInAir();
@@ -373,7 +372,6 @@ void UGrappleComponent::StopSwingPhysics()
 		swingPhysic = nullptr;
 
 		currentProjectile->SetComingBack(true);
-		rope->Destroy();
 	}
 }
 
@@ -383,8 +381,8 @@ void UGrappleComponent::CheckGround()
 	{
 		if (mCharacter && mCharacter->GetCapsuleComponent())
 		{
-			float height = mCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 1.0f;
-			FVector location = mCharacter->GetActorLocation() - FVector::UpVector * height;
+			float height = mCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - radiusOnGround * 0.5f;
+			FVector location = mCharacter->GetActorLocation() - mCharacter->GetActorUpVector() * height;
 
 			TArray<AActor*>OutActors;
 			TArray<AActor*>ActorsToIgnore;
@@ -392,13 +390,12 @@ void UGrappleComponent::CheckGround()
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 			ActorsToIgnore.Add(mCharacter);
-
-			if (UKismetSystemLibrary::SphereOverlapActors(world, location, 50.0f, ObjectTypes, NULL, ActorsToIgnore, OutActors))
+		
+			if (UKismetSystemLibrary::SphereOverlapActors(world, location, radiusOnGround, ObjectTypes, NULL, ActorsToIgnore, OutActors))
 			{
-				HelperLibrary::Print("hit");
 				if (swingPhysic)
 					StopSwingPhysics();
-				
+
 				if (currentProjectile)
 					currentProjectile->SetComingBack(true);
 			}
@@ -424,10 +421,14 @@ void UGrappleComponent::PlayerIsNear()
 			mSkeletalMesh->bRequiredBonesUpToDate = false;
 		}
 
+		if (rope)
+			rope->Destroy();
+
 		if (currentProjectile)
 		{
 			currentProjectile->Destroy();
 		}
+		rope = nullptr;
 		currentProjectile = nullptr;
 		IsFiring = false;
 	}
@@ -444,11 +445,10 @@ void UGrappleComponent::AttractCharacter()
 		mCharacter->LaunchCharacter(mDirection * velocity, true, true);
 
 		//change rotation player when the grapple isn't assisted
+		FRotator finalRotation = tempDir.Rotation();
+		finalRotation.Add(-90.0f, 0.0f, 0.0f);
 
-		FVector tempRight = FVector::CrossProduct(tempDir, FVector::UpVector);
-		tempDir = FVector::CrossProduct(tempDir, tempRight);
-
-		FRotator rotation = FMath::Lerp(mCharacter->GetActorRotation(), tempDir.Rotation(), 0.1f);
+		FRotator rotation = FMath::Lerp(mCharacter->GetActorRotation(), finalRotation, 0.1f);
 		mCharacter->SetActorRotation(rotation);
 
 		if (world)
