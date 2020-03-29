@@ -19,12 +19,13 @@ protected:
 
 	virtual void Tick(float deltaTime) override;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		class UStaticMeshComponent* mesh;
 
 	AGolemProjectCharacter* playerActor = nullptr;
 	bool useGravity = true;
-	bool isUsed = false;
+	UPROPERTY(BlueprintReadWrite)
+		bool isUsed = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector sizeBlock = FVector::OneVector;
 	UPROPERTY(BlueprintReadWrite)

@@ -157,36 +157,15 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 {
 	Super::Tick(_deltaTime);
 
-	if (UWorld* world = GetWorld())
-	{
-		FHitResult hit;
-		if (GetCapsuleComponent())
-		{
-			float height = GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 1.0f;
-
-			if (world->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() - FVector::UpVector * height, ECollisionChannel::ECC_Visibility))
-			{
-				if (hit.bBlockingHit)
-				{
-					if (mGrapple && mGrapple->GetSwingPhysics())
-					{
-						mGrapple->StopSwingPhysics();
-					}
-				}
-			}
-		}
-	}
-
 	if (mGrapple && !mGrapple->GetSwingPhysics())
 	{
 		FRotator rotFinal = FRotator::ZeroRotator;
-		rotFinal.Pitch = 0.0f;
 		rotFinal.Yaw = GetActorRotation().Yaw;
-		rotFinal.Roll = GetActorRotation().Roll;
 
-		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.05f);
+		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.09f);
 		SetActorRotation(rot);
 	}
+
 	if (PushingComponent && PushingComponent->GetIsPushingObject(false) && actorToInteract)
 	{
 		if (fabs(startPushingZ - GetActorLocation().Z) > 2.f)
