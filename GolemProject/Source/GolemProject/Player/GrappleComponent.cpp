@@ -29,7 +29,6 @@ UGrappleComponent::UGrappleComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 	// ...
 }
 
@@ -38,6 +37,7 @@ UGrappleComponent::UGrappleComponent()
 void UGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	SetTickGroup(ETickingGroup::TG_PrePhysics);
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
 	if (mCharacter)
