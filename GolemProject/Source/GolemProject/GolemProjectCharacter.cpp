@@ -292,10 +292,19 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 	{
 		if (!isSightCameraEnabled)
 		{
-
-			if ((isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple) || (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist))
+			if (isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple)
 			{
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
+				isSightCameraEnabled = true;
+				if (GetCharacterMovement())
+				{
+					GetCharacterMovement()->bOrientRotationToMovement = false;
+				}
+				IsInteractingOrAiming = true;
+			}
+			else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist)
+			{
+				pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 				isSightCameraEnabled = true;
 				if (GetCharacterMovement())
 				{
