@@ -20,6 +20,7 @@
 #include "DrawDebugHelpers.h"
 #include "Player/Rope.h"
 #include "Components/CapsuleComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 //#include "DrawDebugHelpers.h"
 
@@ -265,6 +266,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			if (HelperAiming == nullptr)
 			{
 				HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
+				HelperAimingMesh = HelperAiming->FindComponentByClass<UStaticMeshComponent>();
 			}
 			else
 			{
@@ -277,9 +279,24 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				HelperAiming->SetActorScale3D(scale);
 				if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
 				{
+					UPhysicalMaterial* physMat;
+					physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+					//if it's a bouncing surface the calculate the direction of bounce 
+					if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
+					{
+						HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+					}
+					else
+					{
+						HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+					}
 					distance = hitResult.ImpactPoint - location;
 					scale.Z = distance.Size() / 100.0f;
 					HelperAiming->SetActorScale3D(scale);
+				}
+				else
+				{
+					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
 				}
 			}
 		}
@@ -390,7 +407,7 @@ void UGrappleComponent::CheckGround()
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 			ActorsToIgnore.Add(mCharacter);
-		
+
 			if (UKismetSystemLibrary::SphereOverlapActors(world, location, radiusOnGround, ObjectTypes, NULL, ActorsToIgnore, OutActors))
 			{
 				if (swingPhysic)

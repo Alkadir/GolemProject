@@ -24,6 +24,7 @@ private:
 	class USwingPhysic* swingPhysic = nullptr;
 	class ARope* rope = nullptr;
 	class AActor* HelperAiming;
+	class UStaticMeshComponent* HelperAimingMesh;
 
 	FVector mDestination;
 	FVector mDirection;
