@@ -24,6 +24,8 @@ private:
 	class USwingPhysic* swingPhysic = nullptr;
 	class ARope* rope = nullptr;
 	class AActor* HelperAiming;
+	TArray<class AActor*> ActorToIgnore;
+	bool isColorRed;
 
 	FVector mDestination;
 	FVector mDirection;
@@ -155,7 +157,7 @@ public:
 	FVector GetVirtualLeftHandPosition();
 
 	UFUNCTION(BlueprintCallable)
-	void DisplayHelping(bool _hit, FHitResult _hitResult, FVector _location, FVector _end);
+	void DisplayHelping();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };

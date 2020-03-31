@@ -18,11 +18,15 @@ class GOLEMPROJECT_API UFistComponent : public UActorComponent
 	class UCameraComponent* mCamera;
 	class AGolemProjectCharacter* mCharacter;
 	TArray<class AActor*> HelperAiming;
-	FVector mDirection;
-	float accuracy = 100000.0f;
-	int32 mIdBone;
-	bool CanFire;
+	TArray<class UStaticMeshComponent*> HelperAimingMesh;
+	TArray<class AActor*> ActorToIgnore;
 	FTimerHandle TimerHandleFire;
+	FVector mDirection;
+	int32 mIdBone;
+	float accuracy = 100000.0f;
+	bool CanFire;
+	bool CanInteract;
+	bool isColorRed;
 
 private :
 	void ResetFire();
