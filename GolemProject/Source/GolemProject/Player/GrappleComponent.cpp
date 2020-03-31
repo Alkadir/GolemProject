@@ -67,6 +67,7 @@ void UGrappleComponent::BeginPlay()
 			PlayerCameraManager = ctrl->PlayerCameraManager;
 		}
 	}
+	isColorRed = true;
 }
 
 void UGrappleComponent::CheckElementTargetable()
@@ -229,11 +230,14 @@ FVector UGrappleComponent::GetVirtualLeftHandPosition()
 	return pos;
 }
 
-void UGrappleComponent::DisplayHelping(bool _hit, FHitResult _hitResult, FVector _location, FVector _end)
+void UGrappleComponent::DisplayHelping()
 {
-	FVector direction = _end - _location;
+	FVector end = GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling;
+	FVector location = GetHandPosition();
+	FVector direction = end - location;
 	FVector scale;
 	FRotator rotation = direction.Rotation();
+	FHitResult hitResult;
 	if (HelperAiming == nullptr)
 	{
 		HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
@@ -242,32 +246,43 @@ void UGrappleComponent::DisplayHelping(bool _hit, FHitResult _hitResult, FVector
 	}
 	else if (HelperAiming != nullptr)
 	{
-		HelperAiming->SetActorLocation(_location);
+		HelperAiming->SetActorLocation(location);
 		HelperAiming->SetActorRotation(rotation);
 		scale = HelperAiming->GetActorScale3D();
 		FVector distance = direction.GetSafeNormal() * (maxDistanceGrappling + 100.0f);
 		scale.Z = distance.Size() / 100.0f;
 		HelperAiming->SetActorScale3D(scale);
-
-		if (_hit)
+		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 15.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 		{
 			UPhysicalMaterial* physMat;
-			physMat = _hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+			physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
 			if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
 			{
-				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+				if (isColorRed)
+				{
+					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+					isColorRed = false;
+				}
 			}
 			else
 			{
-				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+				if (!isColorRed)
+				{
+					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+					isColorRed = true;
+				}
 			}
-			distance = _hitResult.ImpactPoint - _location;
+			distance = hitResult.ImpactPoint - location;
 			scale.Z = distance.Size() / 100.0f;
 			HelperAiming->SetActorScale3D(scale);
 		}
 		else
 		{
-			HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+			if (!isColorRed)
+			{
+				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+				isColorRed = true;
+			}
 		}
 	}
 }
@@ -301,6 +316,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
+			DisplayHelping();
 			isAiming = true;
 		}
 		else
