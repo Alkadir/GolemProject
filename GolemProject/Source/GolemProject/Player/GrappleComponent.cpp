@@ -208,28 +208,6 @@ FVector UGrappleComponent::GetHandPosition()
 	return pos;
 }
 
-FVector UGrappleComponent::GetVirtualRightHandPosition()
-{
-	FVector pos = FVector::ZeroVector;
-	if (mSkeletalMesh)
-	{
-		int id = mSkeletalMesh->GetBoneIndex("VB hand_r");
-		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
-	}
-	return pos;
-}
-
-FVector UGrappleComponent::GetVirtualLeftHandPosition()
-{
-	FVector pos = FVector::ZeroVector;
-	if (mSkeletalMesh)
-	{
-		int id = mSkeletalMesh->GetBoneIndex("VB hand_l");
-		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
-	}
-	return pos;
-}
-
 void UGrappleComponent::DisplayHelping()
 {
 	FVector end = GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling;
