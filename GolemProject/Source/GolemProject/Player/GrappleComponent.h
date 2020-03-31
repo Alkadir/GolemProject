@@ -24,6 +24,8 @@ private:
 	class USwingPhysic* swingPhysic = nullptr;
 	class ARope* rope = nullptr;
 	class AActor* HelperAiming;
+	TArray<class AActor*> ActorToIgnore;
+	bool isColorRed;
 
 	FVector mDestination;
 	FVector mDirection;
@@ -148,14 +150,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FVector GetHandPosition();
 
-	UFUNCTION()
-	FVector GetVirtualRightHandPosition();
-
-	UFUNCTION()
-	FVector GetVirtualLeftHandPosition();
-
 	UFUNCTION(BlueprintCallable)
-	void DisplayHelping(bool _hit, FHitResult _hitResult, FVector _location, FVector _end);
+	void DisplayHelping();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
@@ -171,6 +167,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//Implicit Delete SwingPhysics var 
 	void StopSwingPhysics();
 
