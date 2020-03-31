@@ -219,7 +219,13 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 	if (isGrappleSkillEnabled && mGrapple)
 	{
 		ChangeToGrapple();
-		mGrapple->GoToDestination(true);
+
+		if(mGrapple->GetSwingPhysics())
+		{ 
+			mGrapple->ChangeSwingToAttrack();
+		}
+		else
+			mGrapple->GoToDestination(true);
 	}
 }
 

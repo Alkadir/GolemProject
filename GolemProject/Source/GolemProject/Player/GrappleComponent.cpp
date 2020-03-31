@@ -265,6 +265,16 @@ void UGrappleComponent::DisplayHelping()
 	}
 }
 
+void UGrappleComponent::ChangeSwingToAttrack()
+{
+	if (currentProjectile)
+	{
+		currentProjectile->SetColliding(true);
+		currentProjectile->SetCollidingSwinging(false);
+		StopSwingPhysics(false);
+	}
+}
+
 void UGrappleComponent::UpdateIKArm()
 {
 	if (world && mCamera && mCharacter)
@@ -383,7 +393,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 }
 
-void UGrappleComponent::StopSwingPhysics()
+void UGrappleComponent::StopSwingPhysics(const bool& _comingBack)
 {
 	if (swingPhysic && currentProjectile)
 	{
@@ -391,7 +401,7 @@ void UGrappleComponent::StopSwingPhysics()
 		delete swingPhysic;
 		swingPhysic = nullptr;
 
-		currentProjectile->SetComingBack(true);
+		currentProjectile->SetComingBack(_comingBack);
 		mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.RemoveAll(this);
 	}
 }

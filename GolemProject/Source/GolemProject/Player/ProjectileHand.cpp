@@ -39,10 +39,13 @@ void AProjectileHand::BeginPlay()
 
 void AProjectileHand::SetComingBack(const bool& _isComingBack)
 {
-	bIsColliding = false;
-	if (meshComponent != nullptr)
+	if (_isComingBack)
 	{
-		meshComponent->SetCollisionProfileName(TEXT("NoCollision"));
+		bIsColliding = false;
+		if (meshComponent != nullptr)
+		{
+			meshComponent->SetCollisionProfileName(TEXT("NoCollision"));
+		}
 	}
 	bIsComingBack = _isComingBack;
 }

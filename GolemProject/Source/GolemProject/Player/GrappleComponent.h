@@ -152,6 +152,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DisplayHelping();
+	
+	UFUNCTION()
+	void ChangeSwingToAttrack();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
@@ -170,7 +173,7 @@ public:
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//Implicit Delete SwingPhysics var 
-	void StopSwingPhysics();
+	void StopSwingPhysics(const bool& _comingBack = true);
 
 	void CheckGround();
 
