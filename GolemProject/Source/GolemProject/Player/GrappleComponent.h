@@ -24,6 +24,8 @@ private:
 	class USwingPhysic* swingPhysic = nullptr;
 	class ARope* rope = nullptr;
 	class AActor* HelperAiming;
+	TArray<class AActor*> ActorToIgnore;
+	bool isColorRed;
 
 	FVector mDestination;
 	FVector mDirection;
@@ -70,7 +72,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Help)
 	TSubclassOf<class AActor> HelperAimingClass;
 
-	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
 	float maxDistanceGrappling = 3000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
@@ -118,6 +120,9 @@ public:
 	FORCEINLINE bool GetFiring() { return IsFiring; }
 
 	UFUNCTION(BlueprintCallable)
+	FORCEINLINE class UCameraComponent* GetCameraShoulder() { return mCamera; }
+
+	UFUNCTION(BlueprintCallable)
 	void GoToDestination(bool _isAssisted);
 
 	UPROPERTY(BlueprintReadOnly)
@@ -139,8 +144,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AProjectileHand* GetProjectile() { return currentProjectile; };
 
-	UFUNCTION()
+	UPROPERTY(BlueprintReadOnly)
+	class UStaticMeshComponent* HelperAimingMesh;
+
+	UFUNCTION(BlueprintCallable)
 	FVector GetHandPosition();
+
+	UFUNCTION(BlueprintCallable)
+	void DisplayHelping();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
@@ -165,4 +176,7 @@ public:
 	void StopSwingPhysics();
 
 	void CheckGround();
+
+	UPROPERTY(BlueprintReadOnly)
+	bool isAiming;
 };

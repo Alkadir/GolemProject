@@ -20,6 +20,7 @@
 #include "DrawDebugHelpers.h"
 #include "Player/Rope.h"
 #include "Components/CapsuleComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 //#include "DrawDebugHelpers.h"
 
@@ -66,6 +67,7 @@ void UGrappleComponent::BeginPlay()
 			PlayerCameraManager = ctrl->PlayerCameraManager;
 		}
 	}
+	isColorRed = true;
 }
 
 void UGrappleComponent::CheckElementTargetable()
@@ -146,8 +148,8 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			if (currentProjectile)
 			{
 				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
-				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
-				FVector direction = (offset - currentProjectile->GetActorLocation());
+				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling);
+				FVector direction = (offset - GetHandPosition());
 				direction.Normalize();
 
 				if (currentProjectile->GetMeshComponent())
@@ -164,7 +166,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				bIsAssisted = _isAssisted;
 				currentProjectile->SetAssisted(_isAssisted);
 
-				//Create the rope visual 
+				//Create the rope visual
 				rope = world->SpawnActor<ARope>(ropeClass);
 				rope->SetGrappleComponent(this);
 			}
@@ -206,6 +208,85 @@ FVector UGrappleComponent::GetHandPosition()
 	return pos;
 }
 
+FVector UGrappleComponent::GetVirtualRightHandPosition()
+{
+	FVector pos = FVector::ZeroVector;
+	if (mSkeletalMesh)
+	{
+		int id = mSkeletalMesh->GetBoneIndex("VB hand_r");
+		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
+	}
+	return pos;
+}
+
+FVector UGrappleComponent::GetVirtualLeftHandPosition()
+{
+	FVector pos = FVector::ZeroVector;
+	if (mSkeletalMesh)
+	{
+		int id = mSkeletalMesh->GetBoneIndex("VB hand_l");
+		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
+	}
+	return pos;
+}
+
+void UGrappleComponent::DisplayHelping()
+{
+	FVector end = GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling;
+	FVector location = GetHandPosition();
+	FVector direction = end - location;
+	FVector scale;
+	FRotator rotation = direction.Rotation();
+	FHitResult hitResult;
+	if (HelperAiming == nullptr)
+	{
+		HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
+		if (HelperAiming != nullptr)
+			HelperAimingMesh = HelperAiming->FindComponentByClass<UStaticMeshComponent>();
+	}
+	else if (HelperAiming != nullptr)
+	{
+		HelperAiming->SetActorLocation(location);
+		HelperAiming->SetActorRotation(rotation);
+		scale = HelperAiming->GetActorScale3D();
+		FVector distance = direction.GetSafeNormal() * (maxDistanceGrappling + 100.0f);
+		scale.Z = distance.Size() / 100.0f;
+		HelperAiming->SetActorScale3D(scale);
+		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 15.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
+		{
+			UPhysicalMaterial* physMat;
+			physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+			if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
+			{
+				if (isColorRed)
+				{
+					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+					isColorRed = false;
+				}
+			}
+			else
+			{
+				if (!isColorRed)
+				{
+					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+					isColorRed = true;
+				}
+			}
+			distance = hitResult.ImpactPoint - location;
+			scale.Z = distance.Size() / 100.0f;
+			HelperAiming->SetActorScale3D(scale);
+		}
+		else
+		{
+			if (!isColorRed)
+			{
+				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+				isColorRed = true;
+			}
+		}
+	}
+}
+
 void UGrappleComponent::UpdateIKArm()
 {
 	if (world && mCamera && mCharacter)
@@ -235,31 +316,8 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
-			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * maxDistanceGrappling;
-			FVector direction = end - GetHandPosition();
-			FVector location = GetHandPosition();
-			FVector scale;
-			FRotator rotation = direction.Rotation();
-			if (HelperAiming == nullptr)
-			{
-				HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
-			}
-			else
-			{
-				HelperAiming->SetActorLocation(location);
-				FHitResult hitResult;
-				HelperAiming->SetActorRotation(rotation);
-				scale = HelperAiming->GetActorScale3D();
-				FVector distance = direction.GetSafeNormal() * maxDistanceGrappling;
-				scale.Z = distance.Size() / 100.0f;
-				HelperAiming->SetActorScale3D(scale);
-				if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
-				{
-					distance = hitResult.ImpactPoint - location;
-					scale.Z = distance.Size() / 100.0f;
-					HelperAiming->SetActorScale3D(scale);
-				}
-			}
+			DisplayHelping();
+			isAiming = true;
 		}
 		else
 		{
@@ -267,6 +325,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			{
 				HelperAiming->Destroy();
 				HelperAiming = nullptr;
+				isAiming = false;
 			}
 		}
 	}
@@ -318,7 +377,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMinLength(minDistanceSwinging);
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
-					
+
 					if (mCharacter->GetCustomCapsuleComponent())
 					{
 						HelperLibrary::Print("add delegate");
