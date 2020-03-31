@@ -206,28 +206,6 @@ FVector UGrappleComponent::GetHandPosition()
 	return pos;
 }
 
-FVector UGrappleComponent::GetVirtualRightHandPosition()
-{
-	FVector pos = FVector::ZeroVector;
-	if (mSkeletalMesh)
-	{
-		int id = mSkeletalMesh->GetBoneIndex("VB hand_r");
-		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
-	}
-	return pos;
-}
-
-FVector UGrappleComponent::GetVirtualLeftHandPosition()
-{
-	FVector pos = FVector::ZeroVector;
-	if (mSkeletalMesh)
-	{
-		int id = mSkeletalMesh->GetBoneIndex("VB hand_l");
-		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
-	}
-	return pos;
-}
-
 void UGrappleComponent::UpdateIKArm()
 {
 	if (world && mCamera && mCharacter)
@@ -294,7 +272,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 	if (currentProjectile && currentProjectile->GetMeshComponent() && mSkeletalMesh)
 	{
-		mDirection = currentProjectile->GetLocation() - GetVirtualRightHandPosition();
+		mDirection = currentProjectile->GetLocation() - mCharacter->GetVirtualRightHandPosition();
 		mDistance += FVector::Dist(mLastLocation, currentProjectile->GetLocation());
 		float distanceWithCharacter = mDirection.Size();
 		mLastLocation = currentProjectile->GetLocation();
@@ -340,7 +318,12 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMinLength(minDistanceSwinging);
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
-
+					
+					if (mCharacter->GetCustomCapsuleComponent())
+					{
+						HelperLibrary::Print("add delegate");
+						mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &UGrappleComponent::OnBeginOverlap);
+					}
 					//Reset dash when the player grappled something
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
 						dashComp->ResetDashInAir();
@@ -372,6 +355,7 @@ void UGrappleComponent::StopSwingPhysics()
 		swingPhysic = nullptr;
 
 		currentProjectile->SetComingBack(true);
+		mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.RemoveAll(this);
 	}
 }
 
@@ -390,7 +374,7 @@ void UGrappleComponent::CheckGround()
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 			ActorsToIgnore.Add(mCharacter);
-		
+
 			if (UKismetSystemLibrary::SphereOverlapActors(world, location, radiusOnGround, ObjectTypes, NULL, ActorsToIgnore, OutActors))
 			{
 				if (swingPhysic)
@@ -463,5 +447,14 @@ void UGrappleComponent::AttractCharacter()
 				currentProjectile->SetComingBack(true);
 			}
 		}
+	}
+}
+
+void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (swingPhysic)
+	{
+		HelperLibrary::Print("on begin overlap ");
+		swingPhysic->InvertVelocity(SweepResult.ImpactNormal);
 	}
 }

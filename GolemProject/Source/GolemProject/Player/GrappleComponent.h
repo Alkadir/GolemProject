@@ -142,12 +142,6 @@ public:
 	UFUNCTION()
 	FVector GetHandPosition();
 
-	UFUNCTION()
-	FVector GetVirtualRightHandPosition();
-
-	UFUNCTION()
-	FVector GetVirtualLeftHandPosition();
-
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
 
@@ -162,6 +156,11 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/*UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	*/
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//Implicit Delete SwingPhysics var 
 	void StopSwingPhysics();
 
