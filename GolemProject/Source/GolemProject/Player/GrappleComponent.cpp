@@ -18,7 +18,10 @@
 #include "SwingPhysic.h"
 #include "DashComponent.h"
 #include "DrawDebugHelpers.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "Player/Rope.h"
+#include "Components/CapsuleComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+
 //#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -27,7 +30,6 @@ UGrappleComponent::UGrappleComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 	// ...
 }
 
@@ -36,6 +38,7 @@ UGrappleComponent::UGrappleComponent()
 void UGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	SetTickGroup(ETickingGroup::TG_PrePhysics);
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
 	if (mCharacter)
@@ -144,13 +147,13 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			if (currentProjectile)
 			{
 				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
-				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
-				FVector direction = (offset - currentProjectile->GetActorLocation());
+				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling);
+				FVector direction = (offset - GetHandPosition());
 				direction.Normalize();
 
 				if (currentProjectile->GetMeshComponent())
 				{
-					mLastLocation = currentProjectile->GetMeshComponent()->GetComponentLocation();
+					mLastLocation = currentProjectile->GetLocation();
 				}
 				mDistance = 0.0f;
 				//DrawDebugLine(world, mCamera->GetComponentLocation(), offset, FColor::Red, true);
@@ -161,6 +164,10 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				IsFiring = true;
 				bIsAssisted = _isAssisted;
 				currentProjectile->SetAssisted(_isAssisted);
+
+				//Create the rope visual 
+				rope = world->SpawnActor<ARope>(ropeClass);
+				rope->SetGrappleComponent(this);
 			}
 		}
 	}
@@ -180,7 +187,7 @@ void UGrappleComponent::SetIKArm(FVector& _lookAt, bool& _isBlend)
 	if (!currentProjectile)
 		_lookAt = IKposition;
 	else if (currentProjectile->GetMeshComponent())
-		_lookAt = currentProjectile->GetMeshComponent()->GetComponentLocation();
+		_lookAt = currentProjectile->GetLocation();
 	else
 		_lookAt = currentProjectile->GetActorLocation();
 
@@ -198,6 +205,71 @@ FVector UGrappleComponent::GetHandPosition()
 		pos = mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
 	}
 	return pos;
+}
+
+FVector UGrappleComponent::GetVirtualRightHandPosition()
+{
+	FVector pos = FVector::ZeroVector;
+	if (mSkeletalMesh)
+	{
+		int id = mSkeletalMesh->GetBoneIndex("VB hand_r");
+		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
+	}
+	return pos;
+}
+
+FVector UGrappleComponent::GetVirtualLeftHandPosition()
+{
+	FVector pos = FVector::ZeroVector;
+	if (mSkeletalMesh)
+	{
+		int id = mSkeletalMesh->GetBoneIndex("VB hand_l");
+		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
+	}
+	return pos;
+}
+
+void UGrappleComponent::DisplayHelping(bool _hit, FHitResult _hitResult, FVector _location, FVector _end)
+{
+	FVector direction = _end - _location;
+	FVector scale;
+	FRotator rotation = direction.Rotation();
+	if (HelperAiming == nullptr)
+	{
+		HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
+		if (HelperAiming != nullptr)
+			HelperAimingMesh = HelperAiming->FindComponentByClass<UStaticMeshComponent>();
+	}
+	else if (HelperAiming != nullptr)
+	{
+		HelperAiming->SetActorLocation(_location);
+		HelperAiming->SetActorRotation(rotation);
+		scale = HelperAiming->GetActorScale3D();
+		FVector distance = direction.GetSafeNormal() * (maxDistanceGrappling + 100.0f);
+		scale.Z = distance.Size() / 100.0f;
+		HelperAiming->SetActorScale3D(scale);
+
+		if (_hit)
+		{
+			UPhysicalMaterial* physMat;
+			physMat = _hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+			if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
+			{
+				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+			}
+			else
+			{
+				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+			}
+			distance = _hitResult.ImpactPoint - _location;
+			scale.Z = distance.Size() / 100.0f;
+			HelperAiming->SetActorScale3D(scale);
+		}
+		else
+		{
+			HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+		}
+	}
 }
 
 void UGrappleComponent::UpdateIKArm()
@@ -229,31 +301,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
-			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * maxDistanceGrappling;
-			FVector direction = end - GetHandPosition();
-			FVector location = GetHandPosition();
-			FVector scale;
-			FRotator rotation = direction.Rotation();
-			if (HelperAiming == nullptr)
-			{
-				HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
-			}
-			else
-			{
-				HelperAiming->SetActorLocation(location);
-				FHitResult hitResult;
-				HelperAiming->SetActorRotation(rotation);
-				scale = HelperAiming->GetActorScale3D();
-				FVector distance = direction.GetSafeNormal() * maxDistanceGrappling;
-				scale.Z = distance.Size() / 100.0f;
-				HelperAiming->SetActorScale3D(scale);
-				if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
-				{
-					distance = hitResult.ImpactPoint - location;
-					scale.Z = distance.Size() / 100.0f;
-					HelperAiming->SetActorScale3D(scale);
-				}
-			}
+			isAiming = true;
 		}
 		else
 		{
@@ -261,15 +309,16 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			{
 				HelperAiming->Destroy();
 				HelperAiming = nullptr;
+				isAiming = false;
 			}
 		}
 	}
 	if (currentProjectile && currentProjectile->GetMeshComponent() && mSkeletalMesh)
 	{
-		mDirection = currentProjectile->GetMeshComponent()->GetComponentLocation() - mSkeletalMesh->GetBoneTransform(mIdBone).GetLocation();
-		mDistance += FVector::Dist(mLastLocation, currentProjectile->GetMeshComponent()->GetComponentLocation());
+		mDirection = currentProjectile->GetLocation() - GetVirtualRightHandPosition();
+		mDistance += FVector::Dist(mLastLocation, currentProjectile->GetLocation());
 		float distanceWithCharacter = mDirection.Size();
-		mLastLocation = currentProjectile->GetMeshComponent()->GetComponentLocation();
+		mLastLocation = currentProjectile->GetLocation();
 		if (currentProjectile->IsComingBack())
 		{
 			if (distanceWithCharacter < offsetStop)
@@ -298,14 +347,13 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		}
 		else if (currentProjectile->IsCollidingSwinging())
 		{
-			
 			if (mCharacter && bIsAssisted)
 			{
 				//Create the swing physics for the player
 				if (!swingPhysic && ClosestGrapplingHook)
 				{
 					swingPhysic = new USwingPhysic(this);
-					
+
 					swingPhysic->SetScaleGravity(scaleGravity);
 					swingPhysic->SetFriction(friction);
 					swingPhysic->SetForceMovement(forceMovement);
@@ -314,11 +362,13 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
 
+					//Reset dash when the player grappled something
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
 						dashComp->ResetDashInAir();
 				}
-				else currentProjectile->SetComingBack(true);
 			}
+
+			CheckGround();
 		}
 		else
 		{
@@ -346,6 +396,34 @@ void UGrappleComponent::StopSwingPhysics()
 	}
 }
 
+void UGrappleComponent::CheckGround()
+{
+	if (world)
+	{
+		if (mCharacter && mCharacter->GetCapsuleComponent())
+		{
+			float height = mCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - radiusOnGround * 0.5f;
+			FVector location = mCharacter->GetActorLocation() - mCharacter->GetActorUpVector() * height;
+
+			TArray<AActor*>OutActors;
+			TArray<AActor*>ActorsToIgnore;
+			TArray<TEnumAsByte<EObjectTypeQuery>>ObjectTypes;
+			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
+			ActorsToIgnore.Add(mCharacter);
+
+			if (UKismetSystemLibrary::SphereOverlapActors(world, location, radiusOnGround, ObjectTypes, NULL, ActorsToIgnore, OutActors))
+			{
+				if (swingPhysic)
+					StopSwingPhysics();
+
+				if (currentProjectile)
+					currentProjectile->SetComingBack(true);
+			}
+		}
+	}
+}
+
 void UGrappleComponent::PlayerIsNear()
 {
 	if (mCharacter)
@@ -364,10 +442,14 @@ void UGrappleComponent::PlayerIsNear()
 			mSkeletalMesh->bRequiredBonesUpToDate = false;
 		}
 
+		if (rope)
+			rope->Destroy();
+
 		if (currentProjectile)
 		{
 			currentProjectile->Destroy();
 		}
+		rope = nullptr;
 		currentProjectile = nullptr;
 		IsFiring = false;
 	}
@@ -384,15 +466,15 @@ void UGrappleComponent::AttractCharacter()
 		mCharacter->LaunchCharacter(mDirection * velocity, true, true);
 
 		//change rotation player when the grapple isn't assisted
+		FRotator finalRotation = tempDir.Rotation();
+		finalRotation.Add(-90.0f, 0.0f, 0.0f);
 
-		FVector tempRight = FVector::CrossProduct(tempDir,FVector::UpVector);
-		tempDir = FVector::CrossProduct(tempDir, tempRight);
-		
-		FRotator rotation = FMath::Lerp(mCharacter->GetActorRotation(), tempDir.Rotation(), 0.1f);
+		FRotator rotation = FMath::Lerp(mCharacter->GetActorRotation(), finalRotation, 0.1f);
 		mCharacter->SetActorRotation(rotation);
 
 		if (world)
 		{
+			//check if the player doesn't collide with anything(in front of him)
 			FHitResult hit;
 			if (world->LineTraceSingleByChannel(hit, mCharacter->GetActorLocation(), mCharacter->GetActorLocation() + mDirection * offsetBlockingObject, ECollisionChannel::ECC_Visibility))
 			{

@@ -8,6 +8,7 @@
 #include "HealthComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterDie);
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GOLEMPROJECT_API UHealthComponent : public UActorComponent
 {
@@ -97,4 +98,9 @@ public:
 		
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		inline bool IsDead() { return bIsDead; }
+
+
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+		FCharacterDie OnCharacterDie;
 };

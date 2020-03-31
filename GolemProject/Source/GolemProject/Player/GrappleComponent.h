@@ -22,7 +22,7 @@ private:
 	class AGolemProjectGameMode* GameMode;
 	class APlayerCameraManager* PlayerCameraManager;
 	class USwingPhysic* swingPhysic = nullptr;
-
+	class ARope* rope = nullptr;
 	class AActor* HelperAiming;
 
 	FVector mDestination;
@@ -50,10 +50,16 @@ private:
 	float forceMovement = 5.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float speedRotation = 0.02f;
+	float speedRotation = 0.06f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float releaseForce = 1.0f;
+	
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float radiusOnGround = 25.0f;
+	
+	UPROPERTY(EditAnywhere, Category = "Swing Render", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ARope> ropeClass;
 
 	float mDistance;
 	
@@ -64,7 +70,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Help)
 	TSubclassOf<class AActor> HelperAimingClass;
 
-	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
 	float maxDistanceGrappling = 3000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
@@ -112,6 +118,9 @@ public:
 	FORCEINLINE bool GetFiring() { return IsFiring; }
 
 	UFUNCTION(BlueprintCallable)
+	FORCEINLINE class UCameraComponent* GetCameraShoulder() { return mCamera; }
+
+	UFUNCTION(BlueprintCallable)
 	void GoToDestination(bool _isAssisted);
 
 	UPROPERTY(BlueprintReadOnly)
@@ -130,10 +139,23 @@ public:
 
 	FORCEINLINE const FVector& GetDirection() { return mDirection; };
 
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AProjectileHand* GetProjectile() { return currentProjectile; };
 
-	UFUNCTION()
+	UPROPERTY(BlueprintReadOnly)
+	class UStaticMeshComponent* HelperAimingMesh;
+
+	UFUNCTION(BlueprintCallable)
 	FVector GetHandPosition();
+
+	UFUNCTION()
+	FVector GetVirtualRightHandPosition();
+
+	UFUNCTION()
+	FVector GetVirtualLeftHandPosition();
+
+	UFUNCTION(BlueprintCallable)
+	void DisplayHelping(bool _hit, FHitResult _hitResult, FVector _location, FVector _end);
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
@@ -151,4 +173,9 @@ public:
 
 	//Implicit Delete SwingPhysics var 
 	void StopSwingPhysics();
+
+	void CheckGround();
+
+	UPROPERTY(BlueprintReadOnly)
+	bool isAiming;
 };

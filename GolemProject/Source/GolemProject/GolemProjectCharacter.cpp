@@ -157,36 +157,15 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 {
 	Super::Tick(_deltaTime);
 
-	if (UWorld* world = GetWorld())
-	{
-		FHitResult hit;
-		if (GetCapsuleComponent())
-		{
-			float height = GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 1.0f;
-
-			if (world->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() - FVector::UpVector * height, ECollisionChannel::ECC_Visibility))
-			{
-				if (hit.bBlockingHit)
-				{
-					if (mGrapple && mGrapple->GetSwingPhysics())
-					{
-						mGrapple->StopSwingPhysics();
-					}
-				}
-			}
-		}
-	}
-
 	if (mGrapple && !mGrapple->GetSwingPhysics())
 	{
 		FRotator rotFinal = FRotator::ZeroRotator;
-		rotFinal.Pitch = 0.0f;
 		rotFinal.Yaw = GetActorRotation().Yaw;
-		rotFinal.Roll = GetActorRotation().Roll;
 
-		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.05f);
+		FRotator rot = FMath::Lerp(GetActorRotation(), rotFinal, 0.09f);
 		SetActorRotation(rot);
 	}
+
 	if (PushingComponent && PushingComponent->GetIsPushingObject(false) && actorToInteract)
 	{
 		if (fabs(startPushingZ - GetActorLocation().Z) > 2.f)
@@ -313,10 +292,19 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 	{
 		if (!isSightCameraEnabled)
 		{
-
-			if ((isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple) || (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist))
+			if (isGrappleSkillEnabled && mGrapple && mGrapple->IsTargetingGrapple)
 			{
 				pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
+				isSightCameraEnabled = true;
+				if (GetCharacterMovement())
+				{
+					GetCharacterMovement()->bOrientRotationToMovement = false;
+				}
+				IsInteractingOrAiming = true;
+			}
+			else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist)
+			{
+				pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 				isSightCameraEnabled = true;
 				if (GetCharacterMovement())
 				{
@@ -519,23 +507,40 @@ void AGolemProjectCharacter::InflictDamage(int _damage)
 		HealthComponent->InflictDamage(_damage);
 }
 
+bool AGolemProjectCharacter::IsCharacterDead()
+{
+	if (HealthComponent) return HealthComponent->IsDead();
+	return false;
+}
+
 //WIP DO NOT TOUCH
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
-	/*if (_activate)
+	UCapsuleComponent* capsule = GetCapsuleComponent();
+	if (_activate)
 	{
-		GetCharacterMovement()->StopMovementImmediately();
+		if (capsule)
+		{
+			capsule->SetCollisionProfileName("NoCollision");
+			//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		/*GetCharacterMovement()->StopMovementImmediately();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->SetSimulatePhysics(true);*/
 	}
 	else
 	{
-		GetMesh()->SetSimulatePhysics(false);
+		if (capsule)
+		{
+			capsule->SetCollisionProfileName("Pawn");
+			//capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		}
+		/*GetMesh()->SetSimulatePhysics(false);
 		GetMesh()->SetAllBodiesSimulatePhysics(false);
 		GetMesh()->ResetAllBodiesSimulatePhysics();
 		GetMesh()->RecreatePhysicsState();
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	}*/
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);*/
+	}
 }
 
 void AGolemProjectCharacter::ResetMeshOnRightPlace()

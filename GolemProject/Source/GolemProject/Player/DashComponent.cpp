@@ -4,6 +4,7 @@
 #include "DashComponent.h"
 #include <Engine/Engine.h>
 #include "GolemProjectCharacter.h"
+#include "Helpers/HelperLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
@@ -36,10 +37,12 @@ void UDashComponent::StopDash()
 		CharacterMovementCmpt->StopMovementImmediately();
 		if (CurrentVelocity.IsZero())
 		{
+			HelperLibrary::Print("direction : " + CurrentDirection.ToString());
 			CharacterMovementCmpt->AddImpulse(CurrentDirection * ForceAfterDash, true);
 		}
 		else
 		{
+			HelperLibrary::Print("velocity : " + CurrentVelocity.GetSafeNormal().ToString());
 			CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
 		}
 		m_character->ResetFriction();
@@ -67,8 +70,8 @@ void UDashComponent::Dash(FVector _direction)
 			if (CharacterMovementCmpt->IsFalling())	HasDashInAir = true;
 			CharacterMovementCmpt->GroundFriction = 0.0f;
 			CurrentDirection = _direction;
-			CurrentVelocity = m_character->GetVelocity().GetAbs() * _direction;
-			CurrentVelocity.Z = 0.0f;
+			CurrentDirection.Z = 0.0f;
+			CurrentVelocity = m_character->GetVelocity().Size() * _direction;
 			m_character->LaunchCharacter(_direction * ForceDash, false, false);
 			isDashing = true;
 			m_canDash = false;

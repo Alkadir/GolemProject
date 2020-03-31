@@ -8,7 +8,6 @@
 #include "Interfaces/Interactable.h"
 #include "GolemProjectCharacter.generated.h"
 
-
 UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
@@ -130,10 +129,6 @@ protected:
 
 	void UseAssistedGrapple();
 
-	void ChangeToGrapple();
-
-	void ChangeToFist();
-
 	UFUNCTION()
 		void SetUpBlockOffsetPositon();
 
@@ -186,7 +181,13 @@ public:
 
 	void StopPushBloc();
 
+	void ChangeToGrapple();
+
+	void ChangeToFist();
+
 	void InflictDamage(int _damage);
+
+	bool IsCharacterDead();
 
 	void ActivateDeath(bool _activate);
 
