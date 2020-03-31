@@ -147,8 +147,8 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			if (currentProjectile)
 			{
 				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
-				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy);
-				FVector direction = (offset - currentProjectile->GetActorLocation());
+				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling);
+				FVector direction = (offset - GetHandPosition());
 				direction.Normalize();
 
 				if (currentProjectile->GetMeshComponent())
@@ -229,6 +229,49 @@ FVector UGrappleComponent::GetVirtualLeftHandPosition()
 	return pos;
 }
 
+void UGrappleComponent::DisplayHelping(bool _hit, FHitResult _hitResult, FVector _location, FVector _end)
+{
+	FVector direction = _end - _location;
+	FVector scale;
+	FRotator rotation = direction.Rotation();
+	if (HelperAiming == nullptr)
+	{
+		HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
+		if (HelperAiming != nullptr)
+			HelperAimingMesh = HelperAiming->FindComponentByClass<UStaticMeshComponent>();
+	}
+	else if (HelperAiming != nullptr)
+	{
+		HelperAiming->SetActorLocation(_location);
+		HelperAiming->SetActorRotation(rotation);
+		scale = HelperAiming->GetActorScale3D();
+		FVector distance = direction.GetSafeNormal() * (maxDistanceGrappling + 100.0f);
+		scale.Z = distance.Size() / 100.0f;
+		HelperAiming->SetActorScale3D(scale);
+
+		if (_hit)
+		{
+			UPhysicalMaterial* physMat;
+			physMat = _hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+			if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
+			{
+				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+			}
+			else
+			{
+				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+			}
+			distance = _hitResult.ImpactPoint - _location;
+			scale.Z = distance.Size() / 100.0f;
+			HelperAiming->SetActorScale3D(scale);
+		}
+		else
+		{
+			HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+		}
+	}
+}
+
 void UGrappleComponent::UpdateIKArm()
 {
 	if (world && mCamera && mCharacter)
@@ -258,47 +301,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
-			FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * maxDistanceGrappling;
-			FVector direction = end - GetHandPosition();
-			FVector location = GetHandPosition();
-			FVector scale;
-			FRotator rotation = direction.Rotation();
-			if (HelperAiming == nullptr)
-			{
-				HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
-				HelperAimingMesh = HelperAiming->FindComponentByClass<UStaticMeshComponent>();
-			}
-			else
-			{
-				HelperAiming->SetActorLocation(location);
-				FHitResult hitResult;
-				HelperAiming->SetActorRotation(rotation);
-				scale = HelperAiming->GetActorScale3D();
-				FVector distance = direction.GetSafeNormal() * maxDistanceGrappling;
-				scale.Z = distance.Size() / 100.0f;
-				HelperAiming->SetActorScale3D(scale);
-				if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
-				{
-					UPhysicalMaterial* physMat;
-					physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
-					//if it's a bouncing surface the calculate the direction of bounce 
-					if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
-					{
-						HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
-					}
-					else
-					{
-						HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
-					}
-					distance = hitResult.ImpactPoint - location;
-					scale.Z = distance.Size() / 100.0f;
-					HelperAiming->SetActorScale3D(scale);
-				}
-				else
-				{
-					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
-				}
-			}
+			isAiming = true;
 		}
 		else
 		{
@@ -306,6 +309,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			{
 				HelperAiming->Destroy();
 				HelperAiming = nullptr;
+				isAiming = false;
 			}
 		}
 	}
