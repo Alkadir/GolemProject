@@ -42,7 +42,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = false; 
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
@@ -151,7 +151,8 @@ void AGolemProjectCharacter::BeginPlay()
 	if (FistComp)
 		FistComp->IsTargetingFist = false;
 
-	IsInteractingOrAiming = false;
+	IsInteracting = false;
+	IsAiming = false;
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -307,7 +308,7 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 				{
 					GetCharacterMovement()->bOrientRotationToMovement = false;
 				}
-				IsInteractingOrAiming = true;
+				IsAiming = true;
 			}
 			else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist)
 			{
@@ -317,7 +318,7 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 				{
 					GetCharacterMovement()->bOrientRotationToMovement = false;
 				}
-				IsInteractingOrAiming = true;
+				IsAiming = true;
 			}
 
 		}
@@ -334,7 +335,7 @@ void AGolemProjectCharacter::ChangeCameraReleased()
 	{
 		if (isSightCameraEnabled)
 		{
-			IsInteractingOrAiming = false;
+			IsAiming = false;
 			isSightCameraEnabled = false;
 			if (GetCharacterMovement())
 			{
@@ -487,7 +488,7 @@ bool AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingP
 		PushingComponent->PushBloc(pushingDirection, pushingPosition, pushingRotation);
 		PushingComponent->SetBlock(Cast<APushableBloc>(actorToInteract));
 	}
-	IsInteractingOrAiming = true;
+	IsInteracting = true;
 	return true;
 }
 
@@ -503,7 +504,7 @@ void AGolemProjectCharacter::StopPushBloc()
 	}
 	pushedObjectIsCollidingForward = false;
 	pushedObjectIsCollidingBackward = false;
-	IsInteractingOrAiming = false;
+	IsInteracting = false;
 }
 
 void AGolemProjectCharacter::InflictDamage(int _damage)

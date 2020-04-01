@@ -10,10 +10,6 @@ void ADartTrap::BeginPlay()
 {
 	Super::BeginPlay();
 	timerCooldown = cooldown;
-	if (alwaysActive)
-	{
-		Activate(nullptr);
-	}
 }
 
 void ADartTrap::Tick(float DeltaTime)
