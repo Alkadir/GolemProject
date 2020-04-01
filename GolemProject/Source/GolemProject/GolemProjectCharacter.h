@@ -206,7 +206,10 @@ public:
 	void ResetMeshOnRightPlace();
 
 	UPROPERTY(BlueprintReadOnly)
-	bool IsInteractingOrAiming;
+	bool IsInteracting;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsAiming;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_Death();
