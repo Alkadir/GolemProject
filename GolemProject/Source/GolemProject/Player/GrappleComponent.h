@@ -40,7 +40,7 @@ private:
 	float minDistanceSwinging = 100.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing physics", meta = (AllowPrivateAccess = "true"))
-	float maxDistanceSwinging = 3000.0f;
+	float maxDistanceSwinging = 1650.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float scaleGravity = 4.0f;
@@ -79,7 +79,7 @@ protected:
 	float velocity = 5000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
-	float offsetStop = 200.0f;
+	float offsetStop = 100.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
 	float offsetBlockingObject = 200.0f;
