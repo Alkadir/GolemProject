@@ -17,14 +17,14 @@ public:
 	ATrap();
 
 protected:
-	// Called when the game starts or when spawned
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Trap")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trap")
 		bool isActivate = false;
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Trap")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trap")
 		bool alwaysActive = false;
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Trap")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trap")
 		int damage = 1;
 
+	virtual void BeginPlay() override;
 public:	
 
 
