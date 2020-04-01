@@ -37,12 +37,10 @@ void UDashComponent::StopDash()
 		CharacterMovementCmpt->StopMovementImmediately();
 		if (CurrentVelocity.IsZero())
 		{
-			HelperLibrary::Print("direction : " + CurrentDirection.ToString());
 			CharacterMovementCmpt->AddImpulse(CurrentDirection * ForceAfterDash, true);
 		}
 		else
 		{
-			HelperLibrary::Print("velocity : " + CurrentVelocity.GetSafeNormal().ToString());
 			CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
 		}
 		m_character->ResetFriction();

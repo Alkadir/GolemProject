@@ -16,54 +16,57 @@ class AGolemProjectCharacter : public ACharacter
 private:
 
 	UPROPERTY(EditAnyWhere, Category = "Debug")
-		bool showCursor = false;
+	bool showCursor = false;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
-		bool isGrappleSkillEnabled = false;
+	bool isGrappleSkillEnabled = false;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
-		bool isFistSkillEnabled = false;
+	bool isFistSkillEnabled = false;
 
 	UPROPERTY()
-		bool isSightCameraEnabled = false;
+	bool isSightCameraEnabled = false;
 
 	float m_valueForward;
 
 	float m_valueRight;
 
 	UPROPERTY()
-		class UUserWidget* currentSightWidget = nullptr;
+	class UUserWidget* currentSightWidget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
-		class UGrappleComponent* mGrapple;
+	class UGrappleComponent* mGrapple;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FistComp, meta = (AllowPrivateAccess = "true"))
-		class UFistComponent* FistComp;
+	class UFistComponent* FistComp;
+
+	UPROPERTY(EditAnywhere)
+	class UCapsuleComponent* customCapsule;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* FollowCamera;
+	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-		class UHealthComponent* HealthComponent;
+	class UHealthComponent* HealthComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
-		class UPushingComponent* PushingComponent;
+	class UPushingComponent* PushingComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
-		class URaycastingComponent* RaycastingComponent;
+	class URaycastingComponent* RaycastingComponent;
 
 	class APlayerController* pc;
 
 	UPROPERTY()
-		class UChildActorComponent* sightCamera;
+	class UChildActorComponent* sightCamera;
 
 	UPROPERTY()
-		class UChildActorComponent* sightCameraL;
+	class UChildActorComponent* sightCameraL;
 
 	float initialGroundFriction;
 
@@ -72,18 +75,19 @@ private:
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
-		AActor* actorToInteract;
+	AActor* actorToInteract;
 	UPROPERTY(BlueprintReadWrite)
-		bool pushedObjectIsCollidingForward;
+	bool pushedObjectIsCollidingForward;
 	UPROPERTY(BlueprintReadWrite)
-		bool pushedObjectIsCollidingBackward;
+	bool pushedObjectIsCollidingBackward;
+
 	float startPushingZ;
 
 	UPROPERTY(BlueprintReadWrite)
-		FVector rightHandPosition;
+	FVector rightHandPosition;
 	FVector offsetRightHand;
 	UPROPERTY(BlueprintReadWrite)
-		FVector leftHandPosition;
+	FVector leftHandPosition;
 	FVector offsetLeftHand;
 
 
@@ -118,7 +122,7 @@ protected:
 	void ChangeCameraReleased();
 
 	UPROPERTY(EditAnywhere)
-		UDashComponent* dashComponent;
+	UDashComponent* dashComponent;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -130,7 +134,7 @@ protected:
 	void UseAssistedGrapple();
 
 	UFUNCTION()
-		void SetUpBlockOffsetPositon();
+	void SetUpBlockOffsetPositon();
 
 	void CheckIfStillOnGround();
 
@@ -138,18 +142,18 @@ public:
 	AGolemProjectCharacter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
-		TSubclassOf<class UUserWidget>  sightHudClass;
+	TSubclassOf<class UUserWidget>  sightHudClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseTurnRate;
+	float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseLookUpRate;
+	float BaseLookUpRate;
 
 	UFUNCTION(BlueprintCallable, Category = "Hud")
-		FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
 
 	FORCEINLINE bool& IsGrappleSkillEnabled() { return isGrappleSkillEnabled; };
 
@@ -169,13 +173,21 @@ public:
 
 	FORCEINLINE class URaycastingComponent* GetRaycastingComponent() const { return RaycastingComponent; }
 
+	FORCEINLINE class UCapsuleComponent* GetCustomCapsuleComponent() const { return customCapsule; }
+
+	UFUNCTION()
+	FVector GetVirtualRightHandPosition();
+
+	UFUNCTION()
+	FVector GetVirtualLeftHandPosition();
+
 	UFUNCTION(BlueprintCallable, Category = "Dash")
-		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
+	FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
 
 	UFUNCTION(BlueprintCallable, Category = "IK")
-		void SetRightHandPosition(FVector newPos) { rightHandPosition = newPos; }
+	void SetRightHandPosition(FVector newPos) { rightHandPosition = newPos; }
 	UFUNCTION(BlueprintCallable, Category = "IK")
-		void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
+	void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
 
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
@@ -194,8 +206,8 @@ public:
 	void ResetMeshOnRightPlace();
 
 	UPROPERTY(BlueprintReadOnly)
-		bool IsInteractingOrAiming;
+	bool IsInteractingOrAiming;
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void Event_Death();
+	void Event_Death();
 };

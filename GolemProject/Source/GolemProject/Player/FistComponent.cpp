@@ -44,6 +44,7 @@ void UFistComponent::BeginPlay()
 	mCamera = HelperLibrary::GetComponentByName<UCameraComponent>(child->GetChildActor(), "Camera");
 	world = GetWorld();
 	CanFire = true;
+	isColorRed = true;
 }
 
 void UFistComponent::UpdateIKArm()
@@ -93,7 +94,7 @@ void UFistComponent::GoToDestination()
 			currentProjectile = world->SpawnActor<AFistProjectile>(fistProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
-				FVector offset = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
+				FVector offset = GetHandPosition() + mCamera->GetForwardVector() * accuracy;
 				FVector direction = (offset - currentProjectile->GetActorLocation());
 				direction /= direction.Size();
 
@@ -135,17 +136,22 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			UpdateIKArm();
 			if (CanFire && mCamera && world)
 			{
-				FVector end = mCamera->GetComponentLocation() + mCamera->GetForwardVector() * accuracy;
+				FVector end = GetHandPosition() + mCamera->GetForwardVector() * accuracy;
 				FVector direction = end - GetHandPosition();
 				FVector location = GetHandPosition();
 				FVector scale;
 				FRotator rotation = direction.Rotation();
+				CanInteract = false;
+				ActorToIgnore.Empty();
 				for (int i = 0; i < NumberBounce; ++i)
 				{
 					//if helping is not spawn, spawn it
 					if (HelperAiming.Num() <= i)
 					{
-						HelperAiming.Add(world->SpawnActor<AActor>(HelperAimingClass));
+						AActor* actorSpawned = world->SpawnActor<AActor>(HelperAimingClass);
+						HelperAiming.Add(actorSpawned);
+						if (HelperAiming[i] != nullptr)
+							HelperAimingMesh.Add(actorSpawned->FindComponentByClass<UStaticMeshComponent>());
 					}
 					if (HelperAiming[i] != nullptr)
 					{
@@ -157,12 +163,21 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 						scale.Z = distance.Size();
 						HelperAiming[i]->SetActorScale3D(scale);
 						//raycast to see if there is any obstacle in front of player
-						if (world->LineTraceSingleByChannel(hitResult, location, end, ECollisionChannel::ECC_Visibility))
+						if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 15.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 						{
+							ActorToIgnore.Empty();
+							ActorToIgnore.Add(hitResult.GetActor());
 							UPhysicalMaterial* physMat;
 							distance = hitResult.ImpactPoint - location;
 							scale.Z = distance.Size() / 100.0f;
 							HelperAiming[i]->SetActorScale3D(scale);
+							if (hitResult.GetActor() != nullptr)
+							{
+								if (IInteractable* interactable = Cast<IInteractable>(hitResult.GetActor()))
+								{
+									CanInteract = true;
+								}
+							}
 							//scale the helping actor to avoid it to going through wall
 							if (hitResult.GetComponent() != nullptr && hitResult.GetComponent()->GetMaterial(0) != nullptr)
 							{
@@ -182,6 +197,9 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 									{
 										for (int j = i + 1; j < HelperAiming.Num(); ++j)
 										{
+											UStaticMeshComponent* staticMeshToDelete = HelperAiming[j]->FindComponentByClass<UStaticMeshComponent>();
+											if (HelperAimingMesh.Contains(staticMeshToDelete))
+												HelperAimingMesh.Remove(staticMeshToDelete);
 											HelperAiming[j]->Destroy();
 											HelperAiming.RemoveAt(j);
 										}
@@ -192,6 +210,28 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 						}
 					}
 				}
+				if (CanInteract)
+				{
+					if (isColorRed)
+					{
+						for (int i = 0; i < HelperAimingMesh.Num(); ++i)
+						{
+							HelperAimingMesh[i]->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+						}
+						isColorRed = false;
+					}
+				}
+				else
+				{
+					if (!isColorRed)
+					{
+						for (int i = 0; i < HelperAimingMesh.Num(); ++i)
+						{
+							HelperAimingMesh[i]->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+						}
+						isColorRed = true;
+					}
+				}
 			}
 			else
 			{
@@ -200,9 +240,13 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 					for (int i = 0; i < HelperAiming.Num(); ++i)
 					{
 						if (HelperAiming[i] != nullptr)
+						{
 							HelperAiming[i]->Destroy();
+						}
 					}
+					HelperAimingMesh.Empty();
 					HelperAiming.Empty();
+					isColorRed = true;
 				}
 			}
 		}
@@ -213,9 +257,13 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 				for (int i = 0; i < HelperAiming.Num(); ++i)
 				{
 					if (HelperAiming[i] != nullptr)
+					{
 						HelperAiming[i]->Destroy();
+					}
 				}
+				HelperAimingMesh.Empty();
 				HelperAiming.Empty();
+				isColorRed = true;
 			}
 		}
 	}

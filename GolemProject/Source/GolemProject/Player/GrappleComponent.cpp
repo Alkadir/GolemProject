@@ -67,6 +67,7 @@ void UGrappleComponent::BeginPlay()
 			PlayerCameraManager = ctrl->PlayerCameraManager;
 		}
 	}
+	isColorRed = true;
 }
 
 void UGrappleComponent::CheckElementTargetable()
@@ -165,7 +166,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				bIsAssisted = _isAssisted;
 				currentProjectile->SetAssisted(_isAssisted);
 
-				//Create the rope visual 
+				//Create the rope visual
 				rope = world->SpawnActor<ARope>(ropeClass);
 				rope->SetGrappleComponent(this);
 			}
@@ -207,33 +208,14 @@ FVector UGrappleComponent::GetHandPosition()
 	return pos;
 }
 
-FVector UGrappleComponent::GetVirtualRightHandPosition()
+void UGrappleComponent::DisplayHelping()
 {
-	FVector pos = FVector::ZeroVector;
-	if (mSkeletalMesh)
-	{
-		int id = mSkeletalMesh->GetBoneIndex("VB hand_r");
-		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
-	}
-	return pos;
-}
-
-FVector UGrappleComponent::GetVirtualLeftHandPosition()
-{
-	FVector pos = FVector::ZeroVector;
-	if (mSkeletalMesh)
-	{
-		int id = mSkeletalMesh->GetBoneIndex("VB hand_l");
-		pos = mSkeletalMesh->GetBoneTransform(id).GetLocation();
-	}
-	return pos;
-}
-
-void UGrappleComponent::DisplayHelping(bool _hit, FHitResult _hitResult, FVector _location, FVector _end)
-{
-	FVector direction = _end - _location;
+	FVector end = GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling;
+	FVector location = GetHandPosition();
+	FVector direction = end - location;
 	FVector scale;
 	FRotator rotation = direction.Rotation();
+	FHitResult hitResult;
 	if (HelperAiming == nullptr)
 	{
 		HelperAiming = world->SpawnActor<AActor>(HelperAimingClass);
@@ -242,33 +224,54 @@ void UGrappleComponent::DisplayHelping(bool _hit, FHitResult _hitResult, FVector
 	}
 	else if (HelperAiming != nullptr)
 	{
-		HelperAiming->SetActorLocation(_location);
+		HelperAiming->SetActorLocation(location);
 		HelperAiming->SetActorRotation(rotation);
 		scale = HelperAiming->GetActorScale3D();
 		FVector distance = direction.GetSafeNormal() * (maxDistanceGrappling + 100.0f);
 		scale.Z = distance.Size() / 100.0f;
 		HelperAiming->SetActorScale3D(scale);
-
-		if (_hit)
+		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 15.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 		{
 			UPhysicalMaterial* physMat;
-			physMat = _hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+			physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
 			if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
 			{
-				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+				if (isColorRed)
+				{
+					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+					isColorRed = false;
+				}
 			}
 			else
 			{
-				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+				if (!isColorRed)
+				{
+					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+					isColorRed = true;
+				}
 			}
-			distance = _hitResult.ImpactPoint - _location;
+			distance = hitResult.ImpactPoint - location;
 			scale.Z = distance.Size() / 100.0f;
 			HelperAiming->SetActorScale3D(scale);
 		}
 		else
 		{
-			HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+			if (!isColorRed)
+			{
+				HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+				isColorRed = true;
+			}
 		}
+	}
+}
+
+void UGrappleComponent::ChangeSwingToAttrack()
+{
+	if (currentProjectile)
+	{
+		currentProjectile->SetColliding(true);
+		currentProjectile->SetCollidingSwinging(false);
+		StopSwingPhysics(false);
 	}
 }
 
@@ -301,6 +304,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsTargetingGrapple && mCharacter->GetSightCameraEnabled() && !currentProjectile)
 		{
 			UpdateIKArm();
+			DisplayHelping();
 			isAiming = true;
 		}
 		else
@@ -315,7 +319,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 	if (currentProjectile && currentProjectile->GetMeshComponent() && mSkeletalMesh)
 	{
-		mDirection = currentProjectile->GetLocation() - GetVirtualRightHandPosition();
+		mDirection = currentProjectile->GetLocation() - mCharacter->GetVirtualRightHandPosition();
 		mDistance += FVector::Dist(mLastLocation, currentProjectile->GetLocation());
 		float distanceWithCharacter = mDirection.Size();
 		mLastLocation = currentProjectile->GetLocation();
@@ -362,6 +366,11 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
 
+					if (mCharacter->GetCustomCapsuleComponent())
+					{
+						HelperLibrary::Print("add delegate");
+						mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &UGrappleComponent::OnBeginOverlap);
+					}
 					//Reset dash when the player grappled something
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
 						dashComp->ResetDashInAir();
@@ -384,7 +393,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 }
 
-void UGrappleComponent::StopSwingPhysics()
+void UGrappleComponent::StopSwingPhysics(const bool& _comingBack)
 {
 	if (swingPhysic && currentProjectile)
 	{
@@ -392,7 +401,8 @@ void UGrappleComponent::StopSwingPhysics()
 		delete swingPhysic;
 		swingPhysic = nullptr;
 
-		currentProjectile->SetComingBack(true);
+		currentProjectile->SetComingBack(_comingBack);
+		mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.RemoveAll(this);
 	}
 }
 
@@ -484,5 +494,14 @@ void UGrappleComponent::AttractCharacter()
 				currentProjectile->SetComingBack(true);
 			}
 		}
+	}
+}
+
+void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (swingPhysic)
+	{
+		HelperLibrary::Print("on begin overlap ");
+		swingPhysic->InvertVelocity(SweepResult.ImpactNormal);
 	}
 }
