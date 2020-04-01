@@ -249,10 +249,10 @@ void UGrappleComponent::DisplayHelping()
 		HelperAiming->SetActorLocation(location);
 		HelperAiming->SetActorRotation(rotation);
 		scale = HelperAiming->GetActorScale3D();
-		FVector distance = direction.GetSafeNormal() * (maxDistanceGrappling + 100.0f);
+		FVector distance = direction.GetSafeNormal() * maxDistanceGrappling;
 		scale.Z = distance.Size() / 100.0f;
 		HelperAiming->SetActorScale3D(scale);
-		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 15.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
+		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 7.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 		{
 			UPhysicalMaterial* physMat;
 			physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
@@ -326,6 +326,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				HelperAiming->Destroy();
 				HelperAiming = nullptr;
 				isAiming = false;
+				isColorRed = true;
 			}
 		}
 	}
