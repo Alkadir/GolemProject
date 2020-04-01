@@ -40,7 +40,7 @@ private:
 	float minDistanceSwinging = 100.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing physics", meta = (AllowPrivateAccess = "true"))
-	float maxDistanceSwinging = 3000.0f;
+	float maxDistanceSwinging = 1650.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float scaleGravity = 4.0f;
@@ -79,7 +79,7 @@ protected:
 	float velocity = 5000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
-	float offsetStop = 200.0f;
+	float offsetStop = 100.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Grapple physics", meta = (AllowPrivateAccess = "true"))
 	float offsetBlockingObject = 200.0f;
@@ -150,14 +150,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FVector GetHandPosition();
 
-	UFUNCTION()
-	FVector GetVirtualRightHandPosition();
-
-	UFUNCTION()
-	FVector GetVirtualLeftHandPosition();
-
 	UFUNCTION(BlueprintCallable)
 	void DisplayHelping();
+	
+	UFUNCTION()
+	void ChangeSwingToAttrack();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
@@ -173,8 +170,10 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//Implicit Delete SwingPhysics var 
-	void StopSwingPhysics();
+	void StopSwingPhysics(const bool& _comingBack = true);
 
 	void CheckGround();
 

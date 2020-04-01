@@ -46,6 +46,8 @@ public:
 
 	FORCEINLINE const bool& IsCollidingSwinging() { return bIsSwingingPossible; };
 
+	FORCEINLINE void SetCollidingSwinging(const bool& _enable) { bIsSwingingPossible = _enable; };
+
 	FORCEINLINE const FVector GetLocation() { return GetMeshComponent()->GetComponentLocation(); };
 
 	void SetComingBack(const bool& _isComingBack);

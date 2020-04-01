@@ -73,6 +73,9 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	customCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("capsule"));
+	customCapsule->InitCapsuleSize(42.f, 96.0f);
+	customCapsule->SetupAttachment(RootComponent);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -149,8 +152,6 @@ void AGolemProjectCharacter::BeginPlay()
 		FistComp->IsTargetingFist = false;
 
 	IsInteractingOrAiming = false;
-
-
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -218,7 +219,13 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 	if (isGrappleSkillEnabled && mGrapple)
 	{
 		ChangeToGrapple();
-		mGrapple->GoToDestination(true);
+
+		if(mGrapple->GetSwingPhysics())
+		{ 
+			mGrapple->ChangeSwingToAttrack();
+		}
+		else
+			mGrapple->GoToDestination(true);
 	}
 }
 
@@ -449,7 +456,6 @@ void AGolemProjectCharacter::ResetFriction()
 	}
 }
 
-
 void AGolemProjectCharacter::SetUpBlockOffsetPositon()
 {
 	if (actorToInteract && PushingComponent)
@@ -484,7 +490,6 @@ bool AGolemProjectCharacter::PushBloc(FVector pushingDirection, FVector pushingP
 	IsInteractingOrAiming = true;
 	return true;
 }
-
 
 void AGolemProjectCharacter::StopPushBloc()
 {
@@ -548,4 +553,26 @@ void AGolemProjectCharacter::ResetMeshOnRightPlace()
 	//GetMesh()->SetupAttachment(GetCapsuleComponent());
 	//GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
 	//GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
+}
+
+FVector AGolemProjectCharacter::GetVirtualRightHandPosition()
+{
+	FVector pos = FVector::ZeroVector;
+	if (GetMesh())
+	{
+		int id = GetMesh()->GetBoneIndex("VB hand_r");
+		pos = GetMesh()->GetBoneTransform(id).GetLocation();
+	}
+	return pos;
+}
+
+FVector AGolemProjectCharacter::GetVirtualLeftHandPosition()
+{
+	FVector pos = FVector::ZeroVector;
+	if (GetMesh())
+	{
+		int id = GetMesh()->GetBoneIndex("VB hand_l");
+		pos = GetMesh()->GetBoneTransform(id).GetLocation();
+	}
+	return pos;
 }
