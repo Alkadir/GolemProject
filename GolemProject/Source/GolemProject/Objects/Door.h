@@ -43,10 +43,9 @@ protected:
 	FVector startPos;
 	FVector destinationPos;
 	float timerLerp;
+	virtual void Tick(float DeltaTime) override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Activable")
