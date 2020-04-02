@@ -25,13 +25,16 @@ protected:
 	class UCharacterMovementComponent* CharacterMovementCmpt;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
-		float ForceDash = 2000.0f;
+		float ForceDash = 1300.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
+		float ForceDashInTheAir = 666.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
 		float ForceAfterDash = 500.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
-		float TimerStopDash = 0.2f;
+		float TimerStopDash = 0.6f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TimerDash)
 		float CDDash = 1.0f;
@@ -57,7 +60,7 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable)
-		FORCEINLINE bool IsDashing() { return isDashing; }
+	FORCEINLINE bool IsDashing() { return isDashing; }
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

@@ -65,12 +65,17 @@ void UDashComponent::Dash(FVector _direction)
 	{
 		if (m_canDash && !HasDashInAir)
 		{
-			if (CharacterMovementCmpt->IsFalling())	HasDashInAir = true;
+			float dashForce = ForceDash;
+			if (CharacterMovementCmpt->IsFalling())
+			{
+				HasDashInAir = true;
+				dashForce = ForceDashInTheAir;
+			}
 			CharacterMovementCmpt->GroundFriction = 0.0f;
 			CurrentDirection = _direction;
 			CurrentDirection.Z = 0.0f;
 			CurrentVelocity = m_character->GetVelocity().Size() * _direction;
-			m_character->LaunchCharacter(_direction * ForceDash, false, false);
+			m_character->LaunchCharacter(_direction * dashForce, false, false);
 			isDashing = true;
 			m_canDash = false;
 			if (UWorld * world = GetWorld())
