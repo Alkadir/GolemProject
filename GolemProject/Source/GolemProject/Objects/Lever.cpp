@@ -36,6 +36,7 @@ void ALever::BeginPlay()
 		FVector4 color(1.0f, 0.0f, 0.0f, 1.0f);
 		MeshComponent->SetVectorParameterValueOnMaterials("Color", color);
 	}
+	CanBeActivatedByFist = true;
 }
 
 /*void ALever::ResetActivation()

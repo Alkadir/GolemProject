@@ -23,4 +23,6 @@ class GOLEMPROJECT_API IInteractable
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
 		const bool Interact(AActor* caller);
+
+	bool CanBeActivatedByFist;
 };
