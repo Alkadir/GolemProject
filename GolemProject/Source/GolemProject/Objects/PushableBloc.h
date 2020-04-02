@@ -16,7 +16,7 @@ class GOLEMPROJECT_API APushableBloc : public AActor, public IInteractable
 
 
 protected:
-
+	virtual void BeginPlay() override;
 	virtual void Tick(float deltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
