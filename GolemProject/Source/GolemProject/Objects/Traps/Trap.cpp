@@ -11,6 +11,15 @@ ATrap::ATrap()
 
 }
 
+void ATrap::BeginPlay()
+{
+	Super::BeginPlay();
+	if (alwaysActive)
+	{
+		Activate(nullptr);
+	}
+}
+
 const bool ATrap::Activate_Implementation(AActor* caller)
 {
 	if (isActivate)
