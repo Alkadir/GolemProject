@@ -369,7 +369,6 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 					if (mCharacter->GetCustomCapsuleComponent())
 					{
-						HelperLibrary::Print("add delegate");
 						mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &UGrappleComponent::OnBeginOverlap);
 					}
 					//Reset dash when the player grappled something
@@ -503,6 +502,6 @@ void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 	if (swingPhysic)
 	{
 		HelperLibrary::Print("on begin overlap ");
-		swingPhysic->InvertVelocity(SweepResult.ImpactNormal);
+		swingPhysic->InvertVelocity();
 	}
 }
