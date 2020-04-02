@@ -163,7 +163,7 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 						scale.Z = distance.Size();
 						HelperAiming[i]->SetActorScale3D(scale);
 						//raycast to see if there is any obstacle in front of player
-						if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 15.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
+						if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 11.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 						{
 							ActorToIgnore.Empty();
 							ActorToIgnore.Add(hitResult.GetActor());
@@ -175,7 +175,8 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 							{
 								if (IInteractable* interactable = Cast<IInteractable>(hitResult.GetActor()))
 								{
-									CanInteract = true;
+									if (interactable->CanBeActivatedByFist)
+										CanInteract = true;
 								}
 							}
 							//scale the helping actor to avoid it to going through wall

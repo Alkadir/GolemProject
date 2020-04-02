@@ -23,6 +23,12 @@ APushableBloc::APushableBloc()
 
 }
 
+void APushableBloc::BeginPlay()
+{
+	Super::BeginPlay();
+	CanBeActivatedByFist = false;
+}
+
 void APushableBloc::Tick(float _deltaTime)
 {
 	Super::Tick(_deltaTime);
