@@ -66,7 +66,6 @@ void UDashComponent::Dash(FVector _direction)
 		if (m_canDash && !HasDashInAir)
 		{
 			float dashForce = ForceDash;
-			HelperLibrary::Print("dash");
 			if (CharacterMovementCmpt->IsFalling())
 			{
 				HasDashInAir = true;
