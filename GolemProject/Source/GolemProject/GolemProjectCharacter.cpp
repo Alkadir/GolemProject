@@ -522,31 +522,31 @@ bool AGolemProjectCharacter::IsCharacterDead()
 //WIP DO NOT TOUCH
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
-	UCapsuleComponent* capsule = GetCapsuleComponent();
-	if (_activate)
-	{
-		if (capsule)
-		{
-			capsule->SetCollisionProfileName("NoCollision");
-			//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-		/*GetCharacterMovement()->StopMovementImmediately();
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		GetMesh()->SetSimulatePhysics(true);*/
-	}
-	else
-	{
-		if (capsule)
-		{
-			capsule->SetCollisionProfileName("Pawn");
-			//capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		}
-		/*GetMesh()->SetSimulatePhysics(false);
-		GetMesh()->SetAllBodiesSimulatePhysics(false);
-		GetMesh()->ResetAllBodiesSimulatePhysics();
-		GetMesh()->RecreatePhysicsState();
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);*/
-	}
+	//UCapsuleComponent* capsule = GetCapsuleComponent();
+	//if (_activate)
+	//{
+	//	if (capsule)
+	//	{
+	//		capsule->SetCollisionProfileName("NoCollision");
+	//		//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//	}
+	//	/*GetCharacterMovement()->StopMovementImmediately();
+	//	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//	GetMesh()->SetSimulatePhysics(true);*/
+	//}
+	//else
+	//{
+	//	if (capsule)
+	//	{
+	//		capsule->SetCollisionProfileName("Pawn");
+	//		//capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//	}
+	//	/*GetMesh()->SetSimulatePhysics(false);
+	//	GetMesh()->SetAllBodiesSimulatePhysics(false);
+	//	GetMesh()->ResetAllBodiesSimulatePhysics();
+	//	GetMesh()->RecreatePhysicsState();
+	//	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);*/
+	//}
 }
 
 void AGolemProjectCharacter::ResetMeshOnRightPlace()
