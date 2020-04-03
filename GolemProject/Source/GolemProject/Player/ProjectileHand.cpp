@@ -3,7 +3,7 @@
 
 #include "ProjectileHand.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Classes/Components/StaticMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Player/GrappleComponent.h"
 #include "Helpers/HelperLibrary.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
@@ -64,7 +64,6 @@ void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleCompon
 void AProjectileHand::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	if (bIsComingBack)
 	{
 		if (grappleComponent && !grappleComponent->GetSwingPhysics() && meshComponent && ProjectileComponent)
@@ -76,9 +75,7 @@ void AProjectileHand::Tick(float DeltaTime)
 	}
 	else if (ProjectileComponent)
 	{
-		if (!bIsColliding)
-			ProjectileComponent->Velocity = direction * velocity;
-		else
+		if (bIsColliding)
 			ProjectileComponent->Velocity = FVector::ZeroVector;
 	}
 }
@@ -92,7 +89,6 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		changeDir.Normalize();
 		ProjectileComponent->Velocity = changeDir * velocity;
 	}*/
-
 	if (!bIsComingBack && HitComponent && OtherActor != this)
 	{
 		bIsColliding = true;

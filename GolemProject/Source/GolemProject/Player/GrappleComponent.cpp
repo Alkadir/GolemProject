@@ -143,15 +143,13 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 	{
 		if (world && mCamera)
 		{
-
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
 				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
-				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling);
-				FVector direction = (offset - GetHandPosition());
+				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCharacter->GetVirtualRightHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling);
+				FVector direction = (offset - mCharacter->GetVirtualRightHandPosition());
 				direction.Normalize();
-
 				if (currentProjectile->GetMeshComponent())
 				{
 					mLastLocation = currentProjectile->GetLocation();
@@ -210,8 +208,8 @@ FVector UGrappleComponent::GetHandPosition()
 
 void UGrappleComponent::DisplayHelping()
 {
-	FVector end = GetHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling;
-	FVector location = GetHandPosition();
+	FVector end = mCharacter->GetVirtualRightHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling;
+	FVector location = mCharacter->GetVirtualRightHandPosition();
 	FVector direction = end - location;
 	FVector scale;
 	FRotator rotation = direction.Rotation();
@@ -230,7 +228,7 @@ void UGrappleComponent::DisplayHelping()
 		FVector distance = direction.GetSafeNormal() * maxDistanceGrappling;
 		scale.Z = distance.Size() / 100.0f;
 		HelperAiming->SetActorScale3D(scale);
-		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 7.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
+		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 6.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::ForOneFrame, hitResult, true))
 		{
 			UPhysicalMaterial* physMat;
 			physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
