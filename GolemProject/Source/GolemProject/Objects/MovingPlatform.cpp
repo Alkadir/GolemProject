@@ -6,6 +6,9 @@
 #include "Components/SceneComponent.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/Actor.h"
+#include "Player/FistProjectile.h"
+#include "TimerManager.h"
+#include "Components/MeshComponent.h"
 
 // Sets default values
 AMovingPlatform::AMovingPlatform(const FObjectInitializer& OI)
@@ -103,12 +106,39 @@ void AMovingPlatform::Init()
 		SetActorLocation(worldCheckpoint[currentIndex]);
 	}
 	isPause = false;
+	meshComponent = FindComponentByClass<UMeshComponent>();
+	if (meshComponent && activatedByHand)
+	{
+		meshComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMovingPlatform::OverlapActivation);
+		meshComponent->OnComponentHit.AddUniqueDynamic(this, &AMovingPlatform::HitActivation);
+		SetResponseToPawn(false);
+		meshComponent->SetScalarParameterValueOnMaterials("Opacity", opacityMin);
+		actualOpacity = opacityMin;
+		isCollidingWithPlayer = false;
+	}
+	else
+	{
+		isCollidingWithPlayer = true;
+	}
+
 }
 
 void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (meshComponent && activatedByHand)
+	{
+		if (isCollidingWithPlayer)
+		{
+			actualOpacity = FMath::Lerp(actualOpacity, 1.f, 0.1f);
+		}
+		else
+		{
+			actualOpacity = FMath::Lerp(actualOpacity, opacityMin, 0.1f);
+		}
+		meshComponent->SetScalarParameterValueOnMaterials("Opacity", actualOpacity);
+	}
 	if (worldCheckpoint.Num() <= 1 || !isActivate || direction == EMovingDirection::None || isPause)
 	{
 		return;
@@ -171,7 +201,7 @@ void AMovingPlatform::MoveCurve(float dt, int refIndex)
 		(direction == EMovingDirection::Forward ? speedCurve[currentIndex].Evaluate(timerLerp) : speedCurve[nextIndex].Evaluate(1.f - timerLerp));*/
 	while (distanceToGo > 0.f && waitTime <= 0.f)
 	{
-		if (USplineComponent * spline = Cast<USplineComponent>(childrens[refIndex]))
+		if (USplineComponent* spline = Cast<USplineComponent>(childrens[refIndex]))
 		{
 			FVector nextPos = worldCheckpoint[refIndex] + spline->GetLocationAtTime(direction == EMovingDirection::Forward ? timerLerp : 1.f - timerLerp, ESplineCoordinateSpace::Local, true);
 
@@ -264,6 +294,51 @@ void AMovingPlatform::SetNextIndex()
 				isActivate = false;
 				break;
 			}
+		}
+	}
+}
+
+void AMovingPlatform::SetResponseToPawn(bool collideWith)
+{
+	if (meshComponent)
+	{
+		if (collideWith)
+		{
+			isCollidingWithPlayer = true;
+			meshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+		}
+		else
+		{
+			isCollidingWithPlayer = false;
+			meshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		}
+	}
+}
+
+void AMovingPlatform::OverlapActivation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (activatedByHand && OtherActor)
+	{
+		if (AFistProjectile* fist = Cast<AFistProjectile>(OtherActor))
+		{
+			SetResponseToPawn(true);
+			FTimerHandle ExecuteTimerHandle;
+			GetWorldTimerManager().SetTimer(ExecuteTimerHandle, FTimerDelegate::CreateUObject(this, &AMovingPlatform::SetResponseToPawn, false), activateTime, false);
+			OtherActor->Destroy();
+		}
+	}
+}
+
+void AMovingPlatform::HitActivation(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (activatedByHand && OtherActor)
+	{
+		if (AFistProjectile* fist = Cast<AFistProjectile>(OtherActor))
+		{
+			SetResponseToPawn(true);
+			FTimerHandle ExecuteTimerHandle;
+			GetWorldTimerManager().SetTimer(ExecuteTimerHandle, FTimerDelegate::CreateUObject(this, &AMovingPlatform::SetResponseToPawn, false), activateTime, false);
+			OtherActor->Destroy();
 		}
 	}
 }

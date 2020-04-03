@@ -98,6 +98,29 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 		AActor* spawner = nullptr;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		bool activatedByHand = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		float activateTime = 5.f;
+	//value between 0 and 1
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		float opacityMin = 0.3f;
+	float actualOpacity;
+
+	bool isCollidingWithPlayer = false;
+	
+	class UMeshComponent* meshComponent;
+
+	UFUNCTION(BlueprintCallable, Category = "Platform")
+		void SetResponseToPawn(bool collideWith);
+
+	UFUNCTION()
+		void OverlapActivation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void HitActivation(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Platform")
