@@ -48,6 +48,12 @@ void AProjectileHand::SetComingBack(const bool& _isComingBack)
 		}
 	}
 	bIsComingBack = _isComingBack;
+
+	if (bIsComingBack)
+	{
+		ProjectileComponent->bSimulationEnabled = true;
+		ProjectileComponent->SetUpdatedComponent(RootComponent);
+	}
 }
 
 void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple)
