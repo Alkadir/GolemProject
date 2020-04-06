@@ -38,7 +38,7 @@ private:
 
 	//values to edit
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float minDistanceSwinging = 100.0f;
+	float minDistanceSwinging = 300.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing physics", meta = (AllowPrivateAccess = "true"))
 	float maxDistanceSwinging = 1650.0f;
@@ -95,7 +95,7 @@ protected:
 	float minDot = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float minDistance = 100.0f;
+	float minDistance = 300.0f;
 
 	UPROPERTY()
 	bool IsFiring;

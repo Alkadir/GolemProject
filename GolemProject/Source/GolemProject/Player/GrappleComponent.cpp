@@ -378,10 +378,10 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		//if swing Physics exists we have to tick it
 		if (swingPhysic)
 		{
-			swingPhysic->Tick(DeltaTime);
-
 			if (bIsClimbing)
 				swingPhysic->ReduceRope();
+
+			swingPhysic->Tick(DeltaTime);
 		}
 
 	}
