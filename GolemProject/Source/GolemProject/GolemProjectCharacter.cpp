@@ -146,7 +146,10 @@ void AGolemProjectCharacter::BeginPlay()
 	}
 
 	if (mGrapple)
+	{
 		mGrapple->IsTargetingGrapple = true;
+		InputComponent->BindAction("AssistedGrapple", IE_Released, mGrapple, &UGrappleComponent::StopClimb);
+	}
 
 	if (FistComp)
 		FistComp->IsTargetingFist = false;
@@ -222,8 +225,8 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 		ChangeToGrapple();
 
 		if(mGrapple->GetSwingPhysics())
-		{ 
-			mGrapple->ChangeSwingToAttrack();
+		{
+			mGrapple->SetClimb(true);
 		}
 		else
 			mGrapple->GoToDestination(true);

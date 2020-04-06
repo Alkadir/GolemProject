@@ -33,11 +33,12 @@ private:
 
 	int32 mIdBone;
 	bool bIsAssisted = false;
+	bool bIsClimbing = false;
 	float accuracy = 100000.0f;
 
 	//values to edit
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float minDistanceSwinging = 100.0f;
+	float minDistanceSwinging = 300.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing physics", meta = (AllowPrivateAccess = "true"))
 	float maxDistanceSwinging = 1650.0f;
@@ -94,7 +95,7 @@ protected:
 	float minDot = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float minDistance = 100.0f;
+	float minDistance = 300.0f;
 
 	UPROPERTY()
 	bool IsFiring;
@@ -152,9 +153,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DisplayHelping();
-	
-	UFUNCTION()
-	void ChangeSwingToAttrack();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
@@ -179,4 +177,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool isAiming;
+
+	FORCEINLINE void SetClimb(bool _isClimbing) { bIsClimbing = _isClimbing; };
+	FORCEINLINE void StopClimb() { bIsClimbing = false; };
 };
