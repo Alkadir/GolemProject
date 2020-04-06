@@ -46,8 +46,6 @@ void AProjectileHand::SetComingBack(const bool& _isComingBack)
 		{
 			meshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 		}
-		ProjectileComponent->bSimulationEnabled = true;
-		ProjectileComponent->SetUpdatedComponent(RootComponent);
 	}
 
 	bIsComingBack = _isComingBack;
@@ -69,6 +67,11 @@ void AProjectileHand::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (bIsComingBack)
 	{
+		if (ProjectileComponent->HasStoppedSimulation())
+		{
+			ProjectileComponent->SetUpdatedComponent(RootComponent);
+		}
+
 		if (grappleComponent && !grappleComponent->GetSwingPhysics() && meshComponent && ProjectileComponent)
 		{
 			FVector dir = grappleComponent->GetHandPosition() - meshComponent->GetComponentLocation();
@@ -114,11 +117,7 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 			}
 		}
 
-		bIsComingBack = true;
-		if (meshComponent != nullptr)
-		{
-			meshComponent->SetCollisionProfileName(TEXT("NoCollision"));
-		}
+		SetComingBack(true);
 	}
 }
 
