@@ -33,6 +33,7 @@ private:
 
 	int32 mIdBone;
 	bool bIsAssisted = false;
+	bool bIsClimbing = false;
 	float accuracy = 100000.0f;
 
 	//values to edit
@@ -152,9 +153,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DisplayHelping();
-	
-	UFUNCTION()
-	void ChangeSwingToAttrack();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE class AActor* GetClosestGrapplingHook() { return ClosestGrapplingHook; };
@@ -179,4 +177,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool isAiming;
+
+	FORCEINLINE void SetClimb(bool _isClimbing) { bIsClimbing = _isClimbing; };
+	FORCEINLINE void StopClimb() { bIsClimbing = false; };
 };
