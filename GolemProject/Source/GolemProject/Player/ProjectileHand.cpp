@@ -46,14 +46,11 @@ void AProjectileHand::SetComingBack(const bool& _isComingBack)
 		{
 			meshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 		}
-	}
-	bIsComingBack = _isComingBack;
-
-	if (bIsComingBack)
-	{
 		ProjectileComponent->bSimulationEnabled = true;
 		ProjectileComponent->SetUpdatedComponent(RootComponent);
 	}
+
+	bIsComingBack = _isComingBack;
 }
 
 void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple)
