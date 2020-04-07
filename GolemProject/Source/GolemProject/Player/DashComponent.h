@@ -73,4 +73,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void ResetDashInAir();
+
+	void CancelDash();
+
+	void CancelDashAndResetCD();
 };
