@@ -62,6 +62,9 @@ private:
 
 	class APlayerController* pc;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
+	class UWallMechanicalComponent* WallMechanicalComponent;
+
 	UPROPERTY()
 	class UChildActorComponent* sightCamera;
 
