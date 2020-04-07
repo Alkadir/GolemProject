@@ -92,3 +92,34 @@ void UDashComponent::ResetDashInAir()
 	HasDashInAir = false;
 }
 
+void UDashComponent::CancelDash()
+{
+	if (UWorld* world = GetWorld())
+	{
+		world->GetTimerManager().ClearTimer(m_loopTimer);
+	}
+	if (m_character != nullptr && CharacterMovementCmpt != nullptr)
+	{
+		CharacterMovementCmpt->StopMovementImmediately();
+		m_character->ResetFriction();
+		isDashing = false;
+	}
+}
+
+void UDashComponent::CancelDashAndResetCD()
+{
+	if (UWorld* world = GetWorld())
+	{
+		world->GetTimerManager().ClearTimer(m_loopTimer);
+		world->GetTimerManager().ClearTimer(m_timerDash);
+	}
+	if (m_character != nullptr && CharacterMovementCmpt != nullptr)
+	{
+		CharacterMovementCmpt->StopMovementImmediately();
+		m_character->ResetFriction();
+		isDashing = false;
+		m_canDash = true;
+		HasDashInAir = false;
+	}
+}
+
