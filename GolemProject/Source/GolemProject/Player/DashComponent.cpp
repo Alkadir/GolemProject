@@ -6,13 +6,14 @@
 #include "GolemProjectCharacter.h"
 #include "Helpers/HelperLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values for this component's properties
 UDashComponent::UDashComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 
@@ -21,6 +22,7 @@ void UDashComponent::BeginPlay()
 {
 	//comm
 	Super::BeginPlay();
+	SetTickGroup(ETickingGroup::TG_PostPhysics);
 	HasDashInAir = false;
 	m_character = Cast<AGolemProjectCharacter>(GetOwner());
 	m_canDash = true;
@@ -57,6 +59,11 @@ void UDashComponent::CanRedashDash()
 void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (isDashing && m_character && DashTrailClass)
+	{
+		GetWorld()->SpawnActor<AActor>(DashTrailClass, m_character->GetMesh()->GetComponentTransform());
+	}
 }
 
 void UDashComponent::Dash(FVector _direction)
@@ -78,7 +85,7 @@ void UDashComponent::Dash(FVector _direction)
 			m_character->LaunchCharacter(_direction * dashForce, false, false);
 			isDashing = true;
 			m_canDash = false;
-			if (UWorld * world = GetWorld())
+			if (UWorld* world = GetWorld())
 			{
 				world->GetTimerManager().SetTimer(m_loopTimer, this, &UDashComponent::StopDash, TimerStopDash, false);
 				world->GetTimerManager().SetTimer(m_timerDash, this, &UDashComponent::CanRedashDash, CDDash, false);

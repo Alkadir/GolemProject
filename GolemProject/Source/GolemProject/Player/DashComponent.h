@@ -39,6 +39,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TimerDash)
 		float CDDash = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FX)
+		TSubclassOf<class AActor> DashTrailClass;
+
 	FVector CurrentVelocity;
 
 	FVector CurrentDirection;
@@ -70,5 +73,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void ResetDashInAir();
-
 };
