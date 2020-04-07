@@ -24,6 +24,7 @@
 #include "Player/SwingPhysic.h"
 #include "Player/RaycastingComponent.h"
 #include "Objects/PushableBloc.h"
+#include "Player/WallMechanicalComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -42,7 +43,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false; 
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
@@ -127,6 +128,7 @@ void AGolemProjectCharacter::BeginPlay()
 	sightCamera = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCamera");
 	sightCameraL = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCameraL");
 	RaycastingComponent = FindComponentByClass<URaycastingComponent>();
+	WallMechanicalComponent = FindComponentByClass<UWallMechanicalComponent>();
 	if (GetCharacterMovement())
 	{
 		initialGroundFriction = GetCharacterMovement()->GroundFriction;
@@ -189,7 +191,16 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 
 void AGolemProjectCharacter::Jump()
 {
-	if (PushingComponent && !PushingComponent->GetIsPushingObject())
+
+	if (GetCharacterMovement() != nullptr && GetCharacterMovement()->IsFalling() && WallMechanicalComponent != nullptr)
+	{
+		if (WallMechanicalComponent->WallJump())
+		{
+			if (dashComponent && IsDashing())
+				dashComponent->CancelDashAndResetCD();
+		}
+	}
+	else if (PushingComponent && !PushingComponent->GetIsPushingObject())
 	{
 		Super::Jump();
 	}
@@ -224,7 +235,7 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 	{
 		ChangeToGrapple();
 
-		if(mGrapple->GetSwingPhysics())
+		if (mGrapple->GetSwingPhysics())
 		{
 			mGrapple->SetClimb(true);
 		}
