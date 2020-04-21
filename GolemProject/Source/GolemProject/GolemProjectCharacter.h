@@ -31,6 +31,8 @@ private:
 
 	float m_valueRight;
 
+	bool WantToAim;
+
 	UPROPERTY()
 	class UUserWidget* currentSightWidget = nullptr;
 
@@ -139,7 +141,10 @@ protected:
 	UFUNCTION()
 	void SetUpBlockOffsetPositon();
 
-	void CheckIfStillOnGround();
+	UFUNCTION()
+	void AimAtEndOfWallJump();
+
+	void SwitchArm();
 
 public:
 	AGolemProjectCharacter();
