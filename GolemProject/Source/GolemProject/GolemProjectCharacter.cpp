@@ -100,6 +100,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("AssistedGrapple", IE_Pressed, this, &AGolemProjectCharacter::UseAssistedGrapple);
 
+	PlayerInputComponent->BindAction("SwitchArm", IE_Pressed, this, &AGolemProjectCharacter::SwitchArm);
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGolemProjectCharacter::MoveRight);
 
@@ -240,6 +242,18 @@ void AGolemProjectCharacter::AimAtEndOfWallJump()
 	{
 		WantToAim = false;
 		ChangeCameraPressed();
+	}
+}
+
+void AGolemProjectCharacter::SwitchArm()
+{
+	if (!FistComp->IsTargetingFist)
+	{
+		ChangeToFist();
+	}
+	else if(!mGrapple->IsTargetingGrapple)
+	{
+		ChangeToGrapple();
 	}
 }
 

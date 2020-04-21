@@ -144,6 +144,8 @@ protected:
 	UFUNCTION()
 	void AimAtEndOfWallJump();
 
+	void SwitchArm();
+
 public:
 	AGolemProjectCharacter();
 
