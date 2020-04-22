@@ -168,7 +168,6 @@ void AGolemProjectCharacter::BeginPlay()
 void AGolemProjectCharacter::Tick(float _deltaTime)
 {
 	Super::Tick(_deltaTime);
-
 	if (mGrapple && !mGrapple->GetSwingPhysics())
 	{
 		FRotator rotFinal = FRotator::ZeroRotator;
@@ -204,7 +203,7 @@ void AGolemProjectCharacter::Jump()
 				ChangeCameraReleased();
 			}
 			if (dashComponent && IsDashing())
-				dashComponent->CancelDashAndResetCD();
+				dashComponent->CancelDash();
 		}
 	}
 	else if (PushingComponent && !PushingComponent->GetIsPushingObject())
@@ -251,7 +250,7 @@ void AGolemProjectCharacter::SwitchArm()
 	{
 		ChangeToFist();
 	}
-	else if(!mGrapple->IsTargetingGrapple)
+	else if (!mGrapple->IsTargetingGrapple)
 	{
 		ChangeToGrapple();
 	}
@@ -607,7 +606,7 @@ void AGolemProjectCharacter::ResetMeshOnRightPlace()
 
 bool AGolemProjectCharacter::IsCharacterSwinging()
 {
-	return mGrapple != nullptr && mGrapple->IsSwinging; 
+	return mGrapple != nullptr && mGrapple->IsSwinging;
 }
 
 FVector AGolemProjectCharacter::GetVirtualRightHandPosition()
