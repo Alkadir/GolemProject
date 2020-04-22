@@ -31,6 +31,8 @@ private:
 
 	float m_valueRight;
 
+	bool WantToAim;
+
 	UPROPERTY()
 	class UUserWidget* currentSightWidget = nullptr;
 
@@ -139,7 +141,10 @@ protected:
 	UFUNCTION()
 	void SetUpBlockOffsetPositon();
 
-	void CheckIfStillOnGround();
+	UFUNCTION()
+	void AimAtEndOfWallJump();
+
+	void SwitchArm();
 
 public:
 	AGolemProjectCharacter();
@@ -178,10 +183,10 @@ public:
 
 	FORCEINLINE class UCapsuleComponent* GetCustomCapsuleComponent() const { return customCapsule; }
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	FVector GetVirtualRightHandPosition();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	FVector GetVirtualLeftHandPosition();
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
@@ -216,4 +221,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_Death();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsCharacterSwinging(); 
 };
