@@ -354,7 +354,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMinLength(minDistanceSwinging);
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
-
+					IsSwinging = true;
 					if (mCharacter->GetCustomCapsuleComponent())
 					{
 						mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &UGrappleComponent::OnBeginOverlap);
@@ -394,7 +394,7 @@ void UGrappleComponent::StopSwingPhysics(const bool& _comingBack)
 		bIsAssisted = false;
 		delete swingPhysic;
 		swingPhysic = nullptr;
-
+		IsSwinging = false;
 		currentProjectile->SetComingBack(_comingBack);
 		mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.RemoveAll(this);
 	}
