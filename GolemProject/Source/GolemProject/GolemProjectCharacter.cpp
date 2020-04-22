@@ -605,6 +605,11 @@ void AGolemProjectCharacter::ResetMeshOnRightPlace()
 	//GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
 }
 
+bool AGolemProjectCharacter::IsCharacterSwinging()
+{
+	return mGrapple != nullptr && mGrapple->IsSwinging; 
+}
+
 FVector AGolemProjectCharacter::GetVirtualRightHandPosition()
 {
 	FVector pos = FVector::ZeroVector;

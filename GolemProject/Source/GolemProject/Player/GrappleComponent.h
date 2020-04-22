@@ -178,6 +178,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool isAiming;
 
+	bool IsSwinging;
+
 	FORCEINLINE void SetClimb(bool _isClimbing) { bIsClimbing = _isClimbing; };
 	FORCEINLINE void StopClimb() { bIsClimbing = false; };
 };
