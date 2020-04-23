@@ -260,13 +260,27 @@ void AMovingPlatform::SetNextIndex()
 			case EMovingPlatformType::Once:
 				nextIndex = worldCheckpoint.Num() - 2;
 				direction = EMovingDirection::Backward;
-				isActivate = false;
+				if (addCycleOnActivate && remainingCycle > 0)
+				{
+					remainingCycle--;
+				}
+				else
+				{
+					isActivate = false;
+				}
 				break;
 			}
 		}
 		else if (nextIndex == 1 && platformType == EMovingPlatformType::OnceLoop)
 		{
-			isActivate = false;
+			if (addCycleOnActivate && remainingCycle > 0)
+			{
+				remainingCycle--;
+			}
+			else
+			{
+				isActivate = false;
+			}
 		}
 	}
 	else if (direction == EMovingDirection::Backward)
@@ -286,12 +300,26 @@ void AMovingPlatform::SetNextIndex()
 				break;
 			case EMovingPlatformType::OnceLoop:
 				nextIndex = worldCheckpoint.Num() - 1;
-				isActivate = false;
+				if (addCycleOnActivate && remainingCycle > 0)
+				{
+					remainingCycle--;
+				}
+				else
+				{
+					isActivate = false;
+				}
 				break;
 			case EMovingPlatformType::Once:
 				nextIndex = 1;
 				direction = EMovingDirection::Forward;
-				isActivate = false;
+				if (addCycleOnActivate && remainingCycle > 0)
+				{
+					remainingCycle--;
+				}
+				else
+				{
+					isActivate = false;
+				}
 				break;
 			}
 		}
@@ -354,6 +382,10 @@ const bool AMovingPlatform::Activate_Implementation(AActor* caller)
 	}
 	if (isActivate)
 	{
+		if (addCycleOnActivate)
+		{
+			remainingCycle++;
+		}
 		return false;
 	}
 	isActivate = true;
