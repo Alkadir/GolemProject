@@ -72,6 +72,11 @@ protected:
 		bool isStair = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		bool alwaysActive = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		bool addCycleOnActivate = false;
+
+	int remainingCycle = 0;
+
 
 	int currentIndex;
 	int nextIndex;
@@ -109,7 +114,7 @@ protected:
 	float actualOpacity;
 
 	bool isCollidingWithPlayer = false;
-	
+
 	class UMeshComponent* meshComponent;
 
 	UFUNCTION(BlueprintCallable, Category = "Platform")
