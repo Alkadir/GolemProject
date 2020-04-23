@@ -194,7 +194,7 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 
 void AGolemProjectCharacter::Jump()
 {
-	if (GetCharacterMovement() != nullptr && GetCharacterMovement()->IsFalling() && WallMechanicalComponent != nullptr)
+	if (GetCharacterMovement() != nullptr && GetCharacterMovement()->IsFalling() && WallMechanicalComponent != nullptr && WallMechanicalComponent->CanWallJump)
 	{
 		if (WallMechanicalComponent->WallJump())
 		{
