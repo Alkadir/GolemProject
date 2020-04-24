@@ -36,15 +36,15 @@ void UDashComponent::StopDash()
 {
 	if (m_character != nullptr && CharacterMovementCmpt != nullptr)
 	{
-		CharacterMovementCmpt->StopMovementImmediately();
-		if (CurrentVelocity.IsZero())
+		//CharacterMovementCmpt->StopMovementImmediately();
+		/*if (CurrentVelocity.IsZero())
 		{
 			CharacterMovementCmpt->AddImpulse(CurrentDirection * ForceAfterDash, true);
 		}
 		else
 		{
 			CharacterMovementCmpt->AddImpulse(CurrentVelocity, true);
-		}
+		}*/
 		m_character->ResetFriction();
 		isDashing = false;
 	}
