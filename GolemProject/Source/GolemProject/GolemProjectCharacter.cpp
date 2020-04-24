@@ -162,7 +162,8 @@ void AGolemProjectCharacter::BeginPlay()
 	IsAiming = false;
 	WantToAim = false;
 
-	WallMechanicalComponent->EndJump.AddDynamic(this, &AGolemProjectCharacter::AimAtEndOfWallJump);
+	if (WallMechanicalComponent)
+		WallMechanicalComponent->EndJump.AddDynamic(this, &AGolemProjectCharacter::AimAtEndOfWallJump);
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -570,38 +571,38 @@ bool AGolemProjectCharacter::IsCharacterDead()
 //WIP DO NOT TOUCH
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
-	//UCapsuleComponent* capsule = GetCapsuleComponent();
-	//if (_activate)
-	//{
-	//	if (capsule)
-	//	{
-	//		capsule->SetCollisionProfileName("NoCollision");
-	//		//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//	}
-	//	/*GetCharacterMovement()->StopMovementImmediately();
-	//	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//	GetMesh()->SetSimulatePhysics(true);*/
-	//}
-	//else
-	//{
-	//	if (capsule)
-	//	{
-	//		capsule->SetCollisionProfileName("Pawn");
-	//		//capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//	}
-	//	/*GetMesh()->SetSimulatePhysics(false);
-	//	GetMesh()->SetAllBodiesSimulatePhysics(false);
-	//	GetMesh()->ResetAllBodiesSimulatePhysics();
-	//	GetMesh()->RecreatePhysicsState();
-	//	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);*/
-	//}
+	UCapsuleComponent* capsule = GetCapsuleComponent();
+	if (_activate)
+	{
+		if (capsule)
+		{
+			//capsule->SetCollisionProfileName("NoCollision");
+			//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		GetCharacterMovement()->StopMovementImmediately();
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetMesh()->SetSimulatePhysics(true);
+	}
+	/*else
+	{
+		if (capsule)
+		{
+			capsule->SetCollisionProfileName("Pawn");
+			//capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		}
+		GetMesh()->SetSimulatePhysics(false);
+		GetMesh()->SetAllBodiesSimulatePhysics(false);
+		GetMesh()->ResetAllBodiesSimulatePhysics();
+		GetMesh()->RecreatePhysicsState();
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}*/
 }
 
 void AGolemProjectCharacter::ResetMeshOnRightPlace()
 {
-	//GetMesh()->SetupAttachment(GetCapsuleComponent());
-	//GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
-	//GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
+	GetMesh()->SetupAttachment(GetCapsuleComponent());
+	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
+	GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
 }
 
 bool AGolemProjectCharacter::IsCharacterSwinging()
