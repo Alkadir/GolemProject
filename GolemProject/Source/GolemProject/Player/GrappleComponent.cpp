@@ -428,6 +428,17 @@ void UGrappleComponent::CheckGround()
 	}
 }
 
+void UGrappleComponent::DeleteHelpingAim()
+{
+	if (HelperAiming != nullptr)
+	{
+		HelperAiming->Destroy();
+		HelperAiming = nullptr;
+		isAiming = false;
+		isColorRed = true;
+	}
+}
+
 void UGrappleComponent::PlayerIsNear()
 {
 	if (mCharacter)
