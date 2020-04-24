@@ -572,6 +572,14 @@ bool AGolemProjectCharacter::IsCharacterDead()
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
 	UCapsuleComponent* capsule = GetCapsuleComponent();
+	if (FistComp)
+		FistComp->DeleteHelpingAim();
+	if (mGrapple)
+	{
+		mGrapple->DeleteHelpingAim();
+		//mGrapple->StopSwingPhysics(false);
+	}
+	ChangeCameraReleased();
 	if (_activate)
 	{
 		if (capsule)
