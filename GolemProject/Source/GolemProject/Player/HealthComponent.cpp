@@ -48,6 +48,7 @@ void UHealthComponent::InflictDamage(int _damage)
 	{
 		Life -= _damage;
 		CanTakeDamage = false;
+		HelperLibrary::Print(FString::FromInt(Life));
 		if (Life <= 0)
 		{
 			OnCharacterDie.Broadcast();
@@ -86,11 +87,12 @@ void UHealthComponent::Respawn()
 	if (PlayerController != nullptr && Player != nullptr)
 	{
 		Player->EnableInput(PlayerController);
-		Player->SetActorLocation(PositionCheckPoint);
-		Player->ActivateDeath(false);
-		IsFallingDown = false;
-		Player->ResetMeshOnRightPlace();
-		bIsDead = false;
+		Player->Destroy();
+		//Player->SetActorLocation(PositionCheckPoint);
+		////Player->ActivateDeath(false);
+		//IsFallingDown = false;
+		//bIsDead = false;
+		////Player->ResetMeshOnRightPlace();
 	}
 }
 
