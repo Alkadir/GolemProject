@@ -77,7 +77,11 @@ public:
 	UFUNCTION()
 	FVector GetHandPosition();
 
+	UFUNCTION()
+	void DeleteHelpingAim();
+
 	FORCEINLINE const FVector& GetDirection() { return mDirection; };
 
 	FORCEINLINE class AFistProjectile* GetProjectile() { return currentProjectile; };
+
 };
