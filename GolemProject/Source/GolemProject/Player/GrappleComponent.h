@@ -19,6 +19,7 @@ private:
 	class USkeletalMeshComponent* mSkeletalMesh;
 	class AProjectileHand* currentProjectile;
 	class AActor* ClosestGrapplingHook;
+	class AActor* LastClosestGrapplingHook;
 	class AGolemProjectGameMode* GameMode;
 	class APlayerCameraManager* PlayerCameraManager;
 	class USwingPhysic* swingPhysic = nullptr;
@@ -26,6 +27,7 @@ private:
 	class AActor* HelperAiming;
 	TArray<class AActor*> ActorToIgnore;
 	bool isColorRed;
+	bool HasCreatedTarget;
 
 	FVector mDestination;
 	FVector mDirection;
