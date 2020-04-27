@@ -95,6 +95,7 @@ void UGrappleComponent::CheckElementTargetable()
 			}
 			HelperLibrary::SortActorsByDistanceTo(actorCloseEnough, mCharacter);
 			float bestDot = -1.0f;
+			float haveFoundActor = false;
 			for (AActor* actor : actorCloseEnough)
 			{
 				if (actor == nullptr) continue;
@@ -107,6 +108,7 @@ void UGrappleComponent::CheckElementTargetable()
 				{
 					bestDot = dot;
 					ClosestGrapplingHook = actor;
+					haveFoundActor = true;
 					if (bestDot == 1.0f) break;
 					//FHitResult hitResult;
 					//if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
@@ -128,20 +130,19 @@ void UGrappleComponent::CheckElementTargetable()
 					//}
 				}
 			}
-			FHitResult hitResult;
-			if (actorCloseEnough.Num() == 0)
-			{
-				if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
-				{
-					Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
-					HasCreatedTarget = false;
-				}
-				ClosestGrapplingHook = nullptr;
-				LastClosestGrapplingHook = nullptr;
-				return;
-			}
 			if (ClosestGrapplingHook != nullptr)
 			{
+				FHitResult hitResult;
+				if (actorCloseEnough.Num() == 0 || !haveFoundActor)
+				{
+					if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+					{
+						Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
+					}
+					ClosestGrapplingHook = nullptr;
+					LastClosestGrapplingHook = nullptr;
+					return;
+				}
 				if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), ClosestGrapplingHook->GetActorLocation(), ECollisionChannel::ECC_Visibility))
 				{
 					if (LastClosestGrapplingHook == hitResult.GetActor()) return;
