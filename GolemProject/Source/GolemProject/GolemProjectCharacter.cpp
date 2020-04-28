@@ -577,7 +577,11 @@ void AGolemProjectCharacter::ActivateDeath(bool _activate)
 	if (mGrapple)
 	{
 		mGrapple->DeleteHelpingAim();
-		//mGrapple->StopSwingPhysics(false);
+		mGrapple->StopSwingPhysicsOnDeath();
+		/*if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->StopSwingPhysics();
+		}*/
 	}
 	ChangeCameraReleased();
 	if (_activate)

@@ -175,6 +175,8 @@ public:
 	//Implicit Delete SwingPhysics var 
 	void StopSwingPhysics(const bool& _comingBack = true);
 
+	void StopSwingPhysicsOnDeath();
+		
 	void CheckGround();
 
 	UPROPERTY(BlueprintReadOnly)
