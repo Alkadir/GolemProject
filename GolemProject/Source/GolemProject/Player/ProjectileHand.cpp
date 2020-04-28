@@ -61,6 +61,13 @@ void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleCompon
 	}
 }
 
+void AProjectileHand::DestroyProjectile()
+{
+	bIsColliding = false;
+	bIsComingBack = false;
+	Destroy();
+}
+
 // Called every frame
 void AProjectileHand::Tick(float DeltaTime)
 {

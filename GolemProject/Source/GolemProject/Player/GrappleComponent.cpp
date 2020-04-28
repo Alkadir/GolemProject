@@ -429,6 +429,23 @@ void UGrappleComponent::StopSwingPhysics(const bool& _comingBack)
 	}
 }
 
+void UGrappleComponent::StopSwingPhysicsOnDeath()
+{
+	if (rope)
+		rope->HideMesh();
+	//if (swingPhysic && currentProjectile)
+	//{
+	//	bIsAssisted = false;
+	//	delete swingPhysic;
+	//	swingPhysic = nullptr;
+	//	IsSwinging = false;
+	//	currentProjectile->DestroyProjectile();
+	//	currentProjectile = nullptr;
+	//	//currentProjectile->SetComingBack(_comingBack);
+	//	mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.RemoveAll(this);
+	//}
+}
+
 void UGrappleComponent::CheckGround()
 {
 	if (world)
