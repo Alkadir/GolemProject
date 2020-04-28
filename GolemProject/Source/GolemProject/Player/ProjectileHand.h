@@ -60,6 +60,9 @@ public:
 	void LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple);
 
 	UFUNCTION()
+	void DestroyProjectile();
+
+	UFUNCTION()
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return meshComponent; };
 
 	// Called every frame
