@@ -8,6 +8,7 @@
 #include "Interfaces/Interactable.h"
 #include "GolemProjectCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartMoving);
 UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
@@ -73,6 +74,8 @@ private:
 	float initialGroundFriction;
 
 	bool HasPressedAiming;
+
+	bool HasAlreadyMove;
 
 protected:
 
@@ -224,4 +227,7 @@ public:
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite ,Category = "Debug")
 	bool showCursor = false;
+
+	UPROPERTY(BlueprintAssignable)
+	FStartMoving OnStartMoving;
 };
