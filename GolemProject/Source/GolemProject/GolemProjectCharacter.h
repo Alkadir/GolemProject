@@ -15,9 +15,6 @@ class AGolemProjectCharacter : public ACharacter
 
 private:
 
-	UPROPERTY(EditAnyWhere, Category = "Debug")
-	bool showCursor = false;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
 	bool isGrappleSkillEnabled = false;
 
@@ -224,4 +221,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsCharacterSwinging(); 
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite ,Category = "Debug")
+	bool showCursor = false;
 };
