@@ -164,6 +164,8 @@ void AGolemProjectCharacter::BeginPlay()
 
 	if (WallMechanicalComponent)
 		WallMechanicalComponent->EndJump.AddDynamic(this, &AGolemProjectCharacter::AimAtEndOfWallJump);
+
+	HasAlreadyMove = false;
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -209,6 +211,11 @@ void AGolemProjectCharacter::Jump()
 	}
 	else if (PushingComponent && !PushingComponent->GetIsPushingObject())
 	{
+		if (!HasAlreadyMove)
+		{
+			HasAlreadyMove = true;
+			OnStartMoving.Broadcast();
+		}
 		Super::Jump();
 	}
 
@@ -231,6 +238,11 @@ void AGolemProjectCharacter::Dash()
 				direction = GetActorForwardVector();
 			}
 			direction.Normalize();
+			if (!HasAlreadyMove)
+			{
+				HasAlreadyMove = true;
+				OnStartMoving.Broadcast();
+			}
 			dashComponent->Dash(direction);
 		}
 	}
@@ -442,6 +454,11 @@ void AGolemProjectCharacter::MoveForward(float Value)
 			}
 		}
 		Direction = Direction.GetSafeNormal();
+		if (!HasAlreadyMove)
+		{
+			HasAlreadyMove = true;
+			OnStartMoving.Broadcast();
+		}
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -493,6 +510,11 @@ void AGolemProjectCharacter::MoveRight(float Value)
 				Direction.Y = X;
 			}
 			Direction = Direction.GetSafeNormal();
+			if (!HasAlreadyMove)
+			{
+				HasAlreadyMove = true;
+				OnStartMoving.Broadcast();
+			}
 			AddMovementInput(Direction, Value);
 		}
 	}
