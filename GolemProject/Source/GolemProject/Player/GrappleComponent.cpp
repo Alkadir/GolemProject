@@ -264,26 +264,29 @@ void UGrappleComponent::DisplayHelping()
 		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 6.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 		{
 			UPhysicalMaterial* physMat;
-			physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
-			if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
+			if (hitResult.GetComponent() != nullptr && hitResult.GetComponent()->GetMaterial(0))
 			{
-				if (isColorRed)
+				physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+				if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
 				{
-					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
-					isColorRed = false;
+					if (isColorRed)
+					{
+						HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+						isColorRed = false;
+					}
 				}
-			}
-			else
-			{
-				if (!isColorRed)
+				else
 				{
-					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
-					isColorRed = true;
+					if (!isColorRed)
+					{
+						HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+						isColorRed = true;
+					}
 				}
+				distance = hitResult.ImpactPoint - location;
+				scale.Z = distance.Size() / 100.0f;
+				HelperAiming->SetActorScale3D(scale);
 			}
-			distance = hitResult.ImpactPoint - location;
-			scale.Z = distance.Size() / 100.0f;
-			HelperAiming->SetActorScale3D(scale);
 		}
 		else
 		{
