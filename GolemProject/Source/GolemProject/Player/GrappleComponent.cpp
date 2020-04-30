@@ -68,6 +68,7 @@ void UGrappleComponent::BeginPlay()
 		}
 	}
 	isColorRed = true;
+	HasCreatedTarget = false;
 }
 
 void UGrappleComponent::CheckElementTargetable()
@@ -93,43 +94,75 @@ void UGrappleComponent::CheckElementTargetable()
 				}
 			}
 			HelperLibrary::SortActorsByDistanceTo(actorCloseEnough, mCharacter);
-			if (followingCam)
+			float bestDot = -1.0f;
+			float haveFoundActor = false;
+			for (AActor* actor : actorCloseEnough)
 			{
-				for (AActor* actor : actorCloseEnough)
+				if (actor == nullptr) continue;
+				// > 0 object seen
+				FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation());
+				FromSoftware.Normalize();
+				float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
+				//to change and finish
+				if (dot > minDot&& dot > bestDot)
 				{
-					if (actor == nullptr) continue;
-					// > 0 object seen
-					FVector FromSoftware = (actor->GetActorLocation() - mCharacter->GetActorLocation());
-					FromSoftware.Normalize();
-					float dot = FVector::DotProduct(followingCam->GetForwardVector(), FromSoftware);
-					//to change and finish
-					if (dot > minDot&& dot < maxDot)
-					{
-						FHitResult hitResult;
-						if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
-						{
-							if (ClosestGrapplingHook != nullptr && ClosestGrapplingHook == hitResult.GetActor()) return;
-							if (ITargetable* target = Cast<ITargetable>(hitResult.GetActor()))
-							{
-								if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
-								{
-									Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
-								}
-								target->Execute_CreateHUD(hitResult.GetActor());
-								ClosestGrapplingHook = actor;
-								return;
-							}
-						}
-					}
+					bestDot = dot;
+					ClosestGrapplingHook = actor;
+					haveFoundActor = true;
+					if (bestDot == 1.0f) break;
+					//FHitResult hitResult;
+					//if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), actor->GetActorLocation(), ECollisionChannel::ECC_Visibility))
+					//{
+					//	if (ClosestGrapplingHook != nullptr && ClosestGrapplingHook == hitResult.GetActor()) return;
+					//	if (ITargetable* target = Cast<ITargetable>(hitResult.GetActor()))
+					//	{
+					//		if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+					//		{
+					//			Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
+					//		}
+					//		target->Execute_CreateHUD(hitResult.GetActor());
+					//		ClosestGrapplingHook = actor;
+					//		
+					//		HelperLibrary::Print("sds");
+					//		if (bestDot == 1.0f) return;
+					//		//return;
+					//	}
+					//}
 				}
 			}
 			if (ClosestGrapplingHook != nullptr)
 			{
-				if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+				FHitResult hitResult;
+				if (actorCloseEnough.Num() == 0 || !haveFoundActor)
 				{
-					Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
+					if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+					{
+						Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
+						if (mCharacter)
+							mCharacter->DeactivateTargetGrapple();
+					}
+					ClosestGrapplingHook = nullptr;
+					LastClosestGrapplingHook = nullptr;
+					return;
 				}
-				ClosestGrapplingHook = nullptr;
+				if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), ClosestGrapplingHook->GetActorLocation(), ECollisionChannel::ECC_Visibility))
+				{
+					if (LastClosestGrapplingHook == hitResult.GetActor()) return;
+					ITargetable* Lasttarget = Cast<ITargetable>(LastClosestGrapplingHook);
+					if (Lasttarget)
+					{
+						Lasttarget->Execute_DestroyHUD(LastClosestGrapplingHook);
+					}
+					ITargetable* target = Cast<ITargetable>(hitResult.GetActor());
+					if (target)
+					{
+						target->Execute_CreateHUD(hitResult.GetActor());
+						LastClosestGrapplingHook = hitResult.GetActor();
+						if (mCharacter)
+							mCharacter->ActivateTargetGrapple(LastClosestGrapplingHook);
+					}
+					return;
+				}
 			}
 		}
 	}
@@ -228,29 +261,32 @@ void UGrappleComponent::DisplayHelping()
 		FVector distance = direction.GetSafeNormal() * maxDistanceGrappling;
 		scale.Z = distance.Size() / 100.0f;
 		HelperAiming->SetActorScale3D(scale);
-		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 6.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::ForOneFrame, hitResult, true))
+		if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 6.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 		{
 			UPhysicalMaterial* physMat;
-			physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
-			if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
+			if (hitResult.GetComponent() != nullptr && hitResult.GetComponent()->GetMaterial(0))
 			{
-				if (isColorRed)
+				physMat = hitResult.GetComponent()->GetMaterial(0)->GetPhysicalMaterial();
+				if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType1)
 				{
-					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
-					isColorRed = false;
+					if (isColorRed)
+					{
+						HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(0.0f, 50.0f, 0.0f, 0.0f));
+						isColorRed = false;
+					}
 				}
-			}
-			else
-			{
-				if (!isColorRed)
+				else
 				{
-					HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
-					isColorRed = true;
+					if (!isColorRed)
+					{
+						HelperAimingMesh->SetVectorParameterValueOnMaterials("Color", FVector4(50.0f, 0.0f, 0.0f, 0.0f));
+						isColorRed = true;
+					}
 				}
+				distance = hitResult.ImpactPoint - location;
+				scale.Z = distance.Size() / 100.0f;
+				HelperAiming->SetActorScale3D(scale);
 			}
-			distance = hitResult.ImpactPoint - location;
-			scale.Z = distance.Size() / 100.0f;
-			HelperAiming->SetActorScale3D(scale);
 		}
 		else
 		{
@@ -400,6 +436,23 @@ void UGrappleComponent::StopSwingPhysics(const bool& _comingBack)
 	}
 }
 
+void UGrappleComponent::StopSwingPhysicsOnDeath()
+{
+	if (rope)
+		rope->HideMesh();
+	//if (swingPhysic && currentProjectile)
+	//{
+	//	bIsAssisted = false;
+	//	delete swingPhysic;
+	//	swingPhysic = nullptr;
+	//	IsSwinging = false;
+	//	currentProjectile->DestroyProjectile();
+	//	currentProjectile = nullptr;
+	//	//currentProjectile->SetComingBack(_comingBack);
+	//	mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.RemoveAll(this);
+	//}
+}
+
 void UGrappleComponent::CheckGround()
 {
 	if (world)
@@ -425,6 +478,17 @@ void UGrappleComponent::CheckGround()
 					currentProjectile->SetComingBack(true);
 			}
 		}
+	}
+}
+
+void UGrappleComponent::DeleteHelpingAim()
+{
+	if (HelperAiming != nullptr)
+	{
+		HelperAiming->Destroy();
+		HelperAiming = nullptr;
+		isAiming = false;
+		isColorRed = true;
 	}
 }
 

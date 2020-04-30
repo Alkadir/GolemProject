@@ -8,15 +8,13 @@
 #include "Interfaces/Interactable.h"
 #include "GolemProjectCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartMoving);
 UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 private:
-
-	UPROPERTY(EditAnyWhere, Category = "Debug")
-	bool showCursor = false;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
 	bool isGrappleSkillEnabled = false;
@@ -77,6 +75,8 @@ private:
 
 	bool HasPressedAiming;
 
+	bool HasAlreadyMove;
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
@@ -99,7 +99,6 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float _deltaTime) override;
 
-	//To do
 	//virtual void Tick(float _deltaTime) override;
 
 	void Fire();
@@ -220,8 +219,20 @@ public:
 	bool IsAiming;
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void ActivateTargetGrapple(class AActor* _target);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DeactivateTargetGrapple();
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void Event_Death();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsCharacterSwinging(); 
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite ,Category = "Debug")
+	bool showCursor = false;
+
+	UPROPERTY(BlueprintAssignable)
+	FStartMoving OnStartMoving;
 };

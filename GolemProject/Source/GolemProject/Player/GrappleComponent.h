@@ -19,6 +19,7 @@ private:
 	class USkeletalMeshComponent* mSkeletalMesh;
 	class AProjectileHand* currentProjectile;
 	class AActor* ClosestGrapplingHook;
+	class AActor* LastClosestGrapplingHook;
 	class AGolemProjectGameMode* GameMode;
 	class APlayerCameraManager* PlayerCameraManager;
 	class USwingPhysic* swingPhysic = nullptr;
@@ -26,6 +27,7 @@ private:
 	class AActor* HelperAiming;
 	TArray<class AActor*> ActorToIgnore;
 	bool isColorRed;
+	bool HasCreatedTarget;
 
 	FVector mDestination;
 	FVector mDirection;
@@ -173,12 +175,17 @@ public:
 	//Implicit Delete SwingPhysics var 
 	void StopSwingPhysics(const bool& _comingBack = true);
 
+	void StopSwingPhysicsOnDeath();
+		
 	void CheckGround();
 
 	UPROPERTY(BlueprintReadOnly)
 	bool isAiming;
 
 	bool IsSwinging;
+
+	UFUNCTION()
+	void DeleteHelpingAim();
 
 	FORCEINLINE void SetClimb(bool _isClimbing) { bIsClimbing = _isClimbing; };
 	FORCEINLINE void StopClimb() { bIsClimbing = false; };

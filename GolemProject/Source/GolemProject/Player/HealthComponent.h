@@ -22,9 +22,9 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
-	int MaxLife = 10;
+	int MaxLife = 1;
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
-	int Life = 10;
+	int Life = 1;
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	float TimerInvulnerability = 0.5f;
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (AllowPrivateAccess = "true"))

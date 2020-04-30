@@ -49,7 +49,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 	// Configure character movement
 	if (GetCharacterMovement())
 	{
-		GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...
+		GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input..
 		GetCharacterMovement()->RotationRate = FRotator(0.0f, 1620.0f, 0.0f); // ...at this rotation rate
 		GetCharacterMovement()->JumpZVelocity = 600.f;
 		GetCharacterMovement()->AirControl = 0.2f;
@@ -162,7 +162,10 @@ void AGolemProjectCharacter::BeginPlay()
 	IsAiming = false;
 	WantToAim = false;
 
-	WallMechanicalComponent->EndJump.AddDynamic(this, &AGolemProjectCharacter::AimAtEndOfWallJump);
+	if (WallMechanicalComponent)
+		WallMechanicalComponent->EndJump.AddDynamic(this, &AGolemProjectCharacter::AimAtEndOfWallJump);
+
+	HasAlreadyMove = false;
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -208,6 +211,11 @@ void AGolemProjectCharacter::Jump()
 	}
 	else if (PushingComponent && !PushingComponent->GetIsPushingObject())
 	{
+		if (!HasAlreadyMove)
+		{
+			HasAlreadyMove = true;
+			OnStartMoving.Broadcast();
+		}
 		Super::Jump();
 	}
 
@@ -230,6 +238,11 @@ void AGolemProjectCharacter::Dash()
 				direction = GetActorForwardVector();
 			}
 			direction.Normalize();
+			if (!HasAlreadyMove)
+			{
+				HasAlreadyMove = true;
+				OnStartMoving.Broadcast();
+			}
 			dashComponent->Dash(direction);
 		}
 	}
@@ -441,6 +454,11 @@ void AGolemProjectCharacter::MoveForward(float Value)
 			}
 		}
 		Direction = Direction.GetSafeNormal();
+		if (!HasAlreadyMove)
+		{
+			HasAlreadyMove = true;
+			OnStartMoving.Broadcast();
+		}
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -492,6 +510,11 @@ void AGolemProjectCharacter::MoveRight(float Value)
 				Direction.Y = X;
 			}
 			Direction = Direction.GetSafeNormal();
+			if (!HasAlreadyMove)
+			{
+				HasAlreadyMove = true;
+				OnStartMoving.Broadcast();
+			}
 			AddMovementInput(Direction, Value);
 		}
 	}
@@ -570,38 +593,50 @@ bool AGolemProjectCharacter::IsCharacterDead()
 //WIP DO NOT TOUCH
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
-	//UCapsuleComponent* capsule = GetCapsuleComponent();
-	//if (_activate)
-	//{
-	//	if (capsule)
-	//	{
-	//		capsule->SetCollisionProfileName("NoCollision");
-	//		//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//	}
-	//	/*GetCharacterMovement()->StopMovementImmediately();
-	//	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//	GetMesh()->SetSimulatePhysics(true);*/
-	//}
-	//else
-	//{
-	//	if (capsule)
-	//	{
-	//		capsule->SetCollisionProfileName("Pawn");
-	//		//capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//	}
-	//	/*GetMesh()->SetSimulatePhysics(false);
-	//	GetMesh()->SetAllBodiesSimulatePhysics(false);
-	//	GetMesh()->ResetAllBodiesSimulatePhysics();
-	//	GetMesh()->RecreatePhysicsState();
-	//	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);*/
-	//}
+	UCapsuleComponent* capsule = GetCapsuleComponent();
+	if (FistComp)
+		FistComp->DeleteHelpingAim();
+	if (mGrapple)
+	{
+		mGrapple->DeleteHelpingAim();
+		mGrapple->StopSwingPhysicsOnDeath();
+		/*if (mGrapple->GetSwingPhysics())
+		{
+			mGrapple->StopSwingPhysics();
+		}*/
+	}
+	ChangeCameraReleased();
+	if (_activate)
+	{
+		if (capsule)
+		{
+			//capsule->SetCollisionProfileName("NoCollision");
+			//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		GetCharacterMovement()->StopMovementImmediately();
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetMesh()->SetSimulatePhysics(true);
+	}
+	/*else
+	{
+		if (capsule)
+		{
+			capsule->SetCollisionProfileName("Pawn");
+			//capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		}
+		GetMesh()->SetSimulatePhysics(false);
+		GetMesh()->SetAllBodiesSimulatePhysics(false);
+		GetMesh()->ResetAllBodiesSimulatePhysics();
+		GetMesh()->RecreatePhysicsState();
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}*/
 }
 
 void AGolemProjectCharacter::ResetMeshOnRightPlace()
 {
-	//GetMesh()->SetupAttachment(GetCapsuleComponent());
-	//GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
-	//GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
+	GetMesh()->SetupAttachment(GetCapsuleComponent());
+	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
+	GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
 }
 
 bool AGolemProjectCharacter::IsCharacterSwinging()

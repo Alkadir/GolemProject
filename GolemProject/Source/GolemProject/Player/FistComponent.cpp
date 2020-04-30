@@ -124,6 +124,23 @@ void UFistComponent::ResetFire()
 	}
 }
 
+void UFistComponent::DeleteHelpingAim()
+{
+	if (HelperAiming.Num() != 0)
+	{
+		for (int i = 0; i < HelperAiming.Num(); ++i)
+		{
+			if (HelperAiming[i] != nullptr)
+			{
+				HelperAiming[i]->Destroy();
+			}
+		}
+		HelperAimingMesh.Empty();
+		HelperAiming.Empty();
+		isColorRed = true;
+	}
+}
+
 // Called every frame
 void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
