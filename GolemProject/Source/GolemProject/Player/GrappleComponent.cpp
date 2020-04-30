@@ -138,6 +138,8 @@ void UGrappleComponent::CheckElementTargetable()
 					if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
 					{
 						Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
+						if (mCharacter)
+							mCharacter->DeactivateTargetGrapple();
 					}
 					ClosestGrapplingHook = nullptr;
 					LastClosestGrapplingHook = nullptr;
@@ -156,6 +158,8 @@ void UGrappleComponent::CheckElementTargetable()
 					{
 						target->Execute_CreateHUD(hitResult.GetActor());
 						LastClosestGrapplingHook = hitResult.GetActor();
+						if (mCharacter)
+							mCharacter->ActivateTargetGrapple(LastClosestGrapplingHook);
 					}
 					return;
 				}
