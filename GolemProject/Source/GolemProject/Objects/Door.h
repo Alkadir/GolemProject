@@ -33,8 +33,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		USceneComponent* destination;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		bool isActivate;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+		bool isDissolving;
 
 	UPROPERTY(EditAnywhere)
 		float timeToMove;

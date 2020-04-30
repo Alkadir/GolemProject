@@ -40,27 +40,30 @@ void ADoor::Tick(float DeltaTime)
 
 	if (openBy == EOpenDoorBy::Movement)
 	{
-		float lastTimer = timerLerp;
-		if (isActivate)
+		if (!isDissolving)
 		{
-			timerLerp += DeltaTime / timeToMove;
-			if (timerLerp > 1.f)
+			float lastTimer = timerLerp;
+			if (isActivate)
 			{
-				timerLerp = 1.f;
+				timerLerp += DeltaTime / timeToMove;
+				if (timerLerp > 1.f)
+				{
+					timerLerp = 1.f;
+				}
 			}
-		}
-		else
-		{
-			timerLerp -= DeltaTime / timeToMove;
-			if (timerLerp < 0.f)
+			else
 			{
-				timerLerp = 0.f;
+				timerLerp -= DeltaTime / timeToMove;
+				if (timerLerp < 0.f)
+				{
+					timerLerp = 0.f;
+				}
 			}
-		}
-		if (!SetActorLocation(FMath::Lerp(startPos, destinationPos, timerLerp)))
-		{
-			HelperLibrary::Print(TEXT("cant move"), 5.f, FColor::Red);
-			timerLerp = lastTimer;
+			if (!SetActorLocation(FMath::Lerp(startPos, destinationPos, timerLerp)))
+			{
+				HelperLibrary::Print(TEXT("cant move"), 5.f, FColor::Red);
+				timerLerp = lastTimer;
+			}
 		}
 	}
 }
