@@ -219,6 +219,12 @@ public:
 	bool IsAiming;
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void ActivateTargetGrapple(class AActor* _target);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DeactivateTargetGrapple();
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void Event_Death();
 
 	UFUNCTION(BlueprintCallable)
