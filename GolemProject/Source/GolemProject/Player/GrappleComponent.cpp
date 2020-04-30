@@ -21,7 +21,6 @@
 #include "Player/Rope.h"
 #include "Components/CapsuleComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
-#include "Helpers/BlueprintFunctionLibraryHelper.h"
 
 //#include "DrawDebugHelpers.h"
 
@@ -139,8 +138,6 @@ void UGrappleComponent::CheckElementTargetable()
 					if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
 					{
 						Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
-						if (mCharacter)
-							mCharacter->DeactivateTargetGrapple();
 					}
 					ClosestGrapplingHook = nullptr;
 					LastClosestGrapplingHook = nullptr;
@@ -158,8 +155,6 @@ void UGrappleComponent::CheckElementTargetable()
 					if (target)
 					{
 						target->Execute_CreateHUD(hitResult.GetActor());
-						if (mCharacter)
-							mCharacter->ActivateTargetGrapple(ClosestGrapplingHook);
 						LastClosestGrapplingHook = hitResult.GetActor();
 					}
 					return;
