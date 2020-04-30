@@ -34,6 +34,7 @@ void AProjectile::LaunchProjectile_Implementation(AActor* _launcher, FVector vel
 	damage = _damage;
 	if (projectileMovement)
 	{
+		HelperLibrary::Print(velocity.ToString() + "  2");
 		projectileMovement->Velocity = velocity;
 		projectileMovement->ProjectileGravityScale = gravityScale;
 	}
