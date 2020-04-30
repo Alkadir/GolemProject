@@ -182,8 +182,6 @@ public:
 
 	FORCEINLINE class UCapsuleComponent* GetCustomCapsuleComponent() const { return customCapsule; }
 
-	FORCEINLINE class UDashComponent* GetDashComponent() const { return dashComponent; }
-
 	UFUNCTION(BlueprintCallable)
 	FVector GetVirtualRightHandPosition();
 
@@ -222,12 +220,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_Death();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void ActivateTargetGrapple(AActor* _target);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void DeactivateTargetGrapple();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsCharacterSwinging(); 

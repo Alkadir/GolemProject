@@ -131,7 +131,6 @@ void AGolemProjectCharacter::BeginPlay()
 	sightCameraL = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCameraL");
 	RaycastingComponent = FindComponentByClass<URaycastingComponent>();
 	WallMechanicalComponent = FindComponentByClass<UWallMechanicalComponent>();
-
 	if (GetCharacterMovement())
 	{
 		initialGroundFriction = GetCharacterMovement()->GroundFriction;
