@@ -182,6 +182,8 @@ public:
 
 	FORCEINLINE class UCapsuleComponent* GetCustomCapsuleComponent() const { return customCapsule; }
 
+	FORCEINLINE class UDashComponent* GetDashComponent() const { return dashComponent; }
+
 	UFUNCTION(BlueprintCallable)
 	FVector GetVirtualRightHandPosition();
 
