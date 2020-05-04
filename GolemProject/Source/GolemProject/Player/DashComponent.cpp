@@ -85,6 +85,9 @@ void UDashComponent::Dash(FVector _direction)
 			m_character->LaunchCharacter(_direction * dashForce, false, false);
 			isDashing = true;
 			m_canDash = false;
+
+			m_character->DashEvent();
+
 			if (UWorld* world = GetWorld())
 			{
 				world->GetTimerManager().SetTimer(m_loopTimer, this, &UDashComponent::StopDash, TimerStopDash, false);

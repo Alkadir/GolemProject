@@ -104,6 +104,7 @@ void UFistComponent::GoToDestination()
 				currentProjectile = nullptr;
 				world->GetTimerManager().SetTimer(TimerHandleFire, this, &UFistComponent::ResetFire, TimerFire, false);
 				CanFire = false;
+				mCharacter->FireEvent();
 			}
 		}
 	}

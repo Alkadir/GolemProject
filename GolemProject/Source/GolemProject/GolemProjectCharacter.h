@@ -198,6 +198,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "IK")
 	void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
 
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Dash Action Event"), Category = Events)
+	void DashEvent();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Fire Action Event"), Category = Events)
+	void FireEvent();
+
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
 	void StopPushBloc();
