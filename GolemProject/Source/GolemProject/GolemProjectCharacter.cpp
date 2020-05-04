@@ -322,7 +322,9 @@ void AGolemProjectCharacter::Fire()
 	else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist)
 	{
 		if (isSightCameraEnabled)
+		{
 			FistComp->GoToDestination();
+		}
 	}
 }
 
