@@ -205,6 +205,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Fire Action Event"), Category = Events)
 	void FireEvent();
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Grappling Action Event"), Category = Events)
+	void GrapplingFireEvent();
+
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
 	void StopPushBloc();
