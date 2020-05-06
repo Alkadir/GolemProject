@@ -36,6 +36,7 @@ private:
 	int32 mIdBone;
 	bool bIsAssisted = false;
 	bool bIsClimbing = false;
+	bool bIsAttracting = false;
 	float accuracy = 100000.0f;
 
 	//values to edit
