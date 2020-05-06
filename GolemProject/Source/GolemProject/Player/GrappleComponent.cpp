@@ -179,6 +179,8 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			currentProjectile = world->SpawnActor<AProjectileHand>(handProjectileClass, mSkeletalMesh->GetBoneTransform(mIdBone));
 			if (currentProjectile)
 			{
+				mCharacter->GrapplingFireEvent();
+
 				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCharacter->GetVirtualRightHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling);
 				FVector direction = (offset - mCharacter->GetVirtualRightHandPosition());
@@ -200,6 +202,8 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				//Create the rope visual
 				rope = world->SpawnActor<ARope>(ropeClass);
 				rope->SetGrappleComponent(this);
+
+			
 			}
 		}
 	}
