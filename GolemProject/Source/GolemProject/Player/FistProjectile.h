@@ -62,7 +62,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Fist, meta = (AllowPrivateAccess = "true"))
 	class UProjectileMovementComponent* ProjectileComponent;
 	FVector Direction;
-
+	FVector lastPosition;
+	float distanceTravelled;
 	void BounceMovement(FVector _normal);
 
 	FTimerHandle TimerHandleDisappear;
