@@ -50,6 +50,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_DestructionFistFX_BP();
 
+	UFUNCTION(Blueprintcallable)
+	const float GetRemainingTimeBeforeDestroy();
+
 	UFUNCTION()
 	void DestroyFist();
 
@@ -59,9 +62,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Fist, meta = (AllowPrivateAccess = "true"))
 	class UProjectileMovementComponent* ProjectileComponent;
 	FVector Direction;
-
+	FVector lastPosition;
+	float distanceTravelled;
 	void BounceMovement(FVector _normal);
 
 	FTimerHandle TimerHandleDisappear;
 	FTimerHandle TimerHandleFXDisappear;
+	bool bHasStopped;
 };

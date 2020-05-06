@@ -317,13 +317,25 @@ void AGolemProjectCharacter::Fire()
 		mGrapple->Cancel();
 
 		if (isSightCameraEnabled)
+		{
 			mGrapple->GoToDestination(false);
+			if (!HasAlreadyMove)
+			{
+				HasAlreadyMove = true;
+				OnStartMoving.Broadcast();
+			}
+		}
 	}
 	else if (isFistSkillEnabled && FistComp && FistComp->IsTargetingFist)
 	{
 		if (isSightCameraEnabled)
 		{
 			FistComp->GoToDestination();
+			if (!HasAlreadyMove)
+			{
+				HasAlreadyMove = true;
+				OnStartMoving.Broadcast();
+			}
 		}
 	}
 }
