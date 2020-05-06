@@ -7,6 +7,7 @@
 #include "Player/GrappleComponent.h"
 #include "Helpers/HelperLibrary.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "GolemProject/GolemProjectCharacter.h"
 
 // Sets default values
 AProjectileHand::AProjectileHand()
@@ -46,6 +47,11 @@ void AProjectileHand::SetComingBack(const bool& _isComingBack)
 		{
 			meshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 		}
+
+		if (AGolemProjectCharacter* character = Cast<AGolemProjectCharacter>(GetOwner()))
+		{
+			character->ComingBackEvent();
+		}
 	}
 
 	bIsComingBack = _isComingBack;
@@ -54,11 +60,11 @@ void AProjectileHand::SetComingBack(const bool& _isComingBack)
 void AProjectileHand::LaunchProjectile(const FVector& _direction, UGrappleComponent* _grapple)
 {
 	direction = _direction;
-	grappleComponent = _grapple;
-	if (ProjectileComponent)
-	{
-		ProjectileComponent->Velocity = direction * velocity;
-	}
+		grappleComponent = _grapple;
+		if (ProjectileComponent)
+		{
+			ProjectileComponent->Velocity = direction * velocity;
+		}
 }
 
 void AProjectileHand::DestroyProjectile()
