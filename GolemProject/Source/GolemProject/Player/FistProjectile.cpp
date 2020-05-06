@@ -9,6 +9,7 @@
 #include "Helpers/HelperLibrary.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Interfaces/Interactable.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AFistProjectile::AFistProjectile()
@@ -67,6 +68,7 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	}
 	if (UWorld* world = GetWorld())
 	{
+		bHasStopped = true;
 		world->GetTimerManager().SetTimer(TimerHandleFXDisappear, this, &AFistProjectile::Event_DestructionFistFX_BP, TimerDisappear - 1.0f, false);
 		world->GetTimerManager().SetTimer(TimerHandleDisappear, this, &AFistProjectile::DestroyFist, TimerDisappear, false);
 	}
@@ -86,6 +88,12 @@ void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce)
 	{
 		ProjectileComponent->Velocity = Direction * Speed;
 	}
+}
+
+const float AFistProjectile::GetRemainingTimeBeforeDestroy()
+{
+	float time = (bHasStopped) ? UKismetSystemLibrary::K2_GetTimerRemainingTimeHandle(this, TimerHandleDisappear) : 1.0f;
+	return time;
 }
 
 void AFistProjectile::DestroyFist()
