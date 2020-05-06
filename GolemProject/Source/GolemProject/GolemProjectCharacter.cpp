@@ -14,6 +14,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Helpers/HelperLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Interfaces/Targetable.h"
 #include "Camera/PlayerCameraManager.h"
 #include "GolemProjectGameMode.h"
@@ -627,6 +628,7 @@ void AGolemProjectCharacter::ActivateDeath(bool _activate)
 			//capsule->SetCollisionProfileName("NoCollision");
 			//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
+		FollowCamera->DetachFromParent(true);
 		GetCharacterMovement()->StopMovementImmediately();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		GetMesh()->SetSimulatePhysics(true);
