@@ -135,15 +135,18 @@ void UGrappleComponent::CheckElementTargetable()
 				FHitResult hitResult;
 				if (actorCloseEnough.Num() == 0 || !haveFoundActor)
 				{
-					if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+					if (!IsFiring)
 					{
-						Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
-						if (mCharacter)
-							mCharacter->DeactivateTargetGrapple();
+						if (ITargetable* Lasttarget = Cast<ITargetable>(ClosestGrapplingHook))
+						{
+							Lasttarget->Execute_DestroyHUD(ClosestGrapplingHook);
+							if (mCharacter)
+								mCharacter->DeactivateTargetGrapple();
+						}
+						ClosestGrapplingHook = nullptr;
+						LastClosestGrapplingHook = nullptr;
+						return;
 					}
-					ClosestGrapplingHook = nullptr;
-					LastClosestGrapplingHook = nullptr;
-					return;
 				}
 				if (world->LineTraceSingleByChannel(hitResult, GetHandPosition(), ClosestGrapplingHook->GetActorLocation(), ECollisionChannel::ECC_Visibility))
 				{
@@ -203,7 +206,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 				rope = world->SpawnActor<ARope>(ropeClass);
 				rope->SetGrappleComponent(this);
 
-			
+
 			}
 		}
 	}
