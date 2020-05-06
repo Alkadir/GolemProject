@@ -519,8 +519,11 @@ void UGrappleComponent::PlayerIsNear()
 
 		if (currentProjectile)
 		{
+			mCharacter->EndGrapplingEvent();
 			currentProjectile->Destroy();
 		}
+
+		bIsAttracting = false;
 		rope = nullptr;
 		currentProjectile = nullptr;
 		IsFiring = false;
@@ -534,6 +537,10 @@ void UGrappleComponent::AttractCharacter()
 	tempDir = mDirection;
 	if (mCharacter && mCharacter->GetCharacterMovement())
 	{
+		if(!bIsAttracting)
+			mCharacter->StartingAttractionEvent();
+
+		bIsAttracting = true;
 		mCharacter->GetCharacterMovement()->GroundFriction = 0.0f;
 		mCharacter->LaunchCharacter(mDirection * velocity, true, true);
 
