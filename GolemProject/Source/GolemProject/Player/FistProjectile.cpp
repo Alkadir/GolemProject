@@ -78,7 +78,6 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 void AFistProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-		HelperLibrary::Print(FString::SanitizeFloat(distanceTravelled));
 	if (distanceTravelled < maxDistance)
 	{
 		distanceTravelled += FVector::Dist(lastPosition, MeshComponent->GetComponentLocation());
@@ -90,13 +89,14 @@ void AFistProjectile::Tick(float DeltaTime)
 	lastPosition = MeshComponent->GetComponentLocation();
 }
 
-void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce)
+void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce, float _maxDistance)
 {
 	Direction = _direction;
 	if (ProjectileComponent)
 	{
 		ProjectileComponent->Velocity = Direction * Speed;
 		lastPosition = MeshComponent->GetComponentLocation();
+		maxDistance = _maxDistance;
 	}
 }
 

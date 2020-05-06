@@ -100,7 +100,7 @@ void UFistComponent::GoToDestination()
 
 				currentProjectile->Instigator = mCharacter->GetInstigator();
 				currentProjectile->SetOwner(mCharacter);
-				currentProjectile->LaunchFist(direction, true);
+				currentProjectile->LaunchFist(direction, true, maxDistance);
 				currentProjectile = nullptr;
 				world->GetTimerManager().SetTimer(TimerHandleFire, this, &UFistComponent::ResetFire, TimerFire, false);
 				CanFire = false;
@@ -154,8 +154,8 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			UpdateIKArm();
 			if (CanFire && mCamera && world)
 			{
-				FVector end = GetHandPosition() + mCamera->GetForwardVector() * accuracy;
-				FVector direction = end - GetHandPosition();
+				FVector end = GetHandPosition() + mCamera->GetForwardVector() * maxDistance;
+				FVector direction = (end - GetHandPosition()).GetSafeNormal();
 				FVector location = GetHandPosition();
 				FVector scale;
 				FRotator rotation = direction.Rotation();
@@ -177,8 +177,8 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 						FHitResult hitResult;
 						HelperAiming[i]->SetActorRotation(rotation);
 						scale = HelperAiming[i]->GetActorScale3D();
-						FVector distance = direction * accuracy;
-						scale.Z = distance.Size();
+						FVector distance = direction * maxDistance;
+						scale.Z = distance.Size() / 100.0f;
 						HelperAiming[i]->SetActorScale3D(scale);
 						//raycast to see if there is any obstacle in front of player
 						if (UKismetSystemLibrary::SphereTraceSingle(world, location, end, 11.0f, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
@@ -205,7 +205,7 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 								if (physMat != nullptr && physMat->SurfaceType == EPhysicalSurface::SurfaceType2)
 								{
 									direction = direction.MirrorByVector(hitResult.ImpactNormal);
-									end = direction * accuracy;
+									end = direction * maxDistance;
 									location = hitResult.ImpactPoint;
 									rotation = direction.Rotation();
 								}

@@ -61,6 +61,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	int32 NumberBounce;
 
+	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
+	float maxDistance = 3000.0f;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
