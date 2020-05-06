@@ -25,9 +25,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float Speed;
 
-	UPROPERTY(EditAnywhere, Category = "physics", meta = (AllowPrivateAccess = "true"))
-	float maxDistance = 3000.0f;
-
 	UPROPERTY(EditAnywhere, Category = Destroy, meta = (AllowPrivateAccess = "true"))
 	float TimerDisappear = 2.0f;
 
@@ -45,7 +42,7 @@ public:
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return MeshComponent; };
 
 	UFUNCTION(Blueprintcallable)
-	void LaunchFist(const FVector& _direction, bool _shouldBounce);
+	void LaunchFist(const FVector& _direction, bool _shouldBounce, float _maxDistance);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_DestructionFistFX_BP();
@@ -63,6 +60,7 @@ private:
 	class UProjectileMovementComponent* ProjectileComponent;
 	FVector Direction;
 	FVector lastPosition;
+	float maxDistance;
 	float distanceTravelled;
 	void BounceMovement(FVector _normal);
 
