@@ -50,6 +50,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_DestructionFistFX_BP();
 
+	UFUNCTION(Blueprintcallable)
+	const float GetRemainingTimeBeforeDestroy();
+
 	UFUNCTION()
 	void DestroyFist();
 
@@ -64,4 +67,5 @@ private:
 
 	FTimerHandle TimerHandleDisappear;
 	FTimerHandle TimerHandleFXDisappear;
+	bool bHasStopped;
 };
