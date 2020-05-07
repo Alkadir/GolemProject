@@ -151,6 +151,9 @@ protected:
 
 	void SwitchArm();
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "PauseMenu"), Category = Events)
+	void PauseEvent();
+
 public:
 	AGolemProjectCharacter();
 
