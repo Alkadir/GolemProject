@@ -579,3 +579,15 @@ void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 		swingPhysic->InvertVelocity();
 	}
 }
+
+void UGrappleComponent::SetClimb(bool _isClimbing) {
+	if (!bIsClimbing)
+		mCharacter->StartReducingRopeEvent();
+
+	bIsClimbing = _isClimbing;
+};
+
+ void UGrappleComponent::StopClimb() {
+	mCharacter->EndReducingRopeEvent();
+	bIsClimbing = false;
+};
