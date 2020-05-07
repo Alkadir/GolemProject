@@ -9,6 +9,12 @@
 #include "GolemProjectCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartMoving);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetGrapple);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetFist);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFireProjectile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetProjectile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFireGrapple);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetGrapple);
 UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
@@ -166,9 +172,9 @@ public:
 
 	FORCEINLINE bool& IsFistSkillEnabled() { return isFistSkillEnabled; };
 
-	FORCEINLINE void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; };
+	FORCEINLINE void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; if (_enable)OnGetGrapple.Broadcast(); };
 
-	FORCEINLINE void SetFistSkillEnabled(bool _enable) { isFistSkillEnabled = _enable; };
+	FORCEINLINE void SetFistSkillEnabled(bool _enable) {isFistSkillEnabled = _enable; if (_enable)OnGetFist.Broadcast();};
 
 	void ResetFriction();
 	/** Returns CameraBoom subobject **/
@@ -256,4 +262,22 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FStartMoving OnStartMoving;
+
+	UPROPERTY(BlueprintAssignable)
+	FGetGrapple OnGetGrapple;
+
+	UPROPERTY(BlueprintAssignable)
+	FGetFist OnGetFist;
+
+	UPROPERTY(BlueprintAssignable)
+	FFireProjectile OnFireProjectile;
+
+	UPROPERTY(BlueprintAssignable)
+	FResetProjectile OnResetProjectile;
+
+	UPROPERTY(BlueprintAssignable)
+	FFireGrapple OnFireGrapple;
+
+	UPROPERTY(BlueprintAssignable)
+	FResetGrapple OnResetGrapple;
 };
