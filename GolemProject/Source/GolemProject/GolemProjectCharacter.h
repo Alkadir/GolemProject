@@ -9,6 +9,14 @@
 #include "GolemProjectCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartMoving);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetGrapple);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetFist);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFireProjectile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetProjectile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFireGrapple);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetGrapple);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrappleEquiped);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFistEquiped);
 UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
@@ -145,6 +153,9 @@ protected:
 
 	void SwitchArm();
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "PauseMenu"), Category = Events)
+	void PauseEvent();
+
 public:
 	AGolemProjectCharacter();
 
@@ -166,9 +177,9 @@ public:
 
 	FORCEINLINE bool& IsFistSkillEnabled() { return isFistSkillEnabled; };
 
-	FORCEINLINE void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; };
+	FORCEINLINE void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; if (_enable)OnGetGrapple.Broadcast(); };
 
-	FORCEINLINE void SetFistSkillEnabled(bool _enable) { isFistSkillEnabled = _enable; };
+	FORCEINLINE void SetFistSkillEnabled(bool _enable) {isFistSkillEnabled = _enable; if (_enable)OnGetFist.Broadcast();};
 
 	void ResetFriction();
 	/** Returns CameraBoom subobject **/
@@ -211,6 +222,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "End Grappling Action Event"), Category = Events)
 	void EndGrapplingEvent();
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Start Reducing Rope Action Event"), Category = Events)
+	void StartReducingRopeEvent();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "End Reducing Rope Action Event"), Category = Events)
+	void EndReducingRopeEvent();
+
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = " Start Swing Action Event"), Category = Events)
 	void StartSwingEvent();
 
@@ -224,8 +241,10 @@ public:
 
 	void StopPushBloc();
 
+	UFUNCTION(BlueprintCallable)
 	void ChangeToGrapple();
 
+	UFUNCTION(BlueprintCallable)
 	void ChangeToFist();
 
 	void InflictDamage(int _damage);
@@ -259,4 +278,28 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FStartMoving OnStartMoving;
+
+	UPROPERTY(BlueprintAssignable)
+	FGetGrapple OnGetGrapple;
+
+	UPROPERTY(BlueprintAssignable)
+	FGetFist OnGetFist;
+
+	UPROPERTY(BlueprintAssignable)
+	FFireProjectile OnFireProjectile;
+
+	UPROPERTY(BlueprintAssignable)
+	FResetProjectile OnResetProjectile;
+
+	UPROPERTY(BlueprintAssignable)
+	FFireGrapple OnFireGrapple;
+
+	UPROPERTY(BlueprintAssignable)
+	FResetGrapple OnResetGrapple;
+
+	UPROPERTY(BlueprintAssignable)
+	FGrappleEquiped OnGrappleEquiped;
+
+	UPROPERTY(BlueprintAssignable)
+	FFistEquiped OnFistEquiped;
 };

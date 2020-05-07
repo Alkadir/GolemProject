@@ -65,6 +65,9 @@ public:
 	UFUNCTION()
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return meshComponent; };
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Impact Action Event"), Category = Events)
+	void ImpactEvent();
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

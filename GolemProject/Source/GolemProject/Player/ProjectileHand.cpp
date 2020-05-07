@@ -120,11 +120,13 @@ void AProjectileHand::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 				if (!bIsAssisted && physMat->SurfaceType == SurfaceType1)
 				{
 					bIsGrapplingPossible = true;
+					ImpactEvent();
 					return;
 				}
 				else if (bIsAssisted && physMat->SurfaceType == SurfaceType3)
 				{
 					bIsSwingingPossible = true;
+					ImpactEvent();
 					return;
 				}
 			}

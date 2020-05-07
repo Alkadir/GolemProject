@@ -34,7 +34,7 @@ UFistComponent::UFistComponent()
 void UFistComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetTickGroup(ETickingGroup::TG_PrePhysics);
+	SetTickGroup(ETickingGroup::TG_PostPhysics);
 
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
@@ -105,6 +105,7 @@ void UFistComponent::GoToDestination()
 				world->GetTimerManager().SetTimer(TimerHandleFire, this, &UFistComponent::ResetFire, TimerFire, false);
 				CanFire = false;
 				mCharacter->FireEvent();
+				mCharacter->OnFireProjectile.Broadcast();
 			}
 		}
 	}
@@ -118,6 +119,7 @@ void UFistComponent::DisplayTrajectory()
 void UFistComponent::ResetFire()
 {
 	CanFire = true;
+	mCharacter->OnResetProjectile.Broadcast();
 	if (mSkeletalMesh)
 	{
 		mSkeletalMesh->UnHideBone(mIdBone);

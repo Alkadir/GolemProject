@@ -183,7 +183,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			if (currentProjectile)
 			{
 				mCharacter->GrapplingFireEvent();
-
+				mCharacter->OnFireGrapple.Broadcast();
 				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCharacter->GetVirtualRightHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling);
 				FVector direction = (offset - mCharacter->GetVirtualRightHandPosition());
@@ -531,6 +531,7 @@ void UGrappleComponent::PlayerIsNear()
 		rope = nullptr;
 		currentProjectile = nullptr;
 		IsFiring = false;
+		mCharacter->OnResetGrapple.Broadcast();
 	}
 }
 
@@ -578,3 +579,15 @@ void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 		swingPhysic->InvertVelocity();
 	}
 }
+
+void UGrappleComponent::SetClimb(bool _isClimbing) {
+	if (!bIsClimbing)
+		mCharacter->StartReducingRopeEvent();
+
+	bIsClimbing = _isClimbing;
+};
+
+ void UGrappleComponent::StopClimb() {
+	mCharacter->EndReducingRopeEvent();
+	bIsClimbing = false;
+};
