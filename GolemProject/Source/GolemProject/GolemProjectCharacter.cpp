@@ -103,6 +103,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("SwitchArm", IE_Pressed, this, &AGolemProjectCharacter::SwitchArm);
 
+	PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AGolemProjectCharacter::PauseEvent);
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGolemProjectCharacter::MoveRight);
 
