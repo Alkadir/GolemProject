@@ -183,7 +183,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 			if (currentProjectile)
 			{
 				mCharacter->GrapplingFireEvent();
-
+				mCharacter->OnFireGrapple.Broadcast();
 				mSkeletalMesh->HideBone(mIdBone, EPhysBodyOp::PBO_None);
 				FVector offset = _isAssisted ? ClosestGrapplingHook->GetActorLocation() : (mCharacter->GetVirtualRightHandPosition() + mCamera->GetForwardVector() * maxDistanceGrappling);
 				FVector direction = (offset - mCharacter->GetVirtualRightHandPosition());
@@ -531,6 +531,7 @@ void UGrappleComponent::PlayerIsNear()
 		rope = nullptr;
 		currentProjectile = nullptr;
 		IsFiring = false;
+		mCharacter->OnResetGrapple.Broadcast();
 	}
 }
 
