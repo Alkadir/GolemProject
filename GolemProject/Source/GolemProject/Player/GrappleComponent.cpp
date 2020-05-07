@@ -388,6 +388,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				//Create the swing physics for the player
 				if (!swingPhysic && ClosestGrapplingHook)
 				{
+					mCharacter->StartSwingEvent();
 					swingPhysic = new USwingPhysic(this);
 
 					swingPhysic->SetScaleGravity(scaleGravity);

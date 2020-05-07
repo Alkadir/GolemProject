@@ -217,6 +217,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "End Grappling Action Event"), Category = Events)
 	void EndGrapplingEvent();
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = " Start Swing Action Event"), Category = Events)
+	void StartSwingEvent();
+
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Starting Attraction Action Event"), Category = Events)
 	void StartingAttractionEvent();
 
