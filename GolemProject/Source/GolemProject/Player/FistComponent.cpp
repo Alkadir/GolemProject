@@ -34,7 +34,7 @@ UFistComponent::UFistComponent()
 void UFistComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetTickGroup(ETickingGroup::TG_PrePhysics);
+	SetTickGroup(ETickingGroup::TG_PostPhysics);
 
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
