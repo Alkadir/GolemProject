@@ -15,6 +15,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFireProjectile);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetProjectile);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFireGrapple);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetGrapple);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrappleEquiped);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFistEquiped);
 UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
@@ -239,8 +241,10 @@ public:
 
 	void StopPushBloc();
 
+	UFUNCTION(BlueprintCallable)
 	void ChangeToGrapple();
 
+	UFUNCTION(BlueprintCallable)
 	void ChangeToFist();
 
 	void InflictDamage(int _damage);
@@ -292,4 +296,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FResetGrapple OnResetGrapple;
+
+	UPROPERTY(BlueprintAssignable)
+	FGrappleEquiped OnGrappleEquiped;
+
+	UPROPERTY(BlueprintAssignable)
+	FFistEquiped OnFistEquiped;
 };
