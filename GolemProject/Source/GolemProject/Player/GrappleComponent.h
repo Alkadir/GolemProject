@@ -188,6 +188,7 @@ public:
 	UFUNCTION()
 	void DeleteHelpingAim();
 
-	FORCEINLINE void SetClimb(bool _isClimbing) { bIsClimbing = _isClimbing; };
-	FORCEINLINE void StopClimb() { bIsClimbing = false; };
+	FORCEINLINE void SetClimb(bool _isClimbing);
+
+	FORCEINLINE void StopClimb();
 };
