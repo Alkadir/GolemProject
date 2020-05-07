@@ -154,7 +154,8 @@ void AGolemProjectCharacter::BeginPlay()
 
 	if (mGrapple)
 	{
-		mGrapple->IsTargetingGrapple = true;
+		//mGrapple->IsTargetingGrapple = true;
+		//ChangeToGrapple();
 		InputComponent->BindAction("AssistedGrapple", IE_Released, mGrapple, &UGrappleComponent::StopClimb);
 	}
 
@@ -292,6 +293,7 @@ void AGolemProjectCharacter::ChangeToGrapple()
 	if (!isGrappleSkillEnabled || FistComp == nullptr || mGrapple == nullptr || mGrapple->IsTargetingGrapple) return;
 	mGrapple->IsTargetingGrapple = true;
 	FistComp->IsTargetingFist = false;
+	OnGrappleEquiped.Broadcast();
 	if (isSightCameraEnabled && pc && sightCamera)
 	{
 		pc->SetViewTargetWithBlend(sightCamera->GetChildActor(), 0.25f);
@@ -301,6 +303,7 @@ void AGolemProjectCharacter::ChangeToGrapple()
 void AGolemProjectCharacter::ChangeToFist()
 {
 	if (!isFistSkillEnabled || FistComp == nullptr || mGrapple == nullptr || FistComp && FistComp->IsTargetingFist) return;
+	OnFistEquiped.Broadcast();
 	FistComp->IsTargetingFist = true;
 	mGrapple->IsTargetingGrapple = false;
 	if (isSightCameraEnabled && pc && sightCameraL)
