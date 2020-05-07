@@ -26,6 +26,7 @@ void UDashComponent::BeginPlay()
 	HasDashInAir = false;
 	m_character = Cast<AGolemProjectCharacter>(GetOwner());
 	m_canDash = true;
+	goDown = false;
 	if (m_character != nullptr)
 	{
 		CharacterMovementCmpt = m_character->GetCharacterMovement();
@@ -63,6 +64,11 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	if (isDashing && m_character && DashTrailClass)
 	{
 		GetWorld()->SpawnActor<AActor>(DashTrailClass, m_character->GetMesh()->GetComponentTransform());
+	}
+
+	if (goDown)
+	{
+		CharacterMovementCmpt->AddImpulse(FVector::DownVector * ForceDashDown);
 	}
 }
 
@@ -102,6 +108,16 @@ void UDashComponent::ResetDashInAir()
 	HasDashInAir = false;
 }
 
+void UDashComponent::DashDown()
+{
+	if (CharacterMovementCmpt != nullptr && m_character != nullptr && CharacterMovementCmpt->IsFalling())
+	{
+		APlayerController* pc = Cast<APlayerController>(m_character->GetController());
+		CharacterMovementCmpt->StopMovementImmediately();
+		goDown = true;
+	}
+}
+
 void UDashComponent::CancelDash()
 {
 	if (UWorld* world = GetWorld())
@@ -130,6 +146,16 @@ void UDashComponent::CancelDashAndResetCD()
 		isDashing = false;
 		m_canDash = true;
 		HasDashInAir = false;
+	}
+}
+
+void UDashComponent::CancelDashDown()
+{
+	if (CharacterMovementCmpt != nullptr && m_character != nullptr)
+	{
+		APlayerController* pc = Cast<APlayerController>(m_character->GetController());
+		m_character->EnableInput(pc);
+		goDown = false;
 	}
 }
 

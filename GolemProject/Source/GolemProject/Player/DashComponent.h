@@ -39,6 +39,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TimerDash)
 		float CDDash = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
+		float ForceDashDown = 5000.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FX)
 		TSubclassOf<class AActor> DashTrailClass;
 
@@ -56,6 +59,8 @@ protected:
 
 	FTimerHandle m_timerDash;
 
+	bool goDown;
+
 	void StopDash();
 
 	void CanRedashDash();
@@ -69,12 +74,18 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-		void Dash(FVector _direction);
+	void Dash(FVector _direction);
 
 	UFUNCTION(BlueprintCallable)
-		void ResetDashInAir();
+	void ResetDashInAir();
+
+	UFUNCTION(BlueprintCallable)
+	void DashDown();
 
 	void CancelDash();
 
 	void CancelDashAndResetCD();
+
+	UFUNCTION(BlueprintCallable)
+	void CancelDashDown();
 };

@@ -143,6 +143,8 @@ protected:
 
 	void Dash();
 
+	void DashDown();
+
 	void UseAssistedGrapple();
 
 	UFUNCTION()
@@ -272,6 +274,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsCharacterSwinging(); 
+
+	UPROPERTY(BlueprintReadWrite)
+	bool IsDashingDown;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite ,Category = "Debug")
 	bool showCursor = false;
