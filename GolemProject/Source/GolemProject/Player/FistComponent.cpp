@@ -118,6 +118,14 @@ void UFistComponent::GoToDestination()
 				CanFire = false;
 				mCharacter->FireEvent();
 				mCharacter->OnFireProjectile.Broadcast();
+
+				if (UGrappleComponent* grapple = Cast<UGrappleComponent>(mCharacter->GetComponentByClass(UGrappleComponent::StaticClass())))
+				{
+					if (USwingPhysic* phys = grapple->GetSwingPhysics())
+					{
+						phys->AddForceMovement(-direction * pushingForce);
+					}
+				}
 			}
 		}
 	}
