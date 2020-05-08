@@ -5,6 +5,7 @@
 #include <Engine/Engine.h>
 #include "GolemProjectCharacter.h"
 #include "Helpers/HelperLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
@@ -26,6 +27,7 @@ void UDashComponent::BeginPlay()
 	HasDashInAir = false;
 	m_character = Cast<AGolemProjectCharacter>(GetOwner());
 	m_canDash = true;
+	goDown = false;
 	if (m_character != nullptr)
 	{
 		CharacterMovementCmpt = m_character->GetCharacterMovement();
@@ -63,6 +65,21 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	if (isDashing && m_character && DashTrailClass)
 	{
 		GetWorld()->SpawnActor<AActor>(DashTrailClass, m_character->GetMesh()->GetComponentTransform());
+	}
+
+	if (UWorld* world = GetWorld())
+	{
+		if (goDown && CharacterMovementCmpt != nullptr && m_character != nullptr)
+		{
+			CharacterMovementCmpt->AddImpulse(FVector::DownVector * ForceDashDown);
+			FVector start(m_character->GetActorLocation() + FVector::DownVector * distanceFromCenterPlayerToStart);
+			FVector end(start + FVector::DownVector * distanceFromStartToEnd);
+			FHitResult hitResult;
+			if (UKismetSystemLibrary::CapsuleTraceSingle(world, start, end, capsuleRadius, capsuleHalfHeight, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::ForOneFrame, hitResult, true))
+			{
+				CancelDashDown();
+			}
+		}
 	}
 }
 
@@ -102,6 +119,18 @@ void UDashComponent::ResetDashInAir()
 	HasDashInAir = false;
 }
 
+bool UDashComponent::DashDown()
+{
+	if (CharacterMovementCmpt != nullptr && m_character != nullptr && CharacterMovementCmpt->IsFalling())
+	{
+		CharacterMovementCmpt->Velocity.X = 0.0f;
+		CharacterMovementCmpt->Velocity.Y = 0.0f;
+		goDown = true;
+		return true;
+	}
+	return false;
+}
+
 void UDashComponent::CancelDash()
 {
 	if (UWorld* world = GetWorld())
@@ -130,6 +159,16 @@ void UDashComponent::CancelDashAndResetCD()
 		isDashing = false;
 		m_canDash = true;
 		HasDashInAir = false;
+	}
+}
+
+void UDashComponent::CancelDashDown()
+{
+	if (CharacterMovementCmpt != nullptr && m_character != nullptr)
+	{
+		m_character->IsDashingDown = false;
+		goDown = false;
+		HelperLibrary::Print("sdkfnsdjf");
 	}
 }
 

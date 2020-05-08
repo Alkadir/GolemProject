@@ -103,6 +103,8 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("SwitchArm", IE_Pressed, this, &AGolemProjectCharacter::SwitchArm);
 
+	PlayerInputComponent->BindAction("DashDown", IE_Pressed, this, &AGolemProjectCharacter::DashDown);
+
 	PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AGolemProjectCharacter::PauseEvent);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGolemProjectCharacter::MoveForward);
@@ -170,6 +172,7 @@ void AGolemProjectCharacter::BeginPlay()
 		WallMechanicalComponent->EndJump.AddDynamic(this, &AGolemProjectCharacter::AimAtEndOfWallJump);
 
 	HasAlreadyMove = false;
+	IsDashingDown = false;
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -201,6 +204,7 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 
 void AGolemProjectCharacter::Jump()
 {
+	if (IsDashingDown) return;
 	if (GetCharacterMovement() != nullptr && GetCharacterMovement()->IsFalling() && WallMechanicalComponent != nullptr && WallMechanicalComponent->CanWallJump)
 	{
 		if (WallMechanicalComponent->WallJump())
@@ -231,6 +235,7 @@ void AGolemProjectCharacter::Jump()
 
 void AGolemProjectCharacter::Dash()
 {
+	if (IsDashingDown) return;
 	if (mGrapple && !mGrapple->GetIsFiring() && dashComponent && !PushingComponent->GetIsPushingObject())
 	{
 		if (Controller != NULL)
@@ -249,6 +254,16 @@ void AGolemProjectCharacter::Dash()
 			}
 			dashComponent->Dash(direction);
 		}
+	}
+}
+
+void AGolemProjectCharacter::DashDown()
+{
+	if (IsDashingDown) return;
+	if (mGrapple && !mGrapple->GetIsFiring() && dashComponent && !PushingComponent->GetIsPushingObject())
+	{
+		if (dashComponent->DashDown())
+			IsDashingDown = true;
 	}
 }
 
@@ -275,6 +290,7 @@ void AGolemProjectCharacter::SwitchArm()
 
 void AGolemProjectCharacter::UseAssistedGrapple()
 {
+	if (IsDashingDown) return;
 	if (isGrappleSkillEnabled && mGrapple)
 	{
 		ChangeToGrapple();
@@ -429,6 +445,7 @@ void AGolemProjectCharacter::ChangeCameraReleased()
 
 void AGolemProjectCharacter::MoveForward(float Value)
 {
+	if (IsDashingDown) return;
 	if (PushingComponent && PushingComponent->GetIsStartingPushingObject() || (mGrapple && mGrapple->GetFiring() && !mGrapple->GetSwingPhysics()))
 	{
 		return;
@@ -485,6 +502,7 @@ void AGolemProjectCharacter::MoveForward(float Value)
 
 void AGolemProjectCharacter::MoveRight(float Value)
 {
+	if (IsDashingDown) return;
 	if (PushingComponent && PushingComponent->GetIsPushingObject() || (mGrapple && mGrapple->GetFiring() && !mGrapple->GetSwingPhysics()))
 	{
 		return;

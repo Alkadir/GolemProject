@@ -39,6 +39,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TimerDash)
 		float CDDash = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
+		float ForceDashDown = 7000.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FX)
 		TSubclassOf<class AActor> DashTrailClass;
 
@@ -56,10 +59,25 @@ protected:
 
 	FTimerHandle m_timerDash;
 
+	bool goDown;
+
 	void StopDash();
 
 	void CanRedashDash();
 
+	TArray<class AActor*> ActorToIgnore;
+
+	UPROPERTY(EditAnywhere)
+		float capsuleRadius = 10.0f;
+
+	UPROPERTY(EditAnywhere)
+		float capsuleHalfHeight = 30.0f;
+
+	UPROPERTY(EditAnywhere)
+		float distanceFromCenterPlayerToStart = 100.0f;
+
+	UPROPERTY(EditAnywhere)
+		float distanceFromStartToEnd = 15.0;
 public:
 
 	UFUNCTION(BlueprintCallable)
@@ -69,12 +87,18 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-		void Dash(FVector _direction);
+	void Dash(FVector _direction);
 
 	UFUNCTION(BlueprintCallable)
-		void ResetDashInAir();
+	void ResetDashInAir();
+
+	UFUNCTION(BlueprintCallable)
+	bool DashDown();
 
 	void CancelDash();
 
 	void CancelDashAndResetCD();
+
+	UFUNCTION(BlueprintCallable)
+	void CancelDashDown();
 };
