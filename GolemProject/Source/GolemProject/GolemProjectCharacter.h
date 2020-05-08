@@ -179,9 +179,11 @@ public:
 
 	FORCEINLINE bool& IsFistSkillEnabled() { return isFistSkillEnabled; };
 
-	FORCEINLINE void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; if (_enable)OnGetGrapple.Broadcast(); };
+	UFUNCTION(BlueprintCallable, Category = "Skill")
+	void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; if (_enable)OnGetGrapple.Broadcast(); };
 
-	FORCEINLINE void SetFistSkillEnabled(bool _enable) {isFistSkillEnabled = _enable; if (_enable)OnGetFist.Broadcast();};
+	UFUNCTION(BlueprintCallable, Category = "Skill")
+	void SetFistSkillEnabled(bool _enable) {isFistSkillEnabled = _enable; if (_enable)OnGetFist.Broadcast();};
 
 	void ResetFriction();
 	/** Returns CameraBoom subobject **/
