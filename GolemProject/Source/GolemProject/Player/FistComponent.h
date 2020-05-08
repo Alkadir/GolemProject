@@ -45,7 +45,7 @@ protected:
 	TSubclassOf<class AActor> HelperAimingClass;
 
 	UPROPERTY(EditAnywhere, Category = Swing)
-	float pushingForce = 100.0f;
+	float pushingForce = 0.0f;
 
 	UFUNCTION(BlueprintCallable)
 	void SetIKArm(FVector& _lookAt, bool& _isBlend);
