@@ -40,7 +40,7 @@ protected:
 		float CDDash = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
-		float ForceDashDown = 5000.0f;
+		float ForceDashDown = 7000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FX)
 		TSubclassOf<class AActor> DashTrailClass;
@@ -65,6 +65,19 @@ protected:
 
 	void CanRedashDash();
 
+	TArray<class AActor*> ActorToIgnore;
+
+	UPROPERTY(EditAnywhere)
+		float capsuleRadius = 10.0f;
+
+	UPROPERTY(EditAnywhere)
+		float capsuleHalfHeight = 30.0f;
+
+	UPROPERTY(EditAnywhere)
+		float distanceFromCenterPlayerToStart = 100.0f;
+
+	UPROPERTY(EditAnywhere)
+		float distanceFromStartToEnd = 15.0;
 public:
 
 	UFUNCTION(BlueprintCallable)
@@ -80,7 +93,7 @@ public:
 	void ResetDashInAir();
 
 	UFUNCTION(BlueprintCallable)
-	void DashDown();
+	bool DashDown();
 
 	void CancelDash();
 

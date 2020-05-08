@@ -5,6 +5,7 @@
 #include <Engine/Engine.h>
 #include "GolemProjectCharacter.h"
 #include "Helpers/HelperLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
@@ -66,9 +67,19 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		GetWorld()->SpawnActor<AActor>(DashTrailClass, m_character->GetMesh()->GetComponentTransform());
 	}
 
-	if (goDown)
+	if (UWorld* world = GetWorld())
 	{
-		CharacterMovementCmpt->AddImpulse(FVector::DownVector * ForceDashDown);
+		if (goDown && CharacterMovementCmpt != nullptr && m_character != nullptr)
+		{
+			CharacterMovementCmpt->AddImpulse(FVector::DownVector * ForceDashDown);
+			FVector start(m_character->GetActorLocation() + FVector::DownVector * distanceFromCenterPlayerToStart);
+			FVector end(start + FVector::DownVector * distanceFromStartToEnd);
+			FHitResult hitResult;
+			if (UKismetSystemLibrary::CapsuleTraceSingle(world, start, end, capsuleRadius, capsuleHalfHeight, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::ForOneFrame, hitResult, true))
+			{
+				CancelDashDown();
+			}
+		}
 	}
 }
 
@@ -108,14 +119,16 @@ void UDashComponent::ResetDashInAir()
 	HasDashInAir = false;
 }
 
-void UDashComponent::DashDown()
+bool UDashComponent::DashDown()
 {
 	if (CharacterMovementCmpt != nullptr && m_character != nullptr && CharacterMovementCmpt->IsFalling())
 	{
-		APlayerController* pc = Cast<APlayerController>(m_character->GetController());
-		CharacterMovementCmpt->StopMovementImmediately();
+		CharacterMovementCmpt->Velocity.X = 0.0f;
+		CharacterMovementCmpt->Velocity.Y = 0.0f;
 		goDown = true;
+		return true;
 	}
+	return false;
 }
 
 void UDashComponent::CancelDash()
@@ -153,9 +166,9 @@ void UDashComponent::CancelDashDown()
 {
 	if (CharacterMovementCmpt != nullptr && m_character != nullptr)
 	{
-		APlayerController* pc = Cast<APlayerController>(m_character->GetController());
-		m_character->EnableInput(pc);
+		m_character->IsDashingDown = false;
 		goDown = false;
+		HelperLibrary::Print("sdkfnsdjf");
 	}
 }
 

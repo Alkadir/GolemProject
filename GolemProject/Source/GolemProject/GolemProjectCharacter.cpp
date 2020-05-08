@@ -262,8 +262,8 @@ void AGolemProjectCharacter::DashDown()
 	if (IsDashingDown) return;
 	if (mGrapple && !mGrapple->GetIsFiring() && dashComponent && !PushingComponent->GetIsPushingObject())
 	{
-		dashComponent->DashDown();
-		IsDashingDown = true;
+		if (dashComponent->DashDown())
+			IsDashingDown = true;
 	}
 }
 
