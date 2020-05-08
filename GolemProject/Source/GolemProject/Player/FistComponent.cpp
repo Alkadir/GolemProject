@@ -18,6 +18,8 @@
 #include "Player/FistProjectile.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "DrawDebugHelpers.h"
+#include "GrappleComponent.h"
+#include "SwingPhysic.h"
 
 // Sets default values for this component's properties
 UFistComponent::UFistComponent()
@@ -55,6 +57,16 @@ void UFistComponent::UpdateIKArm()
 		mDirection = offset - mCharacter->GetActorLocation();
 		IKposition = offset;
 		mDirection.Z = 0.0f;
+
+		if (UGrappleComponent* grapple = Cast<UGrappleComponent>(mCharacter->GetComponentByClass(UGrappleComponent::StaticClass())))
+		{
+			if (USwingPhysic* phys = grapple->GetSwingPhysics())
+			{
+				phys->SetCameraDirection(mDirection);
+				return;
+			}
+		}
+
 		mCharacter->SetActorRotation(mDirection.Rotation());
 
 		//I don't know how anim works in cpp
