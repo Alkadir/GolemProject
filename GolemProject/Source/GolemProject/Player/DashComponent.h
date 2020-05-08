@@ -40,7 +40,7 @@ protected:
 		float CDDash = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VelocityDash)
-		float ForceDashDown = 7000.0f;
+		float ForceDashDown = 15000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FX)
 		TSubclassOf<class AActor> DashTrailClass;
