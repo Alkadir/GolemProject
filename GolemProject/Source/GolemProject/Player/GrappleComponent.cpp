@@ -215,7 +215,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 //cancel projectile
 void UGrappleComponent::Cancel()
 {
-	if (currentProjectile && !currentProjectile->IsCollidingGrappling() && !currentProjectile->IsCollidingSwinging())
+	if (currentProjectile && !currentProjectile->IsCollidingSwinging())
 	{
 		currentProjectile->SetComingBack(true);
 	}
