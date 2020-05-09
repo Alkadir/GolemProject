@@ -57,8 +57,8 @@ void UFistComponent::UpdateIKArm()
 		mDirection = offset - mCharacter->GetActorLocation();
 		IKposition = offset;
 		mDirection.Z = 0.0f;
-
-		if (UGrappleComponent* grapple = Cast<UGrappleComponent>(mCharacter->GetComponentByClass(UGrappleComponent::StaticClass())))
+		
+		if (UGrappleComponent* grapple = mCharacter->FindComponentByClass<UGrappleComponent>())
 		{
 			if (USwingPhysic* phys = grapple->GetSwingPhysics())
 			{
@@ -119,7 +119,7 @@ void UFistComponent::GoToDestination()
 				mCharacter->FireEvent();
 				mCharacter->OnFireProjectile.Broadcast();
 
-				if (UGrappleComponent* grapple = Cast<UGrappleComponent>(mCharacter->GetComponentByClass(UGrappleComponent::StaticClass())))
+				if (UGrappleComponent* grapple = mCharacter->FindComponentByClass<UGrappleComponent>())
 				{
 					if (USwingPhysic* phys = grapple->GetSwingPhysics())
 					{
