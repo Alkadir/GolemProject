@@ -307,6 +307,7 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 void AGolemProjectCharacter::ChangeToGrapple()
 {
 	if (!isGrappleSkillEnabled || FistComp == nullptr || mGrapple == nullptr || mGrapple->IsTargetingGrapple) return;
+	if (mGrapple != nullptr && mGrapple->GetSwingPhysics()) return;
 	mGrapple->IsTargetingGrapple = true;
 	FistComp->IsTargetingFist = false;
 	OnGrappleEquiped.Broadcast();
@@ -319,6 +320,8 @@ void AGolemProjectCharacter::ChangeToGrapple()
 void AGolemProjectCharacter::ChangeToFist()
 {
 	if (!isFistSkillEnabled || FistComp == nullptr || mGrapple == nullptr || FistComp && FistComp->IsTargetingFist) return;
+	if (mGrapple != nullptr && mGrapple->GetSwingPhysics()) return;
+
 	OnFistEquiped.Broadcast();
 	FistComp->IsTargetingFist = true;
 	mGrapple->IsTargetingGrapple = false;

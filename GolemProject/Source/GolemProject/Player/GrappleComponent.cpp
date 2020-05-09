@@ -215,7 +215,7 @@ void UGrappleComponent::GoToDestination(bool _isAssisted)
 //cancel projectile
 void UGrappleComponent::Cancel()
 {
-	if (currentProjectile && !currentProjectile->IsCollidingGrappling() && !currentProjectile->IsCollidingSwinging())
+	if (currentProjectile && !currentProjectile->IsCollidingSwinging())
 	{
 		currentProjectile->SetComingBack(true);
 	}
@@ -389,6 +389,8 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				if (!swingPhysic && ClosestGrapplingHook)
 				{
 					mCharacter->StartSwingEvent();
+					mCharacter->ChangeToFist();
+
 					swingPhysic = new USwingPhysic(this);
 
 					swingPhysic->SetScaleGravity(scaleGravity);
