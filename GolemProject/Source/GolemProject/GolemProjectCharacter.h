@@ -80,6 +80,9 @@ private:
 	UPROPERTY()
 	class UChildActorComponent* sightCameraL;
 
+	/*UPROPERTY()
+	class USlowMoComponent* SlowMoComponent;*/
+
 	float initialGroundFriction;
 
 	bool HasPressedAiming;
@@ -247,6 +250,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Coming Back Action Event"), Category = Events)
 	void ComingBackEvent();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Wall Jump Action Event"), Category = Events)
+	void WallJumpEvent();
 
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 

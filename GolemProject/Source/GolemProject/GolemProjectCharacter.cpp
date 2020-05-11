@@ -28,6 +28,7 @@
 #include "Player/WallMechanicalComponent.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
+//#include "Player/SlowMoComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
@@ -138,6 +139,7 @@ void AGolemProjectCharacter::BeginPlay()
 	sightCameraL = HelperLibrary::GetComponentByName<UChildActorComponent>(this, "ShoulderCameraL");
 	RaycastingComponent = FindComponentByClass<URaycastingComponent>();
 	WallMechanicalComponent = FindComponentByClass<UWallMechanicalComponent>();
+	//SlowMoComponent = FindComponentByClass<USlowMoComponent>();
 	if (GetCharacterMovement())
 	{
 		initialGroundFriction = GetCharacterMovement()->GroundFriction;
@@ -222,6 +224,8 @@ void AGolemProjectCharacter::Jump()
 			}
 			if (dashComponent && IsDashing())
 				dashComponent->CancelDash();
+
+			WallJumpEvent();
 		}
 	}
 	else if (PushingComponent && !PushingComponent->GetIsPushingObject())
@@ -420,6 +424,10 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 			{
 				pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 				isSightCameraEnabled = true;
+
+				/*if (mGrapple->GetSwingPhysics())
+					SlowMoComponent->SetEnableSlowMo();*/
+
 				if (GetCharacterMovement())
 				{
 					GetCharacterMovement()->bOrientRotationToMovement = false;
