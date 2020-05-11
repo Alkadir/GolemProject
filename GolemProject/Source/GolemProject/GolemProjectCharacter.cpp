@@ -732,6 +732,7 @@ bool AGolemProjectCharacter::GoToLocation()
 				if (GetCharacterMovement() != nullptr)
 					GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 				IsWalking = false;
+				OnLocationReach.Broadcast();
 				return true;
 			}
 		}
