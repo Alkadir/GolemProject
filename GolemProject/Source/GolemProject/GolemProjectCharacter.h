@@ -85,6 +85,12 @@ private:
 
 	bool HasAlreadyMove;
 
+	TArray<FVector> PathToFollow;
+
+	bool KeepControllerDisable;
+
+	bool NeedToReachLocation;
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
@@ -309,4 +315,13 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FFistEquiped OnFistEquiped;
+
+	UFUNCTION(BlueprintCallable)
+	bool CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable);
+
+	UFUNCTION()
+	bool GoToLocation();
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsWalking;
 };
