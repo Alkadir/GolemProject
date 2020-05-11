@@ -26,6 +26,8 @@
 #include "Player/RaycastingComponent.h"
 #include "Objects/PushableBloc.h"
 #include "Player/WallMechanicalComponent.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
 //#include "Player/SlowMoComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -201,6 +203,11 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 			rightHandPosition = GetActorLocation() + offsetRightHand;
 			leftHandPosition = GetActorLocation() + offsetLeftHand;
 		}
+	}
+
+	if (NeedToReachLocation)
+	{
+		GoToLocation();
 	}
 }
 
@@ -417,7 +424,7 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 			{
 				pc->SetViewTargetWithBlend(sightCameraL->GetChildActor(), 0.25f);
 				isSightCameraEnabled = true;
-				
+
 				/*if (mGrapple->GetSwingPhysics())
 					SlowMoComponent->SetEnableSlowMo();*/
 
@@ -692,6 +699,59 @@ void AGolemProjectCharacter::ResetMeshOnRightPlace()
 bool AGolemProjectCharacter::IsCharacterSwinging()
 {
 	return mGrapple != nullptr && mGrapple->IsSwinging;
+}
+
+bool AGolemProjectCharacter::CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable)
+{
+	UNavigationPath* path = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), GetActorLocation(), _location, GetController());
+	if (path != nullptr && path->PathPoints.Num() > 0)
+	{
+		KeepControllerDisable = _shoulKeepControllerDisable;
+		NeedToReachLocation = true;
+		PathToFollow = path->PathPoints;
+		if (pc != nullptr)
+			DisableInput(pc);
+		if (GetCharacterMovement() != nullptr)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+		}
+		IsWalking = true;
+		return true;
+	}
+	return false;
+}
+
+bool AGolemProjectCharacter::GoToLocation()
+{
+	if (PathToFollow.Num() > 0)
+	{
+		FVector nextLocation = PathToFollow[0];
+		nextLocation.Z = GetActorLocation().Z;
+		if (FVector::Dist(nextLocation, GetActorLocation()) < 10.0f)
+		{
+			PathToFollow.RemoveAt(0);
+			if (PathToFollow.Num() == 0)
+			{
+				NeedToReachLocation = false;
+				if (!KeepControllerDisable && pc != nullptr)
+				{
+					EnableInput(pc);
+				}
+				if (GetCharacterMovement() != nullptr)
+					GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+				IsWalking = false;
+				OnLocationReach.Broadcast();
+				return true;
+			}
+		}
+		else
+		{
+			FVector direction = PathToFollow[0] - GetActorLocation();
+			AddMovementInput(direction);
+			return false;
+		}
+	}
+	return true;
 }
 
 FVector AGolemProjectCharacter::GetVirtualRightHandPosition()

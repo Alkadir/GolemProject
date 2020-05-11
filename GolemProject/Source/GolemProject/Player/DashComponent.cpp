@@ -72,6 +72,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		if (goDown && CharacterMovementCmpt != nullptr && m_character != nullptr)
 		{
 			CharacterMovementCmpt->AddImpulse(FVector::DownVector * ForceDashDown);
+			world->SpawnActor<AActor>(DashTrailClass, m_character->GetMesh()->GetComponentTransform());
 			FVector start(m_character->GetActorLocation() + FVector::DownVector * distanceFromCenterPlayerToStart);
 			FVector end(start + FVector::DownVector * distanceFromStartToEnd);
 			FHitResult hitResult;
