@@ -727,7 +727,7 @@ bool AGolemProjectCharacter::GoToLocation()
 	{
 		FVector nextLocation = PathToFollow[0];
 		nextLocation.Z = GetActorLocation().Z;
-		if (FVector::Dist(nextLocation, GetActorLocation()) < 10.0f)
+		if (FVector::Dist(nextLocation, GetActorLocation()) < 2.0f)
 		{
 			PathToFollow.RemoveAt(0);
 			if (PathToFollow.Num() == 0)
