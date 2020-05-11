@@ -17,6 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFireGrapple);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetGrapple);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrappleEquiped);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFistEquiped);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHasReachPosition);
 UCLASS(config = Game)
 class AGolemProjectCharacter : public ACharacter
 {
@@ -87,6 +88,12 @@ private:
 	bool HasPressedAiming;
 
 	bool HasAlreadyMove;
+
+	TArray<FVector> PathToFollow;
+
+	bool KeepControllerDisable;
+
+	bool NeedToReachLocation;
 
 protected:
 
@@ -315,4 +322,16 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FFistEquiped OnFistEquiped;
+
+	UPROPERTY()
+	FHasReachPosition OnLocationReach;
+
+	UFUNCTION(BlueprintCallable)
+	bool CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable);
+
+	UFUNCTION()
+	bool GoToLocation();
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsWalking;
 };
