@@ -126,6 +126,7 @@ bool UDashComponent::DashDown()
 	{
 		CharacterMovementCmpt->Velocity.X = 0.0f;
 		CharacterMovementCmpt->Velocity.Y = 0.0f;
+		m_character->DashEvent();
 		goDown = true;
 		return true;
 	}
