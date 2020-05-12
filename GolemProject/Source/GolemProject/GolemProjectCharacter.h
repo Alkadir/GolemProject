@@ -247,6 +247,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "End Reducing Rope Action Event"), Category = Events)
 	void EndReducingRopeEvent();
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Stop Reducing Rope Action Event"), Category = Events)
+	void StopReducingRopeEvent();
+
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = " Start Swing Action Event"), Category = Events)
 	void StartSwingEvent();
 

@@ -310,7 +310,7 @@ void AGolemProjectCharacter::UseAssistedGrapple()
 	{
 		ChangeToGrapple();
 
-		if (mGrapple->GetSwingPhysics())
+		if (mGrapple->GetSwingPhysics() && !mGrapple->GetSwingPhysics()->WasStopped())
 		{
 			mGrapple->SetClimb(true);
 		}
