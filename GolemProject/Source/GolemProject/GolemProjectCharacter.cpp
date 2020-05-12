@@ -209,6 +209,10 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 	{
 		GoToLocation();
 	}
+	else if (HasToRotate)
+	{
+		RotateCharacter();
+	}
 }
 
 void AGolemProjectCharacter::Jump()
@@ -701,7 +705,7 @@ bool AGolemProjectCharacter::IsCharacterSwinging()
 	return mGrapple != nullptr && mGrapple->IsSwinging;
 }
 
-bool AGolemProjectCharacter::CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable)
+bool AGolemProjectCharacter::CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable, bool _walk, FVector _directionToWatch, bool _hasToRotate)
 {
 	UNavigationPath* path = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), GetActorLocation(), _location, GetController());
 	if (path != nullptr && path->PathPoints.Num() > 0)
@@ -709,13 +713,17 @@ bool AGolemProjectCharacter::CanGoToLocation(FVector _location, bool _shoulKeepC
 		KeepControllerDisable = _shoulKeepControllerDisable;
 		NeedToReachLocation = true;
 		PathToFollow = path->PathPoints;
+		HasToRotate = _hasToRotate;
+		RotationToReach = UKismetMathLibrary::FindLookAtRotation(GetActorForwardVector(), _directionToWatch);
+		RotationToReach.Pitch = 0.0f;
+		RotationToReach.Roll = 0.0f;
 		if (pc != nullptr)
 			DisableInput(pc);
 		if (GetCharacterMovement() != nullptr)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 		}
-		IsWalking = true;
+		IsWalking = _walk;
 		return true;
 	}
 	return false;
@@ -727,7 +735,7 @@ bool AGolemProjectCharacter::GoToLocation()
 	{
 		FVector nextLocation = PathToFollow[0];
 		nextLocation.Z = GetActorLocation().Z;
-		if (FVector::Dist(nextLocation, GetActorLocation()) < 10.0f)
+		if (FVector::Dist(nextLocation, GetActorLocation()) < 2.0f)
 		{
 			PathToFollow.RemoveAt(0);
 			if (PathToFollow.Num() == 0)
@@ -740,7 +748,6 @@ bool AGolemProjectCharacter::GoToLocation()
 				if (GetCharacterMovement() != nullptr)
 					GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 				IsWalking = false;
-				OnLocationReach.Broadcast();
 				return true;
 			}
 		}
@@ -752,6 +759,17 @@ bool AGolemProjectCharacter::GoToLocation()
 		}
 	}
 	return true;
+}
+
+void AGolemProjectCharacter::RotateCharacter()
+{
+	FRotator rot = FMath::Lerp(GetActorRotation(), RotationToReach, 0.09f);
+	SetActorRotation(rot);
+	if (rot.Yaw >= RotationToReach.Yaw - 0.25f && rot.Yaw <= RotationToReach.Yaw + 0.25f)
+	{
+		OnLocationReach.Broadcast();
+		HasToRotate = false;
+	}
 }
 
 FVector AGolemProjectCharacter::GetVirtualRightHandPosition()
