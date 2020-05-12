@@ -95,6 +95,10 @@ private:
 
 	bool NeedToReachLocation;
 
+	bool HasToRotate;
+
+	FRotator RotationToReach;
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
@@ -155,6 +159,7 @@ protected:
 
 	void DashDown();
 
+	UFUNCTION()
 	void UseAssistedGrapple();
 
 	UFUNCTION()
@@ -327,10 +332,12 @@ public:
 	FHasReachPosition OnLocationReach;
 
 	UFUNCTION(BlueprintCallable)
-	bool CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable);
+	bool CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable, bool _walk, FVector _directionToWatch, bool _hasToRotate);
 
 	UFUNCTION()
 	bool GoToLocation();
+
+	void RotateCharacter();
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsWalking;
