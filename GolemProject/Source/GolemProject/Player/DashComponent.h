@@ -83,6 +83,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool IsDashing() { return isDashing; }
 
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE bool CanDash() { return m_canDash; }
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
