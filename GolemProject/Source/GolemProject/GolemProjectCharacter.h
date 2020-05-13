@@ -26,13 +26,13 @@ class AGolemProjectCharacter : public ACharacter
 private:
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
-	bool isGrappleSkillEnabled = false;
+		bool isGrappleSkillEnabled = false;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
-	bool isFistSkillEnabled = false;
+		bool isFistSkillEnabled = false;
 
 	UPROPERTY()
-	bool isSightCameraEnabled = false;
+		bool isSightCameraEnabled = false;
 
 	float m_valueForward;
 
@@ -41,44 +41,44 @@ private:
 	bool WantToAim;
 
 	UPROPERTY()
-	class UUserWidget* currentSightWidget = nullptr;
+		class UUserWidget* currentSightWidget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grapple Hook", meta = (AllowPrivateAccess = "true"))
-	class UGrappleComponent* mGrapple;
+		class UGrappleComponent* mGrapple;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FistComp, meta = (AllowPrivateAccess = "true"))
-	class UFistComponent* FistComp;
+		class UFistComponent* FistComp;
 
 	UPROPERTY(EditAnywhere)
-	class UCapsuleComponent* customCapsule;
+		class UCapsuleComponent* customCapsule;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+		class USpringArmComponent* CameraBoom;
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+		class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	class UHealthComponent* HealthComponent;
+		class UHealthComponent* HealthComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
-	class UPushingComponent* PushingComponent;
+		class UPushingComponent* PushingComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
-	class URaycastingComponent* RaycastingComponent;
+		class URaycastingComponent* RaycastingComponent;
 
 	class APlayerController* pc;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pushing, meta = (AllowPrivateAccess = "true"))
-	class UWallMechanicalComponent* WallMechanicalComponent;
+		class UWallMechanicalComponent* WallMechanicalComponent;
 
 	UPROPERTY()
-	class UChildActorComponent* sightCamera;
+		class UChildActorComponent* sightCamera;
 
 	UPROPERTY()
-	class UChildActorComponent* sightCameraL;
+		class UChildActorComponent* sightCameraL;
 
 	/*UPROPERTY()
 	class USlowMoComponent* SlowMoComponent;*/
@@ -102,19 +102,19 @@ private:
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
-	AActor* actorToInteract;
+		AActor* actorToInteract;
 	UPROPERTY(BlueprintReadWrite)
-	bool pushedObjectIsCollidingForward;
+		bool pushedObjectIsCollidingForward;
 	UPROPERTY(BlueprintReadWrite)
-	bool pushedObjectIsCollidingBackward;
+		bool pushedObjectIsCollidingBackward;
 
 	float startPushingZ;
 
 	UPROPERTY(BlueprintReadWrite)
-	FVector rightHandPosition;
+		FVector rightHandPosition;
 	FVector offsetRightHand;
 	UPROPERTY(BlueprintReadWrite)
-	FVector leftHandPosition;
+		FVector leftHandPosition;
 	FVector offsetLeftHand;
 
 
@@ -148,57 +148,68 @@ protected:
 	void ChangeCameraReleased();
 
 	UPROPERTY(EditAnywhere)
-	UDashComponent* dashComponent;
+		UDashComponent* dashComponent;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+		bool CanDash()
+	{
+		if (dashComponent == nullptr)
+		{
+			return false;
+		}
+		return dashComponent->CanDash();
+	}
+
 	void Jump() override;
 
-	void Dash();
+	UFUNCTION(BlueprintCallable)
+		void Dash();
 
 	void DashDown();
 
 	UFUNCTION()
-	void UseAssistedGrapple();
+		void UseAssistedGrapple();
 
 	UFUNCTION()
-	void SetUpBlockOffsetPositon();
+		void SetUpBlockOffsetPositon();
 
 	UFUNCTION()
-	void AimAtEndOfWallJump();
+		void AimAtEndOfWallJump();
 
 	void SwitchArm();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "PauseMenu"), Category = Events)
-	void PauseEvent();
+		void PauseEvent();
 
 public:
 	AGolemProjectCharacter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
-	TSubclassOf<class UUserWidget>  sightHudClass;
+		TSubclassOf<class UUserWidget>  sightHudClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseTurnRate;
+		float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseLookUpRate;
+		float BaseLookUpRate;
 
 	UFUNCTION(BlueprintCallable, Category = "Hud")
-	FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
+		FORCEINLINE bool& GetSightCameraEnabled() { return isSightCameraEnabled; };
 
 	FORCEINLINE bool& IsGrappleSkillEnabled() { return isGrappleSkillEnabled; };
 
 	FORCEINLINE bool& IsFistSkillEnabled() { return isFistSkillEnabled; };
 
 	UFUNCTION(BlueprintCallable, Category = "Skill")
-	void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; if (_enable)OnGetGrapple.Broadcast(); };
+		void SetGrappleSkillEnabled(bool _enable) { isGrappleSkillEnabled = _enable; if (_enable)OnGetGrapple.Broadcast(); };
 
 	UFUNCTION(BlueprintCallable, Category = "Skill")
-	void SetFistSkillEnabled(bool _enable) {isFistSkillEnabled = _enable; if (_enable)OnGetFist.Broadcast();};
+		void SetFistSkillEnabled(bool _enable) { isFistSkillEnabled = _enable; if (_enable)OnGetFist.Broadcast(); };
 
 	void ResetFriction();
 	/** Returns CameraBoom subobject **/
@@ -215,62 +226,62 @@ public:
 	FORCEINLINE class UDashComponent* GetDashComponent() const { return dashComponent; }
 
 	UFUNCTION(BlueprintCallable)
-	FVector GetVirtualRightHandPosition();
+		FVector GetVirtualRightHandPosition();
 
 	UFUNCTION(BlueprintCallable)
-	FVector GetVirtualLeftHandPosition();
+		FVector GetVirtualLeftHandPosition();
 
 	UFUNCTION(BlueprintCallable, Category = "Dash")
-	FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
+		FORCEINLINE bool IsDashing() { return dashComponent->IsDashing(); };
 
 	UFUNCTION(BlueprintCallable, Category = "IK")
-	void SetRightHandPosition(FVector newPos) { rightHandPosition = newPos; }
+		void SetRightHandPosition(FVector newPos) { rightHandPosition = newPos; }
 	UFUNCTION(BlueprintCallable, Category = "IK")
-	void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
+		void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
 
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Dash Action Event"), Category = Events)
-	void DashEvent();
+		void DashEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Fire Action Event"), Category = Events)
-	void FireEvent();
+		void FireEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Grappling Action Event"), Category = Events)
-	void GrapplingFireEvent();
+		void GrapplingFireEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "End Grappling Action Event"), Category = Events)
-	void EndGrapplingEvent();
+		void EndGrapplingEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Start Reducing Rope Action Event"), Category = Events)
-	void StartReducingRopeEvent();
+		void StartReducingRopeEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "End Reducing Rope Action Event"), Category = Events)
-	void EndReducingRopeEvent();
+		void EndReducingRopeEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Stop Reducing Rope Action Event"), Category = Events)
-	void StopReducingRopeEvent();
+		void StopReducingRopeEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = " Start Swing Action Event"), Category = Events)
-	void StartSwingEvent();
+		void StartSwingEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Starting Attraction Action Event"), Category = Events)
-	void StartingAttractionEvent();
+		void StartingAttractionEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Coming Back Action Event"), Category = Events)
-	void ComingBackEvent();
+		void ComingBackEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Wall Jump Action Event"), Category = Events)
-	void WallJumpEvent();
+		void WallJumpEvent();
 
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
 	void StopPushBloc();
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeToGrapple();
+		void ChangeToGrapple();
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeToFist();
+		void ChangeToFist();
 
 	void InflictDamage(int _damage);
 
@@ -281,67 +292,67 @@ public:
 	void ResetMeshOnRightPlace();
 
 	UPROPERTY(BlueprintReadOnly)
-	bool IsInteracting;
+		bool IsInteracting;
 
 	UPROPERTY(BlueprintReadOnly)
-	bool IsAiming;
+		bool IsAiming;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void ActivateTargetGrapple(class AActor* _target);
+		void ActivateTargetGrapple(class AActor* _target);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void DeactivateTargetGrapple();
+		void DeactivateTargetGrapple();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void Event_Death();
+		void Event_Death();
 
 	UFUNCTION(BlueprintCallable)
-	bool IsCharacterSwinging(); 
+		bool IsCharacterSwinging();
 
 	UPROPERTY(BlueprintReadWrite)
-	bool IsDashingDown;
+		bool IsDashingDown;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite ,Category = "Debug")
-	bool showCursor = false;
-
-	UPROPERTY(BlueprintAssignable)
-	FStartMoving OnStartMoving;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Debug")
+		bool showCursor = false;
 
 	UPROPERTY(BlueprintAssignable)
-	FGetGrapple OnGetGrapple;
+		FStartMoving OnStartMoving;
 
 	UPROPERTY(BlueprintAssignable)
-	FGetFist OnGetFist;
+		FGetGrapple OnGetGrapple;
 
 	UPROPERTY(BlueprintAssignable)
-	FFireProjectile OnFireProjectile;
+		FGetFist OnGetFist;
 
 	UPROPERTY(BlueprintAssignable)
-	FResetProjectile OnResetProjectile;
+		FFireProjectile OnFireProjectile;
 
 	UPROPERTY(BlueprintAssignable)
-	FFireGrapple OnFireGrapple;
+		FResetProjectile OnResetProjectile;
 
 	UPROPERTY(BlueprintAssignable)
-	FResetGrapple OnResetGrapple;
+		FFireGrapple OnFireGrapple;
 
 	UPROPERTY(BlueprintAssignable)
-	FGrappleEquiped OnGrappleEquiped;
+		FResetGrapple OnResetGrapple;
 
 	UPROPERTY(BlueprintAssignable)
-	FFistEquiped OnFistEquiped;
+		FGrappleEquiped OnGrappleEquiped;
+
+	UPROPERTY(BlueprintAssignable)
+		FFistEquiped OnFistEquiped;
 
 	UPROPERTY()
-	FHasReachPosition OnLocationReach;
+		FHasReachPosition OnLocationReach;
 
 	UFUNCTION(BlueprintCallable)
-	bool CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable, bool _walk, FVector _directionToWatch, bool _hasToRotate);
+		bool CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable, bool _walk, FVector _directionToWatch, bool _hasToRotate);
 
 	UFUNCTION()
-	bool GoToLocation();
+		bool GoToLocation();
 
 	void RotateCharacter();
 
 	UPROPERTY(BlueprintReadOnly)
-	bool IsWalking;
+		bool IsWalking;
 };

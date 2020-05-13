@@ -232,7 +232,7 @@ void AGolemProjectCharacter::Jump()
 			WallJumpEvent();
 		}
 	}
-	else if (PushingComponent && !PushingComponent->GetIsPushingObject())
+	else if (PushingComponent == nullptr || !PushingComponent->GetIsPushingObject())
 	{
 		if (!HasAlreadyMove)
 		{

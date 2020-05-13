@@ -76,7 +76,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			FVector start(m_character->GetActorLocation() + FVector::DownVector * distanceFromCenterPlayerToStart);
 			FVector end(start + FVector::DownVector * distanceFromStartToEnd);
 			FHitResult hitResult;
-			if (UKismetSystemLibrary::CapsuleTraceSingle(world, start, end, capsuleRadius, capsuleHalfHeight, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::ForOneFrame, hitResult, true))
+			if (UKismetSystemLibrary::CapsuleTraceSingle(world, start, end, capsuleRadius, capsuleHalfHeight, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 			{
 				CancelDashDown();
 			}
@@ -170,7 +170,6 @@ void UDashComponent::CancelDashDown()
 	{
 		m_character->IsDashingDown = false;
 		goDown = false;
-		HelperLibrary::Print("sdkfnsdjf");
 	}
 }
 
