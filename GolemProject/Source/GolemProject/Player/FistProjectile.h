@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FName BoucingTag;
 
+	UPROPERTY(BlueprintReadOnly)
+	class AGolemProjectCharacter* character;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -42,10 +45,13 @@ public:
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return MeshComponent; };
 
 	UFUNCTION(Blueprintcallable)
-	void LaunchFist(const FVector& _direction, bool _shouldBounce, float _maxDistance);
+	void LaunchFist(const FVector& _direction, bool _shouldBounce, float _maxDistance, class AGolemProjectCharacter* _character);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_DestructionFistFX_BP();
+
+	UFUNCTION()
+	void ActivateFX();
 
 	UFUNCTION(Blueprintcallable)
 	const float GetRemainingTimeBeforeDestroy();
