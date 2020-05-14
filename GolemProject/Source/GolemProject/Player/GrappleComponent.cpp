@@ -66,6 +66,8 @@ void UGrappleComponent::BeginPlay()
 		{
 			PlayerCameraManager = ctrl->PlayerCameraManager;
 		}
+
+		mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &UGrappleComponent::OnBeginOverlap);
 	}
 	isColorRed = true;
 	HasCreatedTarget = false;
@@ -404,7 +406,6 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					IsSwinging = true;
 					if (mCharacter->GetCustomCapsuleComponent())
 					{
-						mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &UGrappleComponent::OnBeginOverlap);
 						mCharacter->GetCustomCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 					}
 					//Reset dash when the player grappled something
@@ -412,8 +413,6 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 						dashComp->ResetDashInAir();
 				}
 			}
-
-			CheckGround();
 		}
 		else
 		{
@@ -430,6 +429,13 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				swingPhysic->ReduceRope();
 
 			swingPhysic->Tick(DeltaTime);
+
+			if (bDestroyCustomPhy)
+			{
+				delete swingPhysic;
+				swingPhysic = nullptr;
+				bDestroyCustomPhy = false;
+			}
 		}
 
 	}
@@ -440,11 +446,9 @@ void UGrappleComponent::StopSwingPhysics(const bool& _comingBack)
 	if (swingPhysic && currentProjectile)
 	{
 		bIsAssisted = false;
-		delete swingPhysic;
-		swingPhysic = nullptr;
+		bDestroyCustomPhy = true;
 		IsSwinging = false;
 		currentProjectile->SetComingBack(_comingBack);
-		mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.RemoveAll(this);
 		mCharacter->GetCustomCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
@@ -466,32 +470,25 @@ void UGrappleComponent::StopSwingPhysicsOnDeath()
 	//}
 }
 
-void UGrappleComponent::CheckGround()
+bool UGrappleComponent::CheckGround(FVector _impactNormal)
 {
+	bool bStopSwingPhysics = false;
 	if (world)
 	{
 		if (mCharacter && mCharacter->GetCapsuleComponent())
 		{
-			float height = mCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - radiusOnGround * 0.5f;
-			FVector location = mCharacter->GetActorLocation() - mCharacter->GetActorUpVector() * height;
-
-			TArray<AActor*>OutActors;
-			TArray<AActor*>ActorsToIgnore;
-			TArray<TEnumAsByte<EObjectTypeQuery>>ObjectTypes;
-			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
-			ActorsToIgnore.Add(mCharacter);
-
-			if (UKismetSystemLibrary::SphereOverlapActors(world, location, radiusOnGround, ObjectTypes, NULL, ActorsToIgnore, OutActors))
+			float dot = FVector::DotProduct(mCharacter->GetActorForwardVector(), _impactNormal);
+			
+			if (FMath::Abs(dot) < 0.1f)
 			{
-				if (swingPhysic)
-					StopSwingPhysics();
-
-				if (currentProjectile)
-					currentProjectile->SetComingBack(true);
+				FRotator rotFinal = FRotator::ZeroRotator;
+				rotFinal.Yaw = mCharacter->GetActorRotation().Yaw;
+				mCharacter->SetActorRotation(rotFinal);
+				bStopSwingPhysics = true;
 			}
 		}
 	}
+	return bStopSwingPhysics;
 }
 
 void UGrappleComponent::DeleteHelpingAim()
@@ -547,7 +544,7 @@ void UGrappleComponent::AttractCharacter()
 	tempDir = mDirection;
 	if (mCharacter && mCharacter->GetCharacterMovement())
 	{
-		if(!bIsAttracting)
+		if (!bIsAttracting)
 			mCharacter->StartingAttractionEvent();
 
 		bIsAttracting = true;
@@ -578,10 +575,47 @@ void UGrappleComponent::AttractCharacter()
 
 void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (swingPhysic)
+
+	TArray<FHitResult> AllResults;
+
+	// Get the location of this actor
+	auto Start = mCharacter->GetActorLocation();
+	// Get the location of the other component
+	auto End = OtherComp->GetComponentLocation();
+	
+	// Now do a spherical sweep to find the overlap
+	GetWorld()->SweepMultiByObjectType(
+		AllResults,
+		Start,
+		End,
+		mCharacter->GetActorQuat(),
+		FCollisionObjectQueryParams::AllObjects,
+		FCollisionShape::MakeCapsule(
+			mCharacter->GetCustomCapsuleComponent()->GetScaledCapsuleRadius(), 
+			mCharacter->GetCustomCapsuleComponent()->GetScaledCapsuleHalfHeight()),
+		FCollisionQueryParams::FCollisionQueryParams(false)
+	);
+
+	// Finally check which hit result is the one from this event
+	for (auto HitResult : AllResults)
 	{
-		HelperLibrary::Print("on begin overlap ");
-		swingPhysic->InvertVelocity();
+		if (OtherComp->GetUniqueID() == HitResult.GetComponent()->GetUniqueID()) {
+			
+			// A component with the same UniqueID means we found our overlap!
+
+			// Do your stuff here, using info from 'HitResult'
+			if (CheckGround(HitResult.ImpactNormal))
+			{
+				if (swingPhysic)
+					StopSwingPhysics();
+				return;
+			}
+			else
+			{
+				if (swingPhysic)
+					swingPhysic->InvertVelocity(HitResult.ImpactNormal);
+			}
+		}
 	}
 }
 
@@ -592,7 +626,7 @@ void UGrappleComponent::SetClimb(bool _isClimbing) {
 	bIsClimbing = _isClimbing;
 };
 
- void UGrappleComponent::StopClimb() {
+void UGrappleComponent::StopClimb() {
 	mCharacter->EndReducingRopeEvent();
 	bIsClimbing = false;
 };

@@ -37,6 +37,7 @@ private:
 	bool bIsAssisted = false;
 	bool bIsClimbing = false;
 	bool bIsAttracting = false;
+	bool bDestroyCustomPhy = false;
 	float accuracy = 100000.0f;
 
 	//values to edit
@@ -62,7 +63,7 @@ private:
 	float releaseForce = 1.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float radiusOnGround = 25.0f;
+	float radiusOnGround = 17.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "Swing Render", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ARope> ropeClass;
@@ -178,7 +179,7 @@ public:
 
 	void StopSwingPhysicsOnDeath();
 		
-	void CheckGround();
+	bool CheckGround(FVector _impactNormal);
 
 	UPROPERTY(BlueprintReadOnly)
 	bool isAiming;
