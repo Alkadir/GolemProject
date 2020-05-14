@@ -66,19 +66,16 @@ void AFistProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		}
 
 	}
-	if (UWorld* world = GetWorld())
-	{
-		bHasStopped = true;
-		world->GetTimerManager().SetTimer(TimerHandleFXDisappear, this, &AFistProjectile::Event_DestructionFistFX_BP, TimerDisappear - 1.0f, false);
-		world->GetTimerManager().SetTimer(TimerHandleDisappear, this, &AFistProjectile::DestroyFist, TimerDisappear, false);
-	}
+	bHasStopped = true;
+	//ActivateFX();
+	//world->GetTimerManager().SetTimer(TimerHandleFXDisappear, this, &AFistProjectile::ActivateFX, TimerDisappear - 1.0f, false);
 }
 
 // Called every frame
 void AFistProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (distanceTravelled < maxDistance)
+	/*if (distanceTravelled < maxDistance)
 	{
 		distanceTravelled += FVector::Dist(lastPosition, MeshComponent->GetComponentLocation());
 	}
@@ -86,10 +83,10 @@ void AFistProjectile::Tick(float DeltaTime)
 	{
 		DestroyFist();
 	}
-	lastPosition = MeshComponent->GetComponentLocation();
+	lastPosition = MeshComponent->GetComponentLocation();*/
 }
 
-void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce, float _maxDistance)
+void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce, float _maxDistance, AGolemProjectCharacter* _character)
 {
 	Direction = _direction;
 	if (ProjectileComponent)
@@ -97,7 +94,14 @@ void AFistProjectile::LaunchFist(const FVector& _direction, bool _shouldBounce, 
 		ProjectileComponent->Velocity = Direction * Speed;
 		lastPosition = MeshComponent->GetComponentLocation();
 		maxDistance = _maxDistance;
+		character = _character;
+		SetLifeSpan(_maxDistance / Speed);
 	}
+}
+
+void AFistProjectile::ActivateFX()
+{
+	Event_DestructionFistFX_BP();
 }
 
 const float AFistProjectile::GetRemainingTimeBeforeDestroy()
