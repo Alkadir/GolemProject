@@ -79,7 +79,7 @@ AGolemProjectCharacter::AGolemProjectCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 	customCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("capsule"));
-	customCapsule->InitCapsuleSize(42.f, 96.0f);
+	customCapsule->InitCapsuleSize(43.0f, 97.0f);
 	customCapsule->SetupAttachment(RootComponent);
 }
 
