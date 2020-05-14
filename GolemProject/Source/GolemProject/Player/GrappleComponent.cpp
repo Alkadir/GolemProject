@@ -473,13 +473,14 @@ void UGrappleComponent::StopSwingPhysicsOnDeath()
 bool UGrappleComponent::CheckGround(FVector _impactNormal)
 {
 	bool bStopSwingPhysics = false;
+	float angle = 0.5f;
 	if (world)
 	{
 		if (mCharacter && mCharacter->GetCapsuleComponent())
 		{
 			float dot = FVector::DotProduct(mCharacter->GetActorForwardVector(), _impactNormal);
 			
-			if (FMath::Abs(dot) < 0.1f)
+			if (FMath::Abs(dot) < angle)
 			{
 				FRotator rotFinal = FRotator::ZeroRotator;
 				rotFinal.Yaw = mCharacter->GetActorRotation().Yaw;
@@ -604,7 +605,7 @@ void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 			// A component with the same UniqueID means we found our overlap!
 
 			// Do your stuff here, using info from 'HitResult'
-			if (CheckGround(HitResult.ImpactNormal))
+			if (CheckGround(HitResult.Normal))
 			{
 				if (swingPhysic)
 					StopSwingPhysics();
@@ -613,7 +614,7 @@ void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 			else
 			{
 				if (swingPhysic)
-					swingPhysic->InvertVelocity(HitResult.ImpactNormal);
+					swingPhysic->InvertVelocity(HitResult.Normal);
 			}
 		}
 	}
