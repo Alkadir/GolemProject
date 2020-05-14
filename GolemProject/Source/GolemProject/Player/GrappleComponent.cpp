@@ -400,10 +400,12 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMinLength(minDistanceSwinging);
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
+
 					IsSwinging = true;
 					if (mCharacter->GetCustomCapsuleComponent())
 					{
 						mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &UGrappleComponent::OnBeginOverlap);
+						mCharacter->GetCustomCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 					}
 					//Reset dash when the player grappled something
 					if (UDashComponent* dashComp = mCharacter->FindComponentByClass<UDashComponent>())
@@ -443,6 +445,7 @@ void UGrappleComponent::StopSwingPhysics(const bool& _comingBack)
 		IsSwinging = false;
 		currentProjectile->SetComingBack(_comingBack);
 		mCharacter->GetCustomCapsuleComponent()->OnComponentBeginOverlap.RemoveAll(this);
+		mCharacter->GetCustomCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

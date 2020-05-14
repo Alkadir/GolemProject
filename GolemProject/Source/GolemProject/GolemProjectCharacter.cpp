@@ -177,6 +177,8 @@ void AGolemProjectCharacter::BeginPlay()
 
 	HasAlreadyMove = false;
 	IsDashingDown = false;
+
+	customCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
