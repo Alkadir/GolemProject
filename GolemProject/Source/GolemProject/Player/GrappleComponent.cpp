@@ -478,17 +478,12 @@ bool UGrappleComponent::CheckGround(FVector _impactNormal)
 	float angle = 0.5f;
 	if (world)
 	{
-		if (mCharacter && mCharacter->GetCapsuleComponent())
+		if (rope && _impactNormal.Z > angle)
 		{
-			float dot = FVector::DotProduct(mCharacter->GetActorForwardVector(), _impactNormal);
-			
-			if (FMath::Abs(dot) < angle)
-			{
 				FRotator rotFinal = FRotator::ZeroRotator;
 				rotFinal.Yaw = mCharacter->GetActorRotation().Yaw;
 				mCharacter->SetActorRotation(rotFinal);
 				bStopSwingPhysics = true;
-			}
 		}
 	}
 	return bStopSwingPhysics;
@@ -585,7 +580,7 @@ void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 	auto Start = mCharacter->GetActorLocation();
 	// Get the location of the other component
 	auto End = OtherComp->GetComponentLocation();
-	
+
 	// Now do a spherical sweep to find the overlap
 	GetWorld()->SweepMultiByObjectType(
 		AllResults,
@@ -594,7 +589,7 @@ void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 		mCharacter->GetActorQuat(),
 		FCollisionObjectQueryParams::AllObjects,
 		FCollisionShape::MakeCapsule(
-			mCharacter->GetCustomCapsuleComponent()->GetScaledCapsuleRadius(), 
+			mCharacter->GetCustomCapsuleComponent()->GetScaledCapsuleRadius(),
 			mCharacter->GetCustomCapsuleComponent()->GetScaledCapsuleHalfHeight()),
 		FCollisionQueryParams::FCollisionQueryParams(false)
 	);
@@ -603,7 +598,7 @@ void UGrappleComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 	for (auto HitResult : AllResults)
 	{
 		if (OtherComp->GetUniqueID() == HitResult.GetComponent()->GetUniqueID()) {
-			
+
 			// A component with the same UniqueID means we found our overlap!
 
 			// Do your stuff here, using info from 'HitResult'
