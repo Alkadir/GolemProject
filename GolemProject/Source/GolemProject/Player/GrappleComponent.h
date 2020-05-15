@@ -61,6 +61,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float releaseForce = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float reduceRopeSpeed = 300.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
+	float frameRateMin = 30.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float radiusOnGround = 17.0f;
