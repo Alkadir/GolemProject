@@ -97,8 +97,6 @@ void UDashComponent::Dash(FVector _direction)
 				dashForce = ForceDashInTheAir;
 			}
 			CharacterMovementCmpt->GroundFriction = 0.0f;
-			CurrentDirection = _direction;
-			CurrentDirection.Z = 0.0f;
 			CurrentVelocity = m_character->GetVelocity().Size() * _direction;
 			m_character->LaunchCharacter(_direction * dashForce, false, false);
 			isDashing = true;
