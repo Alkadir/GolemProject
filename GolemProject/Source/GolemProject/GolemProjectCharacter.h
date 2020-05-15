@@ -8,6 +8,18 @@
 #include "Interfaces/Interactable.h"
 #include "GolemProjectCharacter.generated.h"
 
+
+USTRUCT()
+struct FLaunchInfo
+{
+	GENERATED_BODY()
+		UPROPERTY()
+		FVector launchVelocity;
+	bool bXYOverride;
+	bool bZOverride;
+};
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartMoving);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetGrapple);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetFist);
@@ -25,6 +37,7 @@ class AGolemProjectCharacter : public ACharacter
 
 private:
 
+	TArray<FLaunchInfo> launchInfos;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Skills", meta = (AllowPrivateAccess = "true"))
 		bool isGrappleSkillEnabled = false;
 
@@ -186,6 +199,8 @@ protected:
 
 public:
 	AGolemProjectCharacter();
+
+	virtual void LaunchCharacter(FVector LaunchVelocity, bool bXYOverride, bool bZOverride) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hud")
 		TSubclassOf<class UUserWidget>  sightHudClass;

@@ -402,6 +402,8 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					swingPhysic->SetMinLength(minDistanceSwinging);
 					swingPhysic->SetMaxLength(maxDistanceSwinging);
 					swingPhysic->SetReleaseForce(releaseForce);
+					swingPhysic->SetReduceRopeSpeed(reduceRopeSpeed);
+					swingPhysic->SetFrameRateMin(frameRateMin);
 
 					IsSwinging = true;
 					if (mCharacter->GetCustomCapsuleComponent())

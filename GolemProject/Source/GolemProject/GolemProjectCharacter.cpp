@@ -28,10 +28,12 @@
 #include "Player/WallMechanicalComponent.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
+#include "Containers/Array.h"
 //#include "Player/SlowMoComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGolemProjectCharacter
+
 
 AGolemProjectCharacter::AGolemProjectCharacter()
 {
@@ -215,6 +217,20 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 	{
 		RotateCharacter();
 	}
+	if (launchInfos.Num() > 0)
+	{
+		Super::LaunchCharacter(launchInfos[0].launchVelocity, launchInfos[0].bXYOverride, launchInfos[0].bZOverride);
+		launchInfos.RemoveAt(0);
+	}
+}
+
+void AGolemProjectCharacter::LaunchCharacter(FVector LaunchVelocity, bool bXYOverride, bool bZOverride)
+{
+	FLaunchInfo launchInfo;
+	launchInfo.bXYOverride = bZOverride;
+	launchInfo.bXYOverride = bXYOverride;
+	launchInfo.launchVelocity = LaunchVelocity;
+	launchInfos.Add(launchInfo);
 }
 
 void AGolemProjectCharacter::Jump()
