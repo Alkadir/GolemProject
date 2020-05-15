@@ -227,7 +227,7 @@ void AGolemProjectCharacter::Tick(float _deltaTime)
 void AGolemProjectCharacter::LaunchCharacter(FVector LaunchVelocity, bool bXYOverride, bool bZOverride)
 {
 	FLaunchInfo launchInfo;
-	launchInfo.bXYOverride = bZOverride;
+	launchInfo.bZOverride = bZOverride;
 	launchInfo.bXYOverride = bXYOverride;
 	launchInfo.launchVelocity = LaunchVelocity;
 	launchInfos.Add(launchInfo);
