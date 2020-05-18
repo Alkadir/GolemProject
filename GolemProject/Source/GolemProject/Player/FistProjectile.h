@@ -22,7 +22,7 @@ protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	float Speed;
 
 	UPROPERTY(EditAnywhere, Category = Destroy, meta = (AllowPrivateAccess = "true"))
@@ -45,7 +45,7 @@ public:
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() { return MeshComponent; };
 
 	UFUNCTION(Blueprintcallable)
-	void LaunchFist(const FVector& _direction, bool _shouldBounce, float _maxDistance, class AGolemProjectCharacter* _character);
+	void LaunchFist(const FVector& _direction, bool _shouldBounce, float _maxDistance, float _maxSpeed, class AGolemProjectCharacter* _character);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Event_DestructionFistFX_BP();
