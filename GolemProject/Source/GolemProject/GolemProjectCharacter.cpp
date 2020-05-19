@@ -740,6 +740,7 @@ bool AGolemProjectCharacter::CanGoToLocation(FVector _location, bool _shoulKeepC
 		if (GetCharacterMovement() != nullptr)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+			GetCharacterMovement()->StopMovementImmediately();
 		}
 		IsWalking = _walk;
 		return true;
