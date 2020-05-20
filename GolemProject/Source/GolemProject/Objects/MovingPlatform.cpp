@@ -183,14 +183,19 @@ void AMovingPlatform::MoveLine(float dt)
 		float dist = distanceToGo;
 		if (directionToNextCheckpoint.SizeSquared() < dist * dist)
 		{
-			if (platformType != EMovingPlatformType::Once)
-			{
-				dist = directionToNextCheckpoint.Size();
-			}
+			dist = directionToNextCheckpoint.Size();
+			SetActorLocation(worldCheckpoint[nextIndex]);
 			SetNextIndex();
+			if (!isActivate)
+			{
+				distanceToGo = 0.f;
+			}
 		}
-		velocity = directionToNextCheckpoint.GetSafeNormal() * dist;
-		SetActorLocation(GetActorLocation() + velocity);
+		else
+		{
+			velocity = directionToNextCheckpoint.GetSafeNormal() * dist;
+			SetActorLocation(GetActorLocation() + velocity);
+		}
 		distanceToGo -= dist;
 	}
 }
