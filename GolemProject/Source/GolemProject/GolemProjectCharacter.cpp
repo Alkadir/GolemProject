@@ -130,7 +130,6 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AGolemProjectCharacter::BeginPlay()
 {
-	Super::BeginPlay();
 	//currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
@@ -181,6 +180,8 @@ void AGolemProjectCharacter::BeginPlay()
 	IsDashingDown = false;
 
 	customCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Super::BeginPlay();
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
@@ -678,37 +679,20 @@ void AGolemProjectCharacter::ActivateDeath(bool _activate)
 	{
 		mGrapple->DeleteHelpingAim();
 		mGrapple->StopSwingPhysicsOnDeath();
-		/*if (mGrapple->GetSwingPhysics())
-		{
-			mGrapple->StopSwingPhysics();
-		}*/
 	}
 	ChangeCameraReleased();
 	if (_activate)
 	{
 		if (capsule)
 		{
-			//capsule->SetCollisionProfileName("NoCollision");
-			//capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			capsule->SetCollisionProfileName("NoCollision");
+			capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		FollowCamera->DetachFromParent(true);
 		GetCharacterMovement()->StopMovementImmediately();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		GetMesh()->SetSimulatePhysics(true);
 	}
-	/*else
-	{
-		if (capsule)
-		{
-			capsule->SetCollisionProfileName("Pawn");
-			//capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		}
-		GetMesh()->SetSimulatePhysics(false);
-		GetMesh()->SetAllBodiesSimulatePhysics(false);
-		GetMesh()->ResetAllBodiesSimulatePhysics();
-		GetMesh()->RecreatePhysicsState();
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	}*/
 }
 
 void AGolemProjectCharacter::ResetMeshOnRightPlace()
