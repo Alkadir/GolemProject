@@ -166,6 +166,7 @@ void UDashComponent::CancelDashDown()
 {
 	if (CharacterMovementCmpt != nullptr && m_character != nullptr)
 	{
+		m_character->GroundImpactEvent();
 		m_character->IsDashingDown = false;
 		goDown = false;
 	}
