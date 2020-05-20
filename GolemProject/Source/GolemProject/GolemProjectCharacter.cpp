@@ -130,7 +130,6 @@ void AGolemProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AGolemProjectCharacter::BeginPlay()
 {
-	Super::BeginPlay();
 	//currentSightWidget = CreateWidget(GetWorld(), sightHudClass);
 	dashComponent = FindComponentByClass<UDashComponent>();
 	mGrapple = FindComponentByClass<UGrappleComponent>();
@@ -181,6 +180,8 @@ void AGolemProjectCharacter::BeginPlay()
 	IsDashingDown = false;
 
 	customCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Super::BeginPlay();
 }
 
 void AGolemProjectCharacter::Tick(float _deltaTime)
