@@ -297,6 +297,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Wall Jump Action Event"), Category = Events)
 		void WallJumpEvent();
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Ground Impact Action Event"), Category = Events)
+		void GroundImpactEvent();
+
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 
 	void StopPushBloc();
