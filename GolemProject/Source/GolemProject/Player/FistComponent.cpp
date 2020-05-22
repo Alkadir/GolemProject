@@ -114,7 +114,7 @@ void UFistComponent::GoToDestination()
 				currentProjectile->SetOwner(mCharacter);
 				currentProjectile->LaunchFist(direction, true, maxDistance, speedMax, mCharacter);
 				currentProjectile = nullptr;
-				world->GetTimerManager().SetTimer(TimerHandleFire, this, &UFistComponent::ResetFire, (maxDistance / speedMax) + 0.75f, false);
+				world->GetTimerManager().SetTimer(TimerHandleFire, this, &UFistComponent::ResetFire, (maxDistance / speedMax) + 0.60f, false);
 				CanFire = false;
 				mCharacter->FireEvent();
 				mCharacter->OnFireProjectile.Broadcast();
