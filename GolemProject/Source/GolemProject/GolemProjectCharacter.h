@@ -342,6 +342,9 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Debug")
 		bool showCursor = false;
 
+	UFUNCTION(BlueprintCallable)
+		void ShowMouseCursor(bool _showCursor) { showCursor = _showCursor; pc->bShowMouseCursor = _showCursor; }
+
 	UPROPERTY(BlueprintAssignable)
 		FStartMoving OnStartMoving;
 

@@ -180,7 +180,6 @@ void AGolemProjectCharacter::BeginPlay()
 	IsDashingDown = false;
 
 	customCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 	Super::BeginPlay();
 }
 
