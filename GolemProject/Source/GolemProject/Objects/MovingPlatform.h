@@ -162,5 +162,6 @@ public:
 		void SetSpawner(AActor* _spawner);
 	virtual void SetSpawner_Implementation(AActor* _spawner) override;
 
-
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Activate"), Category = Events)
+	void ActivateEvent();
 };
