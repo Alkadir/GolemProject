@@ -337,6 +337,7 @@ void AMovingPlatform::SetResponseToPawn(bool collideWith)
 	{
 		if (collideWith)
 		{
+			ActivateEvent();
 			isCollidingWithPlayer = true;
 			meshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 		}
