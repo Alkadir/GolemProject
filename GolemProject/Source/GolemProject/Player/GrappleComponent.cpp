@@ -38,7 +38,7 @@ UGrappleComponent::UGrappleComponent()
 void UGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	//SetTickGroup(ETickingGroup::TG_PrePhysics);
+	SetTickGroup(ETickingGroup::TG_PrePhysics);
 	AActor* owner = GetOwner();
 	mCharacter = Cast<AGolemProjectCharacter>(owner);
 	if (mCharacter)
