@@ -106,9 +106,11 @@ void AMovingPlatform::Init()
 		SetActorLocation(worldCheckpoint[currentIndex]);
 	}
 	isPause = false;
+	HasBeenActivated = true;
 	meshComponent = FindComponentByClass<UMeshComponent>();
 	if (meshComponent && activatedByHand)
 	{
+		HasBeenActivated = false;
 		meshComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMovingPlatform::OverlapActivation);
 		meshComponent->OnComponentHit.AddUniqueDynamic(this, &AMovingPlatform::HitActivation);
 		SetResponseToPawn(false);
@@ -338,6 +340,7 @@ void AMovingPlatform::SetResponseToPawn(bool collideWith)
 		if (collideWith)
 		{
 			ActivateEvent();
+			HasBeenActivated = true;
 			isCollidingWithPlayer = true;
 			meshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 		}
