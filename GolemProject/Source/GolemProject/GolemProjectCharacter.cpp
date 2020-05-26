@@ -504,7 +504,9 @@ void AGolemProjectCharacter::MoveForward(float Value)
 		{
 			if (mGrapple && FollowCamera && mGrapple->GetSwingPhysics())
 			{
-				mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetForwardVector() * m_valueForward);
+				FVector temp = FollowCamera->GetForwardVector();
+				temp.Z = 0.f;
+				mGrapple->GetSwingPhysics()->AddForceMovement(temp.GetSafeNormal() * m_valueForward);
 			}
 			else
 			{
@@ -559,7 +561,9 @@ void AGolemProjectCharacter::MoveRight(float Value)
 
 		if (mGrapple && mGrapple->GetSwingPhysics() && FollowCamera)
 		{
-			mGrapple->GetSwingPhysics()->AddForceMovement(FollowCamera->GetRightVector() * m_valueRight);
+			FVector temp = FollowCamera->GetRightVector();
+			temp.Z = 0.f;
+			mGrapple->GetSwingPhysics()->AddForceMovement(temp.GetSafeNormal() * m_valueRight);
 		}
 		else
 		{
