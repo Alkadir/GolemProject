@@ -103,9 +103,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 		AActor* spawner = nullptr;
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
-		bool activatedByHand = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
 		float activateTime = 5.f;
 	//value between 0 and 1
@@ -127,6 +124,9 @@ protected:
 
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
+		bool activatedByHand = false;
 
 	UFUNCTION(BlueprintCallable, Category = "Platform")
 		const FVector GetPlatformVelocity()const { return velocity; }
@@ -164,4 +164,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Activate"), Category = Events)
 	void ActivateEvent();
+
+	bool HasBeenActivated;
 };

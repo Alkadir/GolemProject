@@ -20,6 +20,7 @@
 #include "DrawDebugHelpers.h"
 #include "GrappleComponent.h"
 #include "SwingPhysic.h"
+#include "Objects/MovingPlatform.h"
 
 // Sets default values for this component's properties
 UFistComponent::UFistComponent()
@@ -216,6 +217,11 @@ void UFistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 								if (IInteractable* interactable = Cast<IInteractable>(hitResult.GetActor()))
 								{
 									if (interactable->CanBeActivatedByFist)
+										CanInteract = true;
+								}
+								if (AMovingPlatform* platform = Cast<AMovingPlatform>(hitResult.GetActor()))
+								{
+									if (platform->activatedByHand && !platform->HasBeenActivated)
 										CanInteract = true;
 								}
 							}
