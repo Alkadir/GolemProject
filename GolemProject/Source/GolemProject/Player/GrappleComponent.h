@@ -48,7 +48,7 @@ private:
 	float maxDistanceSwinging = 1650.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
-	float scaleGravity = 2.8f;
+	float scaleGravity = 3.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Swing Physics", meta = (AllowPrivateAccess = "true"))
 	float friction = 0.9998f;

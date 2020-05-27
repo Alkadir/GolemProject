@@ -430,7 +430,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			if (bIsClimbing)
 				swingPhysic->ReduceRope();
 
-			//swingPhysic->Tick(DeltaTime);
+			swingPhysic->Tick(DeltaTime);
 
 			if (bDestroyCustomPhy)
 			{
