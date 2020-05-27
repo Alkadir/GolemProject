@@ -672,7 +672,6 @@ bool AGolemProjectCharacter::IsCharacterDead()
 	return false;
 }
 
-//WIP DO NOT TOUCH
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
 	UCapsuleComponent* capsule = GetCapsuleComponent();
@@ -696,13 +695,6 @@ void AGolemProjectCharacter::ActivateDeath(bool _activate)
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		GetMesh()->SetSimulatePhysics(true);
 	}
-}
-
-void AGolemProjectCharacter::ResetMeshOnRightPlace()
-{
-	GetMesh()->SetupAttachment(GetCapsuleComponent());
-	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
-	GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
 }
 
 bool AGolemProjectCharacter::IsCharacterSwinging()
