@@ -464,6 +464,11 @@ void AGolemProjectCharacter::ChangeCameraPressed()
 
 void AGolemProjectCharacter::ChangeCameraReleased()
 {
+	if (WallMechanicalComponent != nullptr && !WallMechanicalComponent->CanAim && WantToAim)
+	{
+		WantToAim = false;
+		return;
+	}
 	if (PushingComponent && PushingComponent->GetIsPushingObject())
 	{
 		return;
