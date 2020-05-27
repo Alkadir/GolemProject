@@ -705,7 +705,7 @@ bool AGolemProjectCharacter::IsCharacterSwinging()
 bool AGolemProjectCharacter::CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable, bool _walk, FVector _directionToWatch, bool _hasToRotate)
 {
 	UNavigationPath* path = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), GetActorLocation(), _location, GetController());
-	if (path != nullptr && path->PathPoints.Num() > 0)
+	if (path != nullptr && path->PathPoints.Num() > 0 && !GetCharacterMovement()->IsFalling())
 	{
 		KeepControllerDisable = _shoulKeepControllerDisable;
 		NeedToReachLocation = true;
