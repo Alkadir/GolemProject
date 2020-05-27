@@ -394,7 +394,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 					mCharacter->ChangeToFist();
 
 					swingPhysic = new USwingPhysic(this);
-
+					
 					swingPhysic->SetScaleGravity(scaleGravity);
 					swingPhysic->SetFriction(friction);
 					swingPhysic->SetForceMovement(forceMovement);
@@ -430,7 +430,7 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			if (bIsClimbing)
 				swingPhysic->ReduceRope();
 
-			swingPhysic->Tick(DeltaTime);
+			//swingPhysic->Tick(DeltaTime);
 
 			if (bDestroyCustomPhy)
 			{
