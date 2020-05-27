@@ -672,7 +672,6 @@ bool AGolemProjectCharacter::IsCharacterDead()
 	return false;
 }
 
-//WIP DO NOT TOUCH
 void AGolemProjectCharacter::ActivateDeath(bool _activate)
 {
 	UCapsuleComponent* capsule = GetCapsuleComponent();
@@ -698,13 +697,6 @@ void AGolemProjectCharacter::ActivateDeath(bool _activate)
 	}
 }
 
-void AGolemProjectCharacter::ResetMeshOnRightPlace()
-{
-	GetMesh()->SetupAttachment(GetCapsuleComponent());
-	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -97.0f));
-	GetMesh()->SetRelativeRotation(GetCapsuleComponent()->GetComponentRotation());
-}
-
 bool AGolemProjectCharacter::IsCharacterSwinging()
 {
 	return mGrapple != nullptr && mGrapple->IsSwinging;
@@ -713,7 +705,7 @@ bool AGolemProjectCharacter::IsCharacterSwinging()
 bool AGolemProjectCharacter::CanGoToLocation(FVector _location, bool _shoulKeepControllerDisable, bool _walk, FVector _directionToWatch, bool _hasToRotate)
 {
 	UNavigationPath* path = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), GetActorLocation(), _location, GetController());
-	if (path != nullptr && path->PathPoints.Num() > 0)
+	if (path != nullptr && path->PathPoints.Num() > 0 && !GetCharacterMovement()->IsFalling())
 	{
 		KeepControllerDisable = _shoulKeepControllerDisable;
 		NeedToReachLocation = true;
