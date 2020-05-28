@@ -264,8 +264,11 @@ public:
 		void SetLeftHandPosition(FVector newPos) { leftHandPosition = newPos; }
 
 
-	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Dash Action Event"), Category = Events)
-		void DashEvent();
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Dash Start Action Event"), Category = Events)
+		void DashStartEvent();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Dash End Action Event"), Category = Events)
+		void DashEndEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Fire Action Event"), Category = Events)
 		void FireEvent();
