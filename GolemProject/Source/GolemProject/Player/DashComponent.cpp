@@ -49,6 +49,7 @@ void UDashComponent::StopDash()
 		}*/
 		m_character->ResetFriction();
 		isDashing = false;
+		m_character->DashEndEvent();
 	}
 }
 
@@ -102,7 +103,7 @@ void UDashComponent::Dash(FVector _direction)
 			isDashing = true;
 			m_canDash = false;
 
-			m_character->DashEvent();
+			m_character->DashStartEvent();
 
 			if (UWorld* world = GetWorld())
 			{
@@ -124,7 +125,8 @@ bool UDashComponent::DashDown()
 	{
 		CharacterMovementCmpt->Velocity.X = 0.0f;
 		CharacterMovementCmpt->Velocity.Y = 0.0f;
-		m_character->DashEvent();
+		CancelDash();
+		m_character->DashStartEvent();
 		goDown = true;
 		return true;
 	}
@@ -139,9 +141,7 @@ void UDashComponent::CancelDash()
 	}
 	if (m_character != nullptr && CharacterMovementCmpt != nullptr)
 	{
-		CharacterMovementCmpt->StopMovementImmediately();
-		m_character->ResetFriction();
-		isDashing = false;
+		StopDash();
 	}
 }
 
@@ -169,6 +169,7 @@ void UDashComponent::CancelDashDown()
 		m_character->GroundImpactEvent();
 		m_character->IsDashingDown = false;
 		goDown = false;
+		m_character->DashEndEvent();
 	}
 }
 
