@@ -301,7 +301,7 @@ public:
 		void WallJumpEvent();
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Ground Impact Action Event"), Category = Events)
-		void GroundImpactEvent();
+		void GroundImpactEvent(const FVector& impactPoint);
 
 	bool PushBloc(FVector pushingDirection, FVector pushingPosition, FRotator pushingRotation);
 

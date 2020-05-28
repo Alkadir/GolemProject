@@ -76,7 +76,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			world->SpawnActor<AActor>(DashTrailClass, m_character->GetMesh()->GetComponentTransform());
 			FVector start(m_character->GetActorLocation() + FVector::DownVector * distanceFromCenterPlayerToStart);
 			FVector end(start + FVector::DownVector * distanceFromStartToEnd);
-			FHitResult hitResult;
+			
 			if (UKismetSystemLibrary::CapsuleTraceSingle(world, start, end, capsuleRadius, capsuleHalfHeight, TraceTypeQuery1, false, ActorToIgnore, EDrawDebugTrace::None, hitResult, true))
 			{
 				CancelDashDown();
@@ -166,7 +166,7 @@ void UDashComponent::CancelDashDown()
 {
 	if (CharacterMovementCmpt != nullptr && m_character != nullptr)
 	{
-		m_character->GroundImpactEvent();
+		m_character->GroundImpactEvent(hitResult.ImpactPoint);
 		m_character->IsDashingDown = false;
 		goDown = false;
 		m_character->DashEndEvent();

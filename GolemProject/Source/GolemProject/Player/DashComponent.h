@@ -59,6 +59,8 @@ protected:
 
 	FTimerHandle m_timerDash;
 
+	FHitResult hitResult;
+
 	bool goDown;
 
 	void StopDash();
