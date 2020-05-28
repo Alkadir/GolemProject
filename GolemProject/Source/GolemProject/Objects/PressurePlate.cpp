@@ -16,20 +16,18 @@ APressurePlate::APressurePlate()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-	USceneComponent* root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	SetRootComponent(root);
+	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	if (mesh)
+	{
+		SetRootComponent(mesh);
+	}
 
 	boxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Box"));
-	if (boxCollider && root)
+	if (boxCollider && mesh)
 	{
-		boxCollider->SetupAttachment(root);
+		boxCollider->SetupAttachment(mesh);
 	}
 
-	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	if (mesh && root)
-	{
-		mesh->SetupAttachment(root);
-	}
 }
 
 void APressurePlate::BeginPlay()
