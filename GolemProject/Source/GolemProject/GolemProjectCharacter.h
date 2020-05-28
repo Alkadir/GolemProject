@@ -319,8 +319,6 @@ public:
 
 	void ActivateDeath(bool _activate);
 
-	void ResetMeshOnRightPlace();
-
 	UPROPERTY(BlueprintReadOnly)
 		bool IsInteracting;
 
